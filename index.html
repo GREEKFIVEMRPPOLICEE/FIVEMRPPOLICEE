@@ -714,11 +714,13 @@
           // Εμφάνιση καρτών προσωπικού
           let officersHtml = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">';
           cat.officers.forEach(o => {
+            // Το Discord εμφανίζεται μόνο σε admin
+            const discordHtml = isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : '';
             officersHtml += `
               <div class="officer-display-card">
                 <div class="name">${o.firstName || ''} ${o.lastName || ''}</div>
                 <div class="rank">${o.rank || ''}</div>
-                <div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>
+                ${discordHtml}
               </div>
             `;
           });
