@@ -204,7 +204,7 @@
     const auth = getAuth(app);
     const contentDocRef = doc(db, "policeSite", "content");
 
-    // Default content (τα πάντα σε plain text)
+    // Default content (χωρίς προεπιλεγμένες φωτογραφίες)
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -271,6 +271,7 @@
 7. Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».`
         }
       ],
+      photos: [], // ΚΑΜΙΑ προεπιλεγμένη φωτογραφία
       footer: {
         left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
         right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης"
