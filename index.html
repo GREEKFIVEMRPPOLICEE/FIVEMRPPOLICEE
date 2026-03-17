@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ΕΛ.ΑΣ. | Πλήρης Επεξεργασία FiveM RP</title>
+  <!-- Font Awesome 5 -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #e8ecf2;
+      color: #1e1e2f;
+      line-height: 1.5;
+    }
+    /* layout δύο στηλών */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+    /* Πλαϊνό πάνελ επεξεργασίας (κρυφό αρχικά) */
+    .edit-panel {
+      width: 380px;
+      background: #1f2b3a;
+      color: #eef4fc;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    .edit-panel.open {
+      transform: translateX(0);
+    }
+    .panel-header {
+      padding: 20px;
+      background: #0f1a24;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #c9a03d;
+    }
+    .panel-header h3 {
+      font-weight: 600;
+      color: #e4c580;
+      font-size: 1.3rem;
+    }
+    .close-panel-btn {
+      background: transparent;
+      border: none;
+      color: #bdd3ec;
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .panel-content {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .edit-section {
+      margin-bottom: 28px;
+      border-bottom: 1px dashed #3e556b;
+      padding-bottom: 16px;
+    }
+    .edit-section h4 {
+      color: #cfb57c;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .edit-field {
+      margin-bottom: 18px;
+    }
+    .edit-field label {
+      display: block;
+      font-size: 0.85rem;
+      color: #a6c1db;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .edit-field input, .edit-field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #2e3d50;
+      border: 1px solid #5c748b;
+      border-radius: 12px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .edit-field textarea {
+      min-height: 70px;
+    }
+    .edit-field textarea.list-textarea {
+      min-height: 120px;
+    }
+    .panel-footer {
+      padding: 20px;
+      background: #0f1a24;
+      border-top: 1px solid #2d445b;
+      font-size: 0.85rem;
+      color: #96aec9;
+    }
+    /* Κύρια προβολή */
+    .main-view {
+      flex: 1;
+      transition: margin-left 0.3s ease;
+      margin-left: 0;
+      background: #f0f2f5;
+      padding: 20px;
+    }
+    .main-view.shifted {
+      margin-left: 380px;
+    }
+    .site-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      overflow: hidden;
+      border: 1px solid rgba(0,45,85,0.15);
+    }
+    /* κουμπί εναλλαγής πάνελ */
+    .toggle-edit-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1d3e63;
+      border: none;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 60px;
+      box-shadow: 0 8px 18px rgba(0,20,40,0.4);
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #c9a03d;
+      transition: 0.2s;
+    }
+    .toggle-edit-btn:hover {
+      transform: scale(1.08);
+      background: #2c527c;
+    }
+    /* Στυλ προεπισκόπησης – ίδια με πριν */
+    .main-header {
+      background: #0b1a30;
+      background-image: linear-gradient(145deg, #0b1a30 0%, #102b44 100%);
+      padding: 1.2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 4px solid #c9a03d;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .badge-icon {
+      font-size: 2.2rem;
+      color: #e4c580;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .logo-text h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: white;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .logo-text h1 span {
+      color: #e4c580;
+      font-weight: 300;
+      font-size: 1.4rem;
+      margin-left: 5px;
+    }
+    .logo-text .subhead {
+      color: #aac7e0;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      word-spacing: 4px;
+    }
+    .rank-tag {
+      background: rgba(255,215,120,0.15);
+      backdrop-filter: blur(4px);
+      padding: 8px 20px;
+      border-radius: 60px;
+      border: 1px solid #c9a03d;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #f5e2b0;
+      box-shadow: inset 0 0 8px rgba(255,200,80,0.3);
+    }
+    .rank-tag i {
+      margin-right: 8px;
+      color: #cfb263;
+    }
+    .nav-tabs {
+      background: #f8fafd;
+      padding: 0.5rem 2.5rem 0;
+      border-bottom: 1px solid #d4deec;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .nav-tab {
+      padding: 0.9rem 1.8rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #2c3f5c;
+      border-radius: 28px 28px 0 0;
+      background: transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-tab i {
+      color: #5e7a9c;
+    }
+    .nav-tab:hover {
+      background: #e0e9f5;
+      color: #0b1a30;
+    }
+    .nav-tab.active {
+      background: white;
+      border-color: #d4deec;
+      border-bottom: 2px solid white;
+      margin-bottom: -1px;
+      color: #0f3b6a;
+      font-weight: 700;
+    }
+    .nav-tab.active i {
+      color: #c9a03d;
+    }
+    .content-area {
+      padding: 2.5rem;
+      background: white;
+    }
+    .page {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+    .page.active-page {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0.3; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0c2b4a;
+      border-left: 8px solid #c9a03d;
+      padding-left: 1.5rem;
+      margin-bottom: 2rem;
+      margin-top: 0.5rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e3b5c;
+      margin: 1.8rem 0 1rem 0;
+    }
+    .protocol-card {
+      background: #f9fcff;
+      border-radius: 24px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid #e2ecf9;
+      box-shadow: 0 6px 14px rgba(0,32,64,0.03);
+    }
+    .article-list {
+      list-style: none;
+    }
+    .article-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed #d3e2f0;
+      display: flex;
+      gap: 15px;
+      font-weight: 500;
+    }
+    .article-list li::before {
+      content: "▹";
+      color: #c9a03d;
+      font-weight: bold;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .signature-block {
+      background: #e9f0f9;
+      border-radius: 28px;
+      padding: 2rem;
+      font-style: italic;
+      border-left: 6px solid #b5944c;
+    }
+    .cover-image {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0 1rem;
+    }
+    .cover-img-placeholder {
+      max-width: 100%;
+      border-radius: 24px;
+      box-shadow: 0 15px 30px -8px rgba(0,20,40,0.3);
+      border: 1px solid #b0c8dd;
+      background: #ffffff;
+      padding: 5px;
+    }
+    .photo-upload-tool {
+      background: #ecf3fa;
+      border-radius: 60px;
+      padding: 0.8rem 1.8rem;
+      margin: 2.5rem 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid #b3c9df;
+    }
+    .photo-upload-tool input {
+      flex: 2 1 260px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 40px;
+      background: white;
+      border: 1px solid #b8d0e5;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .photo-upload-tool button {
+      background: #1d3e63;
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #c9a03d;
+    }
+    #gallery-area {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      align-items: center;
+    }
+    .gallery-img {
+      max-height: 160px;
+      max-width: 220px;
+      border-radius: 20px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+      border: 3px solid white;
+      object-fit: cover;
+    }
+    .site-footer {
+      background: #0f1f30;
+      color: #b0c9e0;
+      padding: 1.5rem 2.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      border-top: 2px solid #c9a03d;
+    }
+    @media (max-width: 800px) {
+      .grid-2col { grid-template-columns: 1fr; }
+      .edit-panel { width: 100%; }
+      .main-view.shifted { margin-left: 0; }
+      .edit-panel.open { transform: translateX(0); width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Πλαϊνό πάνελ επεξεργασίας -->
+  <div class="edit-panel" id="editPanel">
+    <div class="panel-header">
+      <h3><i class="fas fa-edit"></i> Πλήρης επεξεργασία</h3>
+      <button class="close-panel-btn" id="closePanelBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="panel-content" id="panelContent">
+      <!-- Θα γεμίσει δυναμικά από JS -->
+    </div>
+    <div class="panel-footer">
+      <i class="fas fa-save"></i> Οι αλλαγές αποθηκεύονται αυτόματα
+    </div>
+  </div>
+
+  <!-- Κύρια προβολή -->
+  <div class="main-view" id="mainView">
+    <div class="site-container">
+      <!-- Κεφαλίδα -->
+      <header class="main-header">
+        <div class="logo-area">
+          <i class="fas fa-shield-alt badge-icon"></i>
+          <div class="logo-text">
+            <h1><span id="cover-badge-pre">ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ</span> <span id="cover-span-pre">FIVEM RP</span></h1>
+            <div class="subhead" id="cover-subhead-pre">ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ</div>
+          </div>
+        </div>
+        <div class="rank-tag" id="cover-rank-pre"><i class="fas fa-star"></i> ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ</div>
+      </header>
+
+      <!-- Πλοήγηση -->
+      <div class="nav-tabs">
+        <div class="nav-tab active" data-page="page1"><i class="fas fa-home"></i> ΕΞΩΦΥΛΛΟ</div>
+        <div class="nav-tab" data-page="page2"><i class="fas fa-scroll"></i> ΕΙΣΑΓΩΓΗ</div>
+        <div class="nav-tab" data-page="page3"><i class="fas fa-balance-scale"></i> ΚΩΔΙΚΑΣ</div>
+        <div class="nav-tab" data-page="page4"><i class="fas fa-signal"></i> ΣΗΜΑΤΑ & ΛΗΣΤ.</div>
+        <div class="nav-tab" data-page="page5"><i class="fas fa-handcuffs"></i> ΔΙΚΑΙΩΜΑΤΑ</div>
+        <div class="nav-tab" data-page="page6"><i class="fas fa-car-side"></i> TRAFFIC STOP</div>
+        <div class="nav-tab" data-page="page7"><i class="fas fa-images"></i> ΦΩΤΟΓΡΑΦΙΕΣ</div>
+      </div>
+
+      <!-- Περιεχόμενο σελίδων (γεμίζει δυναμικά, αλλά έχουμε δοχεία) -->
+      <div class="content-area" id="contentArea">
+        <!-- page1 εξώφυλλο -->
+        <div id="page1" class="page active-page">
+          <div class="cover-image">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%230e2b45'/%3E%3Cpath d='M0 360 L800 320 L800 400 L0 400Z' fill='%23b6943e' opacity='0.7'/%3E%3Ctext x='80' y='120' font-family='Arial' font-size='60' font-weight='bold' fill='%23f5e7c8'%3EΠΡΩΤΟΚΟΛΛΟ%3C/text%3E%3Ctext x='80' y='190' font-family='Arial' font-size='40' fill='%23ffffff'%3EΕΛΛΗΝΙΚΗΣ ΑΣΤΥΝΟΜΙΑΣ%3C/text%3E%3Ctext x='80' y='270' font-family='Arial' font-size='36' fill='%23e4c580'%3EΤΑΞΙΑΡΧΟΣ%3C/text%3E%3Ctext x='80' y='320' font-family='Arial' font-size='30' fill='%23ffffff'%3EΔΗΜΗΤΡΗΣ ΓΕΩΡΓΑΝΤΖΕΛΗΣ%3C/text%3E%3Ccircle cx='640' cy='140' r='70' fill='%233f6792' stroke='%23cfb152' stroke-width='8'/%3E%3Ctext x='610' y='160' fill='%23ffdd99' font-size='50' font-family='Arial'%3EΕΛ%3C/text%3E%3Ctext x='620' y='220' fill='%23ffdd99' font-size='30'%3EΑΣ%3C/text%3E%3C/svg%3E"
+                 alt="Εξώφυλλο" class="cover-img-placeholder">
+          </div>
+          <div style="text-align: center; margin: 2rem 0 1rem;">
+            <span id="cover-sticker-pre" style="background: #e4c580; padding: 10px 30px; border-radius: 40px; font-weight: 700; color:#0b1f33; display:inline-block;"><i class="fas fa-certificate"></i> ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ. FIVEM RP  —  ΕΚΔΟΣΗ 2025</span>
+          </div>
+          <div class="protocol-card" style="text-align:center;">
+            <p id="cover-quote-pre" style="font-size:1.4rem;"><i class="fas fa-quote-right" style="color:#c9a03d;"></i> Κράτος δικαίου, ασφάλεια, σεβασμός</p>
+          </div>
+        </div>
+        <!-- page2 εισαγωγή -->
+        <div id="page2" class="page">
+          <h2 id="intro-heading-pre">ΕΙΣΑΓΩΓΗ</h2>
+          <div class="protocol-card" id="intro-paragraphs-pre">
+            <p>Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.</p>
+            <p>Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.</p>
+            <p>Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.</p>
+            <div class="signature-block">Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.</div>
+          </div>
+        </div>
+        <!-- page3 κώδικας δεοντολογίας -->
+        <div id="page3" class="page">
+          <h2 id="deon-heading-pre">ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ ΑΣΤΥΝΟΜΙΚΩΝ</h2>
+          <ul class="article-list" id="deon-list-pre">
+            <li>Υπακούει και προασπίζει τους νόμους.</li>
+            <li>Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.</li>
+            <li>Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.</li>
+            <li>Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.</li>
+            <li>Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.</li>
+          </ul>
+        </div>
+        <!-- page4 σήματα & ληστείες -->
+        <div id="page4" class="page">
+          <h2 id="signals-heading-pre">ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ - ΟΜΗΡΙΕΣ</h2>
+          <div class="grid-2col">
+            <div class="protocol-card">
+              <h3 id="signals-left-heading-pre">Κανόνες σημάτων</h3>
+              <p id="signals-left-text-pre">Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.</p>
+            </div>
+            <div class="protocol-card">
+              <h3 id="signals-right-heading-pre">Ληστείες – Ομηρίες</h3>
+              <ul id="signals-right-list-pre" style="padding-left:1.2rem;">
+                <li>Άφιξη εντός 5 λεπτών</li>
+                <li>2 αστυνομικοί παραπάνω από ληστές</li>
+                <li>Άοπλος διαπραγματευτής</li>
+                <li>Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- page5 δικαιώματα πολίτη -->
+        <div id="page5" class="page">
+          <h2 id="rights-heading-pre">ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ & ΠΡΩΤΟΚΟΛΛΟ ΣΥΛΛΗΨΗΣ</h2>
+          <div class="protocol-card">
+            <h3 id="rights-sub-pre">📋 Υπό κράτηση/σύλληψη</h3>
+            <ul id="rights-list-pre">
+              <li>Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»</li>
+              <li>Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.</li>
+              <li>Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.</li>
+              <li>Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.</li>
+            </ul>
+          </div>
+        </div>
+        <!-- page6 traffic stop -->
+        <div id="page6" class="page">
+          <h2 id="traffic-heading-pre">TRAFFIC STOP</h2>
+          <div class="protocol-card">
+            <p id="traffic-desc-pre"><strong>Τι είναι:</strong> Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.</p>
+            <h3 id="traffic-sub-pre">Διαδικασία:</h3>
+            <ol id="traffic-list-pre" style="margin-left:1.5rem;">
+              <li>Ενημέρωση ασυρμάτου.</li>
+              <li>Κλείδωμα πινακίδας με radar.</li>
+              <li>Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).</li>
+              <li>Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.</li>
+              <li>Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.</li>
+              <li>Έλεγχος MDT, πινακίδων, ποινικού μητρώου.</li>
+              <li>Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».</li>
+            </ol>
+          </div>
+        </div>
+        <!-- page7 φωτογραφίες (ίδια λειτουργία) -->
+        <div id="page7" class="page">
+          <h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>
+          <p>Επικολλήστε URL εικόνας για προσθήκη.</p>
+          <div class="photo-upload-tool">
+            <i class="fas fa-link" style="color:#1d3e63;"></i>
+            <input type="text" id="imageUrlInput" placeholder="https://... .jpg" value="https://images.unsplash.com/photo-1585670149965-2c2b5a8e8b9c?w=200&h=150&fit=crop">
+            <button id="addImageBtn"><i class="fas fa-plus-circle"></i> Προσθήκη</button>
+          </div>
+          <div id="gallery-area"></div>
+        </div>
+      </div>
+
+      <footer class="site-footer">
+        <span id="footer-left-pre">ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας</span>
+        <span id="footer-right-pre">Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Κουμπί άνοιγμα/κλείσιμο πάνελ -->
+  <button class="toggle-edit-btn" id="togglePanelBtn"><i class="fas fa-pencil-alt"></i></button>
+
+  <script>
+    (function() {
+      // ----- ΑΡΧΙΚΟ ΠΕΡΙΕΧΟΜΕΝΟ (default) -----
+      const defaultContent = {
+        cover: {
+          badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
+          span: "FIVEM RP",
+          subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ",
+          rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ",
+          sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ. FIVEM RP  —  ΕΚΔΟΣΗ 2025",
+          quote: "Κράτος δικαίου, ασφάλεια, σεβασμός"
+        },
+        intro: {
+          heading: "ΕΙΣΑΓΩΓΗ",
+          paras: [
+            "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.",
+            "Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.",
+            "Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.",
+            "Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών."
+          ]
+        },
+        deon: {
+          heading: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ ΑΣΤΥΝΟΜΙΚΩΝ",
+          items: [
+            "Υπακούει και προασπίζει τους νόμους.",
+            "Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.",
+            "Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.",
+            "Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.",
+            "Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας."
+          ]
+        },
+        signals: {
+          heading: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ - ΟΜΗΡΙΕΣ",
+          leftHeading: "Κανόνες σημάτων",
+          leftText: "Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.",
+          rightHeading: "Ληστείες – Ομηρίες",
+          rightItems: [
+            "Άφιξη εντός 5 λεπτών",
+            "2 αστυνομικοί παραπάνω από ληστές",
+            "Άοπλος διαπραγματευτής",
+            "Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης."
+          ]
+        },
+        rights: {
+          heading: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ & ΠΡΩΤΟΚΟΛΛΟ ΣΥΛΛΗΨΗΣ",
+          sub: "📋 Υπό κράτηση/σύλληψη",
+          items: [
+            "Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»",
+            "Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.",
+            "Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.",
+            "Παροχή δικηγόρου αν δεν έχει οικονομική άνεση."
+          ]
+        },
+        traffic: {
+          heading: "TRAFFIC STOP",
+          desc: "Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.",
+          procedure: [
+            "Ενημέρωση ασυρμάτου.",
+            "Κλείδωμα πινακίδας με radar.",
+            "Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).",
+            "Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.",
+            "Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.",
+            "Έλεγχος MDT, πινακίδων, ποινικού μητρώου.",
+            "Αναφορά ασυρμάτου «traffic stop υπό έλεγχο»."
+          ]
+        },
+        footer: {
+          left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
+          right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης"
+        }
+      };
+
+      // Φόρτωση από localStorage ή default
+      let siteContent = JSON.parse(localStorage.getItem('siteContentFull')) || defaultContent;
+
+      // ----- DOM elements (προβολή) -----
+      // cover
+      const coverBadge = document.getElementById('cover-badge-pre');
+      const coverSpan = document.getElementById('cover-span-pre');
+      const coverSub = document.getElementById('cover-subhead-pre');
+      const coverRank = document.getElementById('cover-rank-pre');
+      const coverSticker = document.getElementById('cover-sticker-pre');
+      const coverQuote = document.getElementById('cover-quote-pre');
+
+      // intro
+      const introHeading = document.getElementById('intro-heading-pre');
+      const introParasDiv = document.getElementById('intro-paragraphs-pre');
+
+      // deon
+      const deonHeading = document.getElementById('deon-heading-pre');
+      const deonList = document.getElementById('deon-list-pre');
+
+      // signals
+      const signalsHeading = document.getElementById('signals-heading-pre');
+      const signalsLeftHeading = document.getElementById('signals-left-heading-pre');
+      const signalsLeftText = document.getElementById('signals-left-text-pre');
+      const signalsRightHeading = document.getElementById('signals-right-heading-pre');
+      const signalsRightList = document.getElementById('signals-right-list-pre');
+
+      // rights
+      const rightsHeading = document.getElementById('rights-heading-pre');
+      const rightsSub = document.getElementById('rights-sub-pre');
+      const rightsList = document.getElementById('rights-list-pre');
+
+      // traffic
+      const trafficHeading = document.getElementById('traffic-heading-pre');
+      const trafficDesc = document.getElementById('traffic-desc-pre');
+      const trafficSub = document.getElementById('traffic-sub-pre');
+      const trafficList = document.getElementById('traffic-list-pre');
+
+      // footer
+      const footerLeft = document.getElementById('footer-left-pre');
+      const footerRight = document.getElementById('footer-right-pre');
+
+      // Συνάρτηση render όλων
+      function renderContent() {
+        // cover
+        coverBadge.textContent = siteContent.cover.badge;
+        coverSpan.textContent = siteContent.cover.span;
+        coverSub.textContent = siteContent.cover.subhead;
+        coverRank.innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank;
+        coverSticker.innerHTML = '<i class="fas fa-certificate"></i> ' + siteContent.cover.sticker;
+        coverQuote.innerHTML = '<i class="fas fa-quote-right" style="color:#c9a03d;"></i> ' + siteContent.cover.quote;
+
+        // intro
+        introHeading.textContent = siteContent.intro.heading;
+        introParasDiv.innerHTML = siteContent.intro.paras.map(p => `<p>${p}</p>`).join('') + 
+          '<div class="signature-block">Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.</div>';
+
+        // deon
+        deonHeading.textContent = siteContent.deon.heading;
+        deonList.innerHTML = siteContent.deon.items.map(i => `<li>${i}</li>`).join('');
+
+        // signals
+        signalsHeading.textContent = siteContent.signals.heading;
+        signalsLeftHeading.textContent = siteContent.signals.leftHeading;
+        signalsLeftText.textContent = siteContent.signals.leftText;
+        signalsRightHeading.textContent = siteContent.signals.rightHeading;
+        signalsRightList.innerHTML = siteContent.signals.rightItems.map(i => `<li>${i}</li>`).join('');
+
+        // rights
+        rightsHeading.textContent = siteContent.rights.heading;
+        rightsSub.textContent = siteContent.rights.sub;
+        rightsList.innerHTML = siteContent.rights.items.map(i => `<li>${i}</li>`).join('');
+
+        // traffic
+        trafficHeading.textContent = siteContent.traffic.heading;
+        trafficDesc.innerHTML = '<strong>Τι είναι:</strong> ' + siteContent.traffic.desc;
+        trafficSub.textContent = 'Διαδικασία:';
+        trafficList.innerHTML = siteContent.traffic.procedure.map((step, idx) => `<li>${step}</li>`).join('');
+
+        // footer
+        footerLeft.textContent = siteContent.footer.left;
+        footerRight.textContent = siteContent.footer.right;
+      }
+
+      // Δημιουργία πάνελ επεξεργασίας
+      function buildPanel() {
+        const panel = document.getElementById('panelContent');
+        panel.innerHTML = ''; // καθαρισμός
+
+        // Ενότητα Εξώφυλλο
+        panel.appendChild(sectionTitle('Εξώφυλλο'));
+        panel.appendChild(field('cover.badge', 'Κεντρικό κείμενο', siteContent.cover.badge, 'input'));
+        panel.appendChild(field('cover.span', 'Span (FIVEM RP)', siteContent.cover.span, 'input'));
+        panel.appendChild(field('cover.subhead', 'Υπότιτλος', siteContent.cover.subhead, 'input'));
+        panel.appendChild(field('cover.rank', 'Rank tag', siteContent.cover.rank, 'input'));
+        panel.appendChild(field('cover.sticker', 'Sticker', siteContent.cover.sticker, 'input'));
+        panel.appendChild(field('cover.quote', 'Απόφθεγμα', siteContent.cover.quote, 'input'));
+
+        // Εισαγωγή
+        panel.appendChild(sectionTitle('Εισαγωγή'));
+        panel.appendChild(field('intro.heading', 'Τίτλος', siteContent.intro.heading, 'input'));
+        panel.appendChild(field('intro.paras', 'Παράγραφοι (μία ανά γραμμή)', siteContent.intro.paras.join('\n'), 'textarea', 'list-textarea'));
+
+        // Κώδικας δεοντολογίας
+        panel.appendChild(sectionTitle('Κώδικας Δεοντολογίας'));
+        panel.appendChild(field('deon.heading', 'Τίτλος', siteContent.deon.heading, 'input'));
+        panel.appendChild(field('deon.items', 'Λίστα (μία ανά γραμμή)', siteContent.deon.items.join('\n'), 'textarea', 'list-textarea'));
+
+        // Σήματα & ληστείες
+        panel.appendChild(sectionTitle('Σήματα & Ληστείες'));
+        panel.appendChild(field('signals.heading', 'Τίτλος ενότητας', siteContent.signals.heading, 'input'));
+        panel.appendChild(field('signals.leftHeading', 'Αριστερή επικεφαλίδα', siteContent.signals.leftHeading, 'input'));
+        panel.appendChild(field('signals.leftText', 'Αριστερό κείμενο', siteContent.signals.leftText, 'textarea'));
+        panel.appendChild(field('signals.rightHeading', 'Δεξιά επικεφαλίδα', siteContent.signals.rightHeading, 'input'));
+        panel.appendChild(field('signals.rightItems', 'Δεξιά λίστα (μία ανά γραμμή)', siteContent.signals.rightItems.join('\n'), 'textarea', 'list-textarea'));
+
+        // Δικαιώματα πολίτη
+        panel.appendChild(sectionTitle('Δικαιώματα Πολίτη'));
+        panel.appendChild(field('rights.heading', 'Τίτλος', siteContent.rights.heading, 'input'));
+        panel.appendChild(field('rights.sub', 'Υπότιτλος', siteContent.rights.sub, 'input'));
+        panel.appendChild(field('rights.items', 'Λίστα δικαιωμάτων (μία ανά γραμμή)', siteContent.rights.items.join('\n'), 'textarea', 'list-textarea'));
+
+        // Traffic Stop
+        panel.appendChild(sectionTitle('Traffic Stop'));
+        panel.appendChild(field('traffic.heading', 'Τίτλος', siteContent.traffic.heading, 'input'));
+        panel.appendChild(field('traffic.desc', 'Περιγραφή', siteContent.traffic.desc, 'input'));
+        panel.appendChild(field('traffic.procedure', 'Βήματα (μία ανά γραμμή)', siteContent.traffic.procedure.join('\n'), 'textarea', 'list-textarea'));
+
+        // Footer
+        panel.appendChild(sectionTitle('Υποσέλιδο'));
+        panel.appendChild(field('footer.left', 'Αριστερό κείμενο', siteContent.footer.left, 'input'));
+        panel.appendChild(field('footer.right', 'Δεξί κείμενο', siteContent.footer.right, 'input'));
+
+        // προσθήκη event listeners για ενημέρωση
+        document.querySelectorAll('.edit-field input, .edit-field textarea').forEach(el => {
+          el.addEventListener('input', function(e) {
+            const path = this.dataset.path;
+            updateContent(path, this.value);
+          });
+        });
+      }
+
+      function sectionTitle(text) {
+        const div = document.createElement('div');
+        div.className = 'edit-section';
+        div.innerHTML = `<h4>${text}</h4>`;
+        return div;
+      }
+
+      function field(path, label, value, type, extraClass = '') {
+        const div = document.createElement('div');
+        div.className = 'edit-field';
+        const lab = document.createElement('label');
+        lab.htmlFor = 'field-' + path.replace(/\./g,'-');
+        lab.textContent = label;
+        let input;
+        if (type === 'textarea') {
+          input = document.createElement('textarea');
+          input.className = extraClass;
+        } else {
+          input = document.createElement('input');
+          input.type = 'text';
+        }
+        input.id = 'field-' + path.replace(/\./g,'-');
+        input.dataset.path = path;
+        input.value = value;
+        div.appendChild(lab);
+        div.appendChild(input);
+        return div;
+      }
+
+      function updateContent(path, newValue) {
+        const parts = path.split('.');
+        let obj = siteContent;
+        for (let i = 0; i < parts.length - 1; i++) {
+          obj = obj[parts[i]];
+        }
+        const last = parts[parts.length - 1];
+        // Αν είναι λίστα (από textarea με γραμμές)
+        if (last === 'items' || last === 'rightItems' || last === 'procedure' || last === 'paras') {
+          obj[last] = newValue.split('\n').filter(l => l.trim() !== '');
+        } else {
+          obj[last] = newValue;
+        }
+        // αποθήκευση
+        localStorage.setItem('siteContentFull', JSON.stringify(siteContent));
+        renderContent();
+      }
+
+      // Αρχική render
+      renderContent();
+
+      // tabs λειτουργία
+      const tabs = document.querySelectorAll('.nav-tab');
+      const pages = document.querySelectorAll('.page');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-page');
+          tabs.forEach(t => t.classList.remove('active'));
+          pages.forEach(p => p.classList.remove('active-page'));
+          this.classList.add('active');
+          document.getElementById(targetId).classList.add('active-page');
+        });
+      });
+
+      // πάνελ επεξεργασίας toggle
+      const panel = document.getElementById('editPanel');
+      const mainView = document.getElementById('mainView');
+      const toggleBtn = document.getElementById('togglePanelBtn');
+      const closeBtn = document.getElementById('closePanelBtn');
+
+      toggleBtn.addEventListener('click', () => {
+        panel.classList.toggle('open');
+        mainView.classList.toggle('shifted');
+        if (panel.classList.contains('open')) {
+          buildPanel(); // ανανέωση πάνελ με τρέχοντα δεδομένα
+        }
+      });
+
+      closeBtn.addEventListener('click', () => {
+        panel.classList.remove('open');
+        mainView.classList.remove('shifted');
+      });
+
+      // gallery
+      const addBtn = document.getElementById('addImageBtn');
+      const urlInput = document.getElementById('imageUrlInput');
+      const gallery = document.getElementById('gallery-area');
+      addBtn.addEventListener('click', () => {
+        const url = urlInput.value.trim();
+        if (!url) return;
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'gallery-img';
+        img.onerror = () => { alert('Μη έγκυρο URL'); img.remove(); };
+        gallery.appendChild(img);
+        urlInput.value = '';
+      });
+    })();
+  </script>
+</body>
+</html>
