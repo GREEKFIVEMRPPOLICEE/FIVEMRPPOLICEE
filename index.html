@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Σύγχρονη Διαχείριση</title>
+  <title>ΕΛ.ΑΣ. | Προηγμένη Διαχείριση</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* ίδια βάση με πριν, με μικρές προσθήκες */
+    /* ίδια βάση με προηγούμενα, με μερικές προσθήκες */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -81,9 +81,9 @@
     .protocol-card { background: #f8fafc; border-radius: 28px; padding: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 8px 20px -8px rgba(0,20,40,0.1); }
     .site-footer { background: #0f1f30; color: #b0c9e0; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; border-top: 2px solid #fbbf24; }
 
-    /* ADMIN PANEL - ανανεωμένο */
+    /* ADMIN PANEL */
     .admin-panel {
-      width: 460px;
+      width: 500px;
       background: rgba(18, 28, 40, 0.95);
       backdrop-filter: blur(12px);
       border-radius: 40px;
@@ -132,7 +132,7 @@
       gap: 8px;
     }
 
-    /* νέα στυλ για κατηγορίες - cards */
+    /* category cards */
     .categories-grid {
       display: flex;
       flex-direction: column;
@@ -156,9 +156,11 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 16px;
+      flex-wrap: wrap;
     }
     .category-title-input {
-      flex: 1;
+      flex: 2;
+      min-width: 200px;
       background: #0f1f30;
       border: 1px solid #5b7da0;
       color: white;
@@ -167,14 +169,36 @@
       font-size: 1rem;
       font-weight: 500;
     }
-    .category-title-input:focus {
-      outline: none;
-      border-color: #fbbf24;
-      box-shadow: 0 0 0 3px rgba(251,191,36,0.2);
+    .category-select {
+      background: #0f1f30;
+      border: 1px solid #5b7da0;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 40px;
+      font-size: 0.95rem;
+    }
+    .visibility-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f1f30;
+      padding: 5px 15px;
+      border-radius: 40px;
+      border: 1px solid #5b7da0;
+    }
+    .visibility-toggle label {
+      color: #b3cef0;
+      font-size: 0.9rem;
+    }
+    .visibility-toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: #fbbf24;
     }
     .category-actions {
       display: flex;
       gap: 8px;
+      margin-left: auto;
     }
     .category-btn {
       width: 42px;
@@ -203,6 +227,8 @@
     .category-btn.move {
       background: #3a4e66;
     }
+
+    /* περιεχόμενο κατηγορίας */
     .content-textarea {
       width: 100%;
       background: #132433;
@@ -213,13 +239,58 @@
       font-family: 'Inter', sans-serif;
       font-size: 0.95rem;
       resize: vertical;
-      min-height: 120px;
+      min-height: 150px;
       margin-top: 8px;
     }
     .content-textarea:focus {
       outline: none;
       border-color: #fbbf24;
       box-shadow: 0 0 0 3px rgba(251,191,36,0.2);
+    }
+
+    /* officers grid (για τύπο personnel) */
+    .officers-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .officer-card {
+      background: #1b2b3b;
+      border-radius: 20px;
+      padding: 16px;
+      border: 1px solid #4a6a8a;
+    }
+    .officer-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .officer-fields input {
+      background: #0f1f30;
+      border: 1px solid #5b7da0;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 30px;
+    }
+    .officer-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .add-officer-btn {
+      background: #2a5f2a;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
     }
 
     .add-category-btn {
@@ -326,6 +397,34 @@
     }
     .login-card .error { color: #b02e2e; margin-top: 16px; }
 
+    /* officer cards στην προβολή */
+    .officer-display-card {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .officer-display-card .name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0c2b4a;
+    }
+    .officer-display-card .rank {
+      font-size: 1.1rem;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+    .officer-display-card .discord {
+      background: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 40px;
+      display: inline-block;
+      align-self: flex-start;
+    }
     @media (max-width: 1000px) { .app { flex-direction: column; } }
   </style>
 </head>
@@ -360,7 +459,7 @@
     <div class="admin-panel" id="adminPanel" style="display: none;">
       <div class="admin-header">
         <h3><i class="fas fa-crown"></i> Πίνακας Διαχειριστή</h3>
-        <p>Επεξεργασία σε πραγματικό χρόνο</p>
+        <p>Διαχείριση κατηγοριών, προσωπικού και φωτογραφιών</p>
       </div>
       <div class="admin-content" id="adminContent"></div>
     </div>
@@ -396,6 +495,7 @@
     const auth = getAuth(app);
     const contentDocRef = doc(db, "policeSite", "content");
 
+    // Default content με νέα πεδία: visibility (public/admin) και type (text/personnel)
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -406,14 +506,47 @@
         quote: "Κράτος δικαίου, ασφάλεια, σεβασμός"
       },
       categories: [
-        { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", content: `Η Ελληνική Αστυνομία...` },
-        { id: "cat2", title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ", content: `- Υπακούει...` },
-        { id: "cat3", title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ", content: `**Κανόνες σημάτων**...` },
-        { id: "cat4", title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ", content: `📋 Υπό κράτηση...` },
-        { id: "cat5", title: "TRAFFIC STOP", content: `Τι είναι...` }
+        {
+          id: "cat1",
+          title: "ΕΙΣΑΓΩΓΗ",
+          type: "text",
+          visibility: "public",
+          content: `Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.\n\nΟι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.\n\nΟ Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.\n\nΤη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών."
+        },
+        {
+          id: "cat2",
+          title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ",
+          type: "text",
+          visibility: "public",
+          content: `- Υπακούει και προασπίζει τους νόμους.\n- Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.\n- Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.\n- Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.\n- Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.`
+        },
+        {
+          id: "cat3",
+          title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ",
+          type: "text",
+          visibility: "public",
+          content: `**Κανόνες σημάτων**\nΤο σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.\n\n**Ληστείες – Ομηρίες**\n- Άφιξη εντός 5 λεπτών\n- 2 αστυνομικοί παραπάνω από ληστές\n- Άοπλος διαπραγματευτής\n- Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.`
+        },
+        {
+          id: "cat4",
+          title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ",
+          type: "text",
+          visibility: "public",
+          content: `📋 Υπό κράτηση/σύλληψη\n- Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»\n- Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.\n- Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.\n- Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.`
+        },
+        {
+          id: "cat5",
+          title: "TRAFFIC STOP",
+          type: "text",
+          visibility: "public",
+          content: `Τι είναι: Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.\n\nΔιαδικασία:\n1. Ενημέρωση ασυρμάτου.\n2. Κλείδωμα πινακίδας με radar.\n3. Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).\n4. Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.\n5. Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.\n6. Έλεγχος MDT, πινακίδων, ποινικού μητρώου.\n7. Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».`
+        }
       ],
       photos: [],
-      footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" }
+      footer: {
+        left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
+        right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης"
+      }
     };
 
     let siteContent = JSON.parse(JSON.stringify(defaultContent));
@@ -436,21 +569,29 @@
     function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
     function safeSetHTML(id, value) { const el = document.getElementById(id); if (el) el.innerHTML = value; }
 
+    // Μετατροπή plain text σε HTML (για text categories)
     function textToHTML(text) {
       if (!text) return '';
       const lines = text.split('\n');
-      let inList = false, html = '';
+      let inList = false;
+      let html = '';
       for (let line of lines) {
         line = line.trim();
-        if (line === '') { if (inList) { html += '</ul>'; inList = false; } continue; }
+        if (line === '') {
+          if (inList) { html += '</ul>'; inList = false; }
+          continue;
+        }
         if (line.startsWith('- ') || line.startsWith('* ')) {
           if (!inList) { html += '<ul>'; inList = true; }
           html += `<li>${line.substring(2)}</li>`;
         } else {
           if (inList) { html += '</ul>'; inList = false; }
           const numberedMatch = line.match(/^(\d+)\.\s+(.*)/);
-          if (numberedMatch) { html += `<ol><li>${numberedMatch[2]}</li></ol>`; }
-          else { html += `<p>${line}</p>`; }
+          if (numberedMatch) {
+            html += `<ol><li>${numberedMatch[2]}</li></ol>`;
+          } else {
+            html += `<p>${line}</p>`;
+          }
         }
       }
       if (inList) html += '</ul>';
@@ -464,12 +605,20 @@
           const data = snap.data();
           siteContent = {
             cover: { ...defaultContent.cover, ...(data.cover || {}) },
-            categories: Array.isArray(data.categories) ? data.categories : defaultContent.categories,
+            categories: Array.isArray(data.categories) ? data.categories.map(c => ({
+              type: 'text',
+              visibility: 'public',
+              ...c
+            })) : defaultContent.categories,
             photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos,
             footer: { ...defaultContent.footer, ...(data.footer || {}) }
           };
-        } else { await setDoc(contentDocRef, defaultContent); }
-      } catch (e) { console.error("Firebase load error, using default", e); }
+        } else {
+          await setDoc(contentDocRef, defaultContent);
+        }
+      } catch (e) {
+        console.error("Firebase load error, using default", e);
+      }
       renderMain();
       if (isAdmin) renderAdminPanel();
     }
@@ -501,10 +650,17 @@
       safeSetText('footer-right-pre', siteContent.footer.right);
 
       if (!navTabs || !contentArea) return;
-      navTabs.innerHTML = ''; contentArea.innerHTML = '';
+      navTabs.innerHTML = '';
+      contentArea.innerHTML = '';
 
       const categories = siteContent.categories || [];
-      categories.forEach((cat, index) => {
+      // Φιλτράρισμα με βάση την ορατότητα
+      const visibleCategories = categories.filter(cat => {
+        if (cat.visibility === 'admin') return isAdmin; // μόνο admin βλέπουν
+        return true; // public ή undefined
+      });
+
+      visibleCategories.forEach((cat, index) => {
         if (!cat || !cat.id) return;
         const tab = document.createElement('div');
         tab.className = `nav-tab ${index === 0 ? 'active' : ''}`;
@@ -515,11 +671,30 @@
         const page = document.createElement('div');
         page.id = `page-${cat.id}`;
         page.className = `page ${index === 0 ? 'active-page' : ''}`;
-        const htmlContent = textToHTML(cat.content || '');
-        page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${htmlContent}</div>`;
+
+        if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
+          // Εμφάνιση καρτών προσωπικού
+          let officersHtml = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">';
+          cat.officers.forEach(o => {
+            officersHtml += `
+              <div class="officer-display-card">
+                <div class="name">${o.firstName || ''} ${o.lastName || ''}</div>
+                <div class="rank">${o.rank || ''}</div>
+                <div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>
+              </div>
+            `;
+          });
+          officersHtml += '</div>';
+          page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`;
+        } else {
+          // Προβολή κειμένου
+          const htmlContent = textToHTML(cat.content || '');
+          page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${htmlContent}</div>`;
+        }
         contentArea.appendChild(page);
       });
 
+      // Σελίδα φωτογραφιών (πάντα ορατή)
       const photoTab = document.createElement('div');
       photoTab.className = 'nav-tab';
       photoTab.dataset.page = 'page-photos';
@@ -534,6 +709,7 @@
       photoPage.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`;
       contentArea.appendChild(photoPage);
 
+      // Ενεργοποίηση tabs
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -544,19 +720,19 @@
           if (targetPage) targetPage.classList.add('active-page');
         });
       });
-      if (categories.length === 0) {
+
+      if (visibleCategories.length === 0) {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         const photoTabElem = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.page === 'page-photos');
         if (photoTabElem) { photoTabElem.classList.add('active'); document.getElementById('page-photos').classList.add('active-page'); }
       }
     }
 
-    // ΝΕΑ ΣΥΝΑΡΤΗΣΗ RENDER ADMIN PANEL με ανανεωμένο UI για κατηγορίες
+    // Admin panel - πλήρης διαχείριση
     function renderAdminPanel() {
       if (!adminContent) return;
       adminContent.innerHTML = '';
 
-      // Ενότητα Εξώφυλλο
       adminContent.appendChild(sectionTitle('Εξώφυλλο'));
       adminContent.appendChild(field('cover.badge', 'Κεντρικό κείμενο', siteContent.cover.badge));
       adminContent.appendChild(field('cover.span', 'Span FIVEM RP', siteContent.cover.span));
@@ -565,7 +741,6 @@
       adminContent.appendChild(field('cover.sticker', 'Sticker', siteContent.cover.sticker));
       adminContent.appendChild(field('cover.quote', 'Απόφθεγμα', siteContent.cover.quote));
 
-      // Ενότητα Κατηγορίες - με κάρτες
       adminContent.appendChild(sectionTitle('Κατηγορίες'));
       const categoriesContainer = document.createElement('div');
       categoriesContainer.className = 'categories-grid';
@@ -576,9 +751,9 @@
         const card = document.createElement('div');
         card.className = 'category-card';
 
-        // Κεφαλίδα κάρτας
         const header = document.createElement('div');
         header.className = 'category-card-header';
+
         const titleInput = document.createElement('input');
         titleInput.type = 'text';
         titleInput.className = 'category-title-input';
@@ -590,10 +765,38 @@
           saveToFirebase();
         });
 
+        // Select type
+        const typeSelect = document.createElement('select');
+        typeSelect.className = 'category-select';
+        typeSelect.innerHTML = `<option value="text" ${cat.type === 'text' ? 'selected' : ''}>Κείμενο</option>
+                                <option value="personnel" ${cat.type === 'personnel' ? 'selected' : ''}>Προσωπικό</option>`;
+        typeSelect.addEventListener('change', (e) => {
+          cat.type = e.target.value;
+          if (cat.type === 'personnel' && !cat.officers) {
+            cat.officers = [];
+          }
+          renderMain();
+          saveToFirebase();
+          renderAdminPanel(); // ανανέωση για να εμφανιστεί η φόρμα προσωπικού
+        });
+
+        // Visibility checkbox (admin only)
+        const visDiv = document.createElement('div');
+        visDiv.className = 'visibility-toggle';
+        visDiv.innerHTML = `
+          <label>Admin only</label>
+          <input type="checkbox" ${cat.visibility === 'admin' ? 'checked' : ''}>
+        `;
+        const checkbox = visDiv.querySelector('input');
+        checkbox.addEventListener('change', (e) => {
+          cat.visibility = e.target.checked ? 'admin' : 'public';
+          renderMain();
+          saveToFirebase();
+        });
+
         const actions = document.createElement('div');
         actions.className = 'category-actions';
 
-        // Κουμπιά μετακίνησης (πάνω/κάτω)
         if (index > 0) {
           const upBtn = document.createElement('button');
           upBtn.className = 'category-btn move';
@@ -604,7 +807,7 @@
             categories[index-1] = temp;
             renderMain();
             saveToFirebase();
-            renderAdminPanel(); // ανανέωση της λίστας
+            renderAdminPanel();
           });
           actions.appendChild(upBtn);
         }
@@ -635,31 +838,85 @@
         actions.appendChild(deleteBtn);
 
         header.appendChild(titleInput);
+        header.appendChild(typeSelect);
+        header.appendChild(visDiv);
         header.appendChild(actions);
         card.appendChild(header);
 
-        // Περιεχόμενο (textarea)
-        const contentLabel = document.createElement('label');
-        contentLabel.textContent = 'Περιεχόμενο (απλό κείμενο)';
-        contentLabel.style.display = 'block';
-        contentLabel.style.marginBottom = '6px';
-        contentLabel.style.color = '#b3cef0';
-        card.appendChild(contentLabel);
+        if (cat.type === 'personnel') {
+          // Διαχείριση προσωπικού
+          const officers = cat.officers || [];
+          const officersDiv = document.createElement('div');
+          officersDiv.className = 'officers-grid';
 
-        const textarea = document.createElement('textarea');
-        textarea.className = 'content-textarea';
-        textarea.value = cat.content || '';
-        textarea.addEventListener('input', (e) => {
-          cat.content = e.target.value;
-          renderMain();
-          saveToFirebase();
-        });
-        card.appendChild(textarea);
+          officers.forEach((off, offIndex) => {
+            const offCard = document.createElement('div');
+            offCard.className = 'officer-card';
+            offCard.innerHTML = `
+              <div class="officer-fields">
+                <input type="text" placeholder="Όνομα" value="${off.firstName || ''}" data-field="firstName">
+                <input type="text" placeholder="Επώνυμο" value="${off.lastName || ''}" data-field="lastName">
+                <input type="text" placeholder="Βαθμός" value="${off.rank || ''}" data-field="rank">
+                <input type="text" placeholder="Discord" value="${off.discord || ''}" data-field="discord">
+              </div>
+              <div class="officer-actions">
+                <button class="category-btn delete" data-index="${offIndex}"><i class="fas fa-trash"></i></button>
+              </div>
+            `;
+            // event listeners για τα πεδία
+            offCard.querySelectorAll('input').forEach(inp => {
+              inp.addEventListener('input', (e) => {
+                const field = e.target.dataset.field;
+                off[field] = e.target.value;
+                renderMain();
+                saveToFirebase();
+              });
+            });
+            offCard.querySelector('.delete-photo-btn, .delete-cat-btn')?.addEventListener('click', (e) => {
+              cat.officers.splice(offIndex, 1);
+              renderMain();
+              saveToFirebase();
+              renderAdminPanel();
+            });
+            officersDiv.appendChild(offCard);
+          });
+
+          const addBtn = document.createElement('button');
+          addBtn.className = 'add-officer-btn';
+          addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Προσθήκη αστυνομικού';
+          addBtn.addEventListener('click', () => {
+            if (!cat.officers) cat.officers = [];
+            cat.officers.push({ firstName: '', lastName: '', rank: '', discord: '' });
+            renderMain();
+            saveToFirebase();
+            renderAdminPanel();
+          });
+
+          card.appendChild(officersDiv);
+          card.appendChild(addBtn);
+        } else {
+          // text category
+          const contentLabel = document.createElement('label');
+          contentLabel.textContent = 'Περιεχόμενο (απλό κείμενο)';
+          contentLabel.style.display = 'block';
+          contentLabel.style.marginBottom = '6px';
+          contentLabel.style.color = '#b3cef0';
+          card.appendChild(contentLabel);
+
+          const textarea = document.createElement('textarea');
+          textarea.className = 'content-textarea';
+          textarea.value = cat.content || '';
+          textarea.addEventListener('input', (e) => {
+            cat.content = e.target.value;
+            renderMain();
+            saveToFirebase();
+          });
+          card.appendChild(textarea);
+        }
 
         categoriesContainer.appendChild(card);
       });
 
-      // Κουμπί προσθήκης νέας κατηγορίας
       const addCatBtn = document.createElement('button');
       addCatBtn.className = 'add-category-btn';
       addCatBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Προσθήκη νέας κατηγορίας';
@@ -669,6 +926,8 @@
         siteContent.categories.push({
           id: newId,
           title: 'Νέα κατηγορία',
+          type: 'text',
+          visibility: 'public',
           content: 'Περιεχόμενο...'
         });
         renderMain();
@@ -677,7 +936,7 @@
       });
       adminContent.appendChild(addCatBtn);
 
-      // Ενότητα Φωτογραφίες (ίδια)
+      // Φωτογραφίες
       adminContent.appendChild(sectionTitle('Φωτογραφίες'));
       const photoUploadDiv = document.createElement('div');
       photoUploadDiv.className = 'photo-upload-tool-admin';
@@ -700,12 +959,11 @@
       });
       adminContent.appendChild(photosGrid);
 
-      // Ενότητα Υποσέλιδο
       adminContent.appendChild(sectionTitle('Υποσέλιδο'));
       adminContent.appendChild(field('footer.left', 'Αριστερό κείμενο', siteContent.footer.left));
       adminContent.appendChild(field('footer.right', 'Δεξί κείμενο', siteContent.footer.right));
 
-      // Event listeners για φωτογραφίες
+      // Event listeners φωτογραφιών
       const addPhotoBtn = document.getElementById('adminAddPhotoBtn');
       const photoUrlInput = document.getElementById('adminPhotoUrl');
       if (addPhotoBtn && photoUrlInput) {
