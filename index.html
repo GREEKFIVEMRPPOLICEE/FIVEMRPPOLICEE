@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Dynamic Categories</title>
+  <title>ΕΛ.ΑΣ. | Admin Control & Photo Upload</title>
   <!-- Font Awesome 5 -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
   <!-- Google Fonts -->
@@ -33,7 +33,7 @@
     window.firebaseAuth = auth;
   </script>
   <style>
-    /* Στυλ όπως πριν, με μικρές προσθήκες */
+    /* ίδια στυλ με προηγουμένως */
     * {
       margin: 0;
       padding: 0;
@@ -438,6 +438,7 @@
       border: 1px solid #b0c8dd;
       padding: 5px;
     }
+    /* Στυλ για την ενότητα φωτογραφιών */
     .photo-upload-tool {
       background: #ecf3fa;
       border-radius: 60px;
@@ -706,14 +707,28 @@
       const photoPage = document.createElement('div');
       photoPage.id = 'page-photos';
       photoPage.className = 'page';
+
+      // Μόνο οι admin βλέπουν τη φόρμα προσθήκης
+      let uploadHtml = '';
+      if (isAdmin) {
+        uploadHtml = `
+          <div class="photo-upload-tool">
+            <i class="fas fa-link"></i>
+            <input id="imageUrlInput" placeholder="URL εικόνας">
+            <button id="addImageBtn"><i class="fas fa-plus-circle"></i> Προσθήκη</button>
+          </div>
+        `;
+      }
+
       photoPage.innerHTML = `
         <h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>
-        <div class="photo-upload-tool">
-          <i class="fas fa-link"></i>
-          <input id="imageUrlInput" placeholder="URL εικόνας">
-          <button id="addImageBtn"><i class="fas fa-plus-circle"></i> Προσθήκη</button>
+        ${uploadHtml}
+        <div id="gallery-area">
+          <!-- Προαιρετικές αρχικές φωτογραφίες -->
+          <img src="https://images.unsplash.com/photo-1585670149965-2c2b5a8e8b9c?w=200&h=150&fit=crop" class="gallery-img" alt="περίπολο">
+          <img src="https://images.unsplash.com/photo-1542756470-3d7f2b2f3e9d?w=200&h=150&fit=crop" class="gallery-img" alt="αστυνομικό τμήμα">
+          <img src="https://images.pexels.com/photos/712916/pexels-photo-712916.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop" class="gallery-img" alt="σήμα">
         </div>
-        <div id="gallery-area"></div>
       `;
       contentArea.appendChild(photoPage);
 
@@ -728,34 +743,33 @@
         });
       });
 
-      // Αρχικά ενεργό το πρώτο tab
+      // Αρχικά ενεργό το πρώτο tab ή αν δεν υπάρχουν κατηγορίες, τα φωτογραφιών
       if (siteContent.categories.length > 0) {
         document.getElementById(`page-${siteContent.categories[0].id}`).classList.add('active-page');
       } else {
-        // αν δεν υπάρχει καμία κατηγορία, κάνε ενεργό το photoPage
         document.getElementById('page-photos').classList.add('active-page');
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        // βρες το tab φωτογραφιών και κάντο active
         const photoNavTab = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.page === 'page-photos');
         if (photoNavTab) photoNavTab.classList.add('active');
       }
 
-      // Ξανασυνδέουμε το κουμπί προσθήκης φωτογραφιών (γιατί αντικαταστάθηκε το DOM)
-      const addBtn = document.getElementById('addImageBtn');
-      const urlInput = document.getElementById('imageUrlInput');
-      const gallery = document.getElementById('gallery-area');
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          const url = urlInput.value.trim();
-          if (url) {
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'gallery-img';
-            img.onerror = () => { alert('Μη έγκυρο URL'); img.remove(); };
-            gallery.appendChild(img);
-            urlInput.value = '';
-          }
-        });
+      // Ξανασυνδέουμε το κουμπί προσθήκης φωτογραφιών μόνο αν είμαστε admin
+      if (isAdmin) {
+        const addBtn = document.getElementById('addImageBtn');
+        const urlInput = document.getElementById('imageUrlInput');
+        const gallery = document.getElementById('gallery-area');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => {
+            const url = urlInput.value.trim();
+            if (url) {
+              const img = document.createElement('img');
+              img.src = url;
+              img.className = 'gallery-img';
+              img.onerror = () => { alert('Μη έγκυρο URL'); img.remove(); };
+              gallery.appendChild(img);
+              urlInput.value = '';
+            }
+          });
+        }
       }
     }
 
@@ -791,7 +805,7 @@
       });
       panelDiv.appendChild(addCatBtn);
 
-      siteContent.categories.forEach((cat, idx) => {
+      siteContent.categories.forEach((cat) => {
         const catDiv = document.createElement('div');
         catDiv.className = 'category-item';
         
@@ -883,6 +897,8 @@
           toggleEditBtn.classList.remove('visible');
           authStatus.innerHTML += ' (απλός χρήστης)';
         }
+        // Ανανέωση της σελίδας για να εμφανιστεί/κρυφτεί η φόρμα φωτογραφιών
+        renderAll();
       } else {
         authStatus.innerHTML = 'Μη συνδεδεμένος';
         loginBtn.style.display = 'inline-flex';
@@ -891,6 +907,7 @@
         isAdmin = false;
         panel.classList.remove('open');
         mainView.classList.remove('shifted');
+        renderAll(); // ξανατρέχουμε για να κρύψουμε τη φόρμα
       }
     });
 
