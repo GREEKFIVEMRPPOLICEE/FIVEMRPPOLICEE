@@ -8,485 +8,124 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Firebase SDK modular -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCM8zk9I3LOy9VGAqmIgpyDcjes3HWtvYA",
-      authDomain: "policefivem-e368f.firebaseapp.com",
-      projectId: "policefivem-e368f",
-      storageBucket: "policefivem-e368f.firebasestorage.app",
-      messagingSenderId: "553518888871",
-      appId: "1:553518888871:web:033e7d3ba25da5e1386882"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const contentDocRef = doc(db, "policeSite", "content");
-
-    window.firebaseDb = db;
-    window.contentDocRef = contentDocRef;
-    window.firebaseAuth = auth;
-  </script>
   <style>
-    /* ίδια στυλ με προηγουμένως */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #e8ecf2;
-      color: #1e1e2f;
-      line-height: 1.5;
-    }
-    .app-wrapper {
-      display: flex;
-      min-height: 100vh;
-    }
+    /* Στυλ όπως πριν – συμπυκνωμένα για συντομία, αλλά πλήρη */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #e8ecf2; color: #1e1e2f; }
+    .app-wrapper { display: flex; min-height: 100vh; }
     /* Πλαϊνό πάνελ */
     .edit-panel {
-      width: 420px;
-      background: #1f2b3a;
-      color: #eef4fc;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-      transform: translateX(-100%);
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
+      width: 420px; background: #1f2b3a; color: #eef4fc;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.3); overflow-y: auto;
+      transition: transform 0.3s ease; transform: translateX(-100%);
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 1000;
+      display: flex; flex-direction: column;
     }
-    .edit-panel.open {
-      transform: translateX(0);
-    }
+    .edit-panel.open { transform: translateX(0); }
     .panel-header {
-      padding: 20px;
-      background: #0f1a24;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 20px; background: #0f1a24;
+      display: flex; justify-content: space-between; align-items: center;
       border-bottom: 2px solid #c9a03d;
     }
-    .panel-header h3 {
-      font-weight: 600;
-      color: #e4c580;
-      font-size: 1.3rem;
-    }
-    .close-panel-btn {
-      background: transparent;
-      border: none;
-      color: #bdd3ec;
-      font-size: 1.8rem;
-      cursor: pointer;
-    }
-    .panel-content {
-      padding: 20px;
-      flex: 1;
-      overflow-y: auto;
-    }
-    .edit-section {
-      margin-bottom: 28px;
-      border-bottom: 1px dashed #3e556b;
-      padding-bottom: 16px;
-    }
-    .edit-section h4 {
-      color: #cfb57c;
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .edit-field {
-      margin-bottom: 18px;
-    }
-    .edit-field label {
-      display: block;
-      font-size: 0.85rem;
-      color: #a6c1db;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
+    .panel-header h3 { font-weight: 600; color: #e4c580; font-size: 1.3rem; }
+    .close-panel-btn { background: transparent; border: none; color: #bdd3ec; font-size: 1.8rem; cursor: pointer; }
+    .panel-content { padding: 20px; flex: 1; overflow-y: auto; }
+    .edit-section { margin-bottom: 28px; border-bottom: 1px dashed #3e556b; padding-bottom: 16px; }
+    .edit-section h4 { color: #cfb57c; font-size: 1.1rem; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    .edit-field { margin-bottom: 18px; }
+    .edit-field label { display: block; font-size: 0.85rem; color: #a6c1db; margin-bottom: 5px; font-weight: 500; }
     .edit-field input, .edit-field textarea {
-      width: 100%;
-      padding: 10px 12px;
-      background: #2e3d50;
-      border: 1px solid #5c748b;
-      border-radius: 12px;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
-      resize: vertical;
+      width: 100%; padding: 10px 12px; background: #2e3d50;
+      border: 1px solid #5c748b; border-radius: 12px; color: white;
+      font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: vertical;
     }
-    .edit-field textarea {
-      min-height: 70px;
-    }
-    .edit-field textarea.list-textarea {
-      min-height: 120px;
-    }
+    .edit-field textarea { min-height: 70px; }
     .panel-footer {
-      padding: 20px;
-      background: #0f1a24;
-      border-top: 1px solid #2d445b;
-      font-size: 0.85rem;
-      color: #96aec9;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 20px; background: #0f1a24; border-top: 1px solid #2d445b;
+      font-size: 0.85rem; color: #96aec9; display: flex; align-items: center; gap: 10px;
     }
-    .save-indicator {
-      margin-left: auto;
-      background: #2a5f2a;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: #d4edda;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .save-indicator.show {
-      opacity: 1;
-    }
+    .save-indicator { margin-left: auto; background: #2a5f2a; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #d4edda; opacity: 0; transition: opacity 0.3s; }
+    .save-indicator.show { opacity: 1; }
     /* κύρια προβολή */
-    .main-view {
-      flex: 1;
-      transition: margin-left 0.3s ease;
-      margin-left: 0;
-      background: #f0f2f5;
-      padding: 20px;
-    }
-    .main-view.shifted {
-      margin-left: 420px;
-    }
-    .site-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 32px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-      overflow: hidden;
-      border: 1px solid rgba(0,45,85,0.15);
-    }
+    .main-view { flex: 1; transition: margin-left 0.3s ease; margin-left: 0; background: #f0f2f5; padding: 20px; }
+    .main-view.shifted { margin-left: 420px; }
+    .site-container { max-width: 1100px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid rgba(0,45,85,0.15); }
     /* γραμμή σύνδεσης */
     .auth-bar {
-      background: #eef2f6;
-      padding: 10px 25px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 15px;
+      background: #eef2f6; padding: 10px 25px; display: flex;
+      align-items: center; justify-content: flex-end; gap: 15px;
       border-bottom: 1px solid #cbd6e4;
     }
-    .auth-status {
-      font-size: 0.9rem;
-      color: #1e3b5c;
-      background: white;
-      padding: 5px 16px;
-      border-radius: 30px;
-      border: 1px solid #b0c4db;
-    }
+    .auth-status { font-size: 0.9rem; color: #1e3b5c; background: white; padding: 5px 16px; border-radius: 30px; border: 1px solid #b0c4db; }
     .auth-btn {
-      background: #1d3e63;
-      border: none;
-      color: white;
-      padding: 8px 22px;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid #c9a03d;
-      font-size: 0.9rem;
+      background: #1d3e63; border: none; color: white; padding: 8px 22px;
+      border-radius: 40px; font-weight: 600; cursor: pointer; border: 1px solid #c9a03d; font-size: 0.9rem;
     }
-    .auth-btn.logout {
-      background: #5e4c38;
-      border-color: #a69b87;
-    }
+    .auth-btn.logout { background: #5e4c38; border-color: #a69b87; }
     .login-modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      visibility: hidden;
-      opacity: 0;
-      transition: 0.2s;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+      z-index: 2000; visibility: hidden; opacity: 0; transition: 0.2s;
     }
-    .login-modal.show {
-      visibility: visible;
-      opacity: 1;
-    }
-    .login-card {
-      background: white;
-      max-width: 380px;
-      width: 90%;
-      padding: 30px;
-      border-radius: 40px;
-      box-shadow: 0 25px 40px rgba(0,0,0,0.5);
-    }
-    .login-card h3 {
-      margin-bottom: 20px;
-      color: #0b1a30;
-    }
-    .login-card input {
-      width: 100%;
-      padding: 14px 18px;
-      margin-bottom: 15px;
-      border: 2px solid #dde3ec;
-      border-radius: 60px;
-      font-size: 1rem;
-    }
-    .login-card button {
-      background: #1d3e63;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 60px;
-      font-weight: 700;
-      width: 100%;
-      cursor: pointer;
-    }
-    .login-card .error {
-      color: #b02e2e;
-      margin-top: 10px;
-    }
+    .login-modal.show { visibility: visible; opacity: 1; }
+    .login-card { background: white; max-width: 380px; width: 90%; padding: 30px; border-radius: 40px; box-shadow: 0 25px 40px rgba(0,0,0,0.5); }
+    .login-card h3 { margin-bottom: 20px; color: #0b1a30; }
+    .login-card input { width: 100%; padding: 14px 18px; margin-bottom: 15px; border: 2px solid #dde3ec; border-radius: 60px; font-size: 1rem; }
+    .login-card button { background: #1d3e63; color: white; border: none; padding: 14px; border-radius: 60px; font-weight: 700; width: 100%; cursor: pointer; }
+    .login-card .error { color: #b02e2e; margin-top: 10px; }
     /* κουμπί επεξεργασίας */
     .toggle-edit-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #1d3e63;
-      border: none;
-      color: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 60px;
-      box-shadow: 0 8px 18px rgba(0,20,40,0.4);
-      font-size: 1.8rem;
-      cursor: pointer;
-      z-index: 1100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #c9a03d;
-      transition: 0.2s;
+      position: fixed; bottom: 30px; right: 30px; background: #1d3e63; border: none; color: white;
+      width: 60px; height: 60px; border-radius: 60px; box-shadow: 0 8px 18px rgba(0,20,40,0.4);
+      font-size: 1.8rem; cursor: pointer; z-index: 1100; display: none; align-items: center; justify-content: center;
+      border: 2px solid #c9a03d; transition: 0.2s;
     }
-    .toggle-edit-btn.visible {
-      display: flex;
-    }
+    .toggle-edit-btn.visible { display: flex; }
     /* κατηγορίες στο panel */
-    .category-item {
-      background: #2b3849;
-      border-radius: 16px;
-      padding: 15px;
-      margin-bottom: 20px;
-      border: 1px solid #4d627a;
-    }
-    .category-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .category-header input {
-      flex: 1;
-      margin-right: 10px;
-      background: #1d2a38;
-      border: 1px solid #6e8bb0;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 30px;
-    }
-    .delete-cat-btn {
-      background: #a13d3d;
-      border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 36px;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .add-category-btn {
-      background: #2a5f2a;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 40px;
-      width: 100%;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 20px;
-    }
+    .category-item { background: #2b3849; border-radius: 16px; padding: 15px; margin-bottom: 20px; border: 1px solid #4d627a; }
+    .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .category-header input { flex: 1; margin-right: 10px; background: #1d2a38; border: 1px solid #6e8bb0; color: white; padding: 8px 12px; border-radius: 30px; }
+    .delete-cat-btn { background: #a13d3d; border: none; color: white; width: 36px; height: 36px; border-radius: 36px; font-size: 1.2rem; cursor: pointer; }
+    .add-category-btn { background: #2a5f2a; color: white; border: none; padding: 12px 20px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
     /* κύρια στυλ προβολής */
     .main-header {
-      background: #0b1a30;
-      background-image: linear-gradient(145deg, #0b1a30 0%, #102b44 100%);
-      padding: 1.2rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: #0b1a30; background-image: linear-gradient(145deg, #0b1a30 0%, #102b44 100%);
+      padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: space-between;
       border-bottom: 4px solid #c9a03d;
     }
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .badge-icon {
-      font-size: 2.2rem;
-      color: #e4c580;
-    }
-    .logo-text h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: white;
-      text-transform: uppercase;
-    }
-    .logo-text h1 span {
-      color: #e4c580;
-      font-weight: 300;
-      font-size: 1.4rem;
-    }
-    .logo-text .subhead {
-      color: #aac7e0;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    .rank-tag {
-      background: rgba(255,215,120,0.15);
-      padding: 8px 20px;
-      border-radius: 60px;
-      border: 1px solid #c9a03d;
-      font-weight: 600;
-      color: #f5e2b0;
-    }
+    .logo-area { display: flex; align-items: center; gap: 16px; }
+    .badge-icon { font-size: 2.2rem; color: #e4c580; }
+    .logo-text h1 { font-size: 1.8rem; font-weight: 700; color: white; text-transform: uppercase; }
+    .logo-text h1 span { color: #e4c580; font-weight: 300; font-size: 1.4rem; }
+    .logo-text .subhead { color: #aac7e0; font-size: 0.9rem; font-weight: 500; }
+    .rank-tag { background: rgba(255,215,120,0.15); padding: 8px 20px; border-radius: 60px; border: 1px solid #c9a03d; font-weight: 600; color: #f5e2b0; }
     .nav-tabs {
-      background: #f8fafd;
-      padding: 0.5rem 2.5rem 0;
-      border-bottom: 1px solid #d4deec;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
+      background: #f8fafd; padding: 0.5rem 2.5rem 0; border-bottom: 1px solid #d4deec;
+      display: flex; flex-wrap: wrap; gap: 4px;
     }
     .nav-tab {
-      padding: 0.9rem 1.8rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #2c3f5c;
-      border-radius: 28px 28px 0 0;
-      background: transparent;
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-bottom: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      padding: 0.9rem 1.8rem; font-weight: 600; font-size: 0.95rem; color: #2c3f5c;
+      border-radius: 28px 28px 0 0; background: transparent; cursor: pointer;
+      border: 1px solid transparent; border-bottom: none; display: inline-flex; align-items: center; gap: 8px;
     }
-    .nav-tab.active {
-      background: white;
-      border-color: #d4deec;
-      border-bottom: 2px solid white;
-      color: #0f3b6a;
-    }
-    .nav-tab.active i {
-      color: #c9a03d;
-    }
-    .content-area {
-      padding: 2.5rem;
-      background: white;
-    }
-    .page {
-      display: none;
-    }
-    .page.active-page {
-      display: block;
-    }
-    h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #0c2b4a;
-      border-left: 8px solid #c9a03d;
-      padding-left: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .protocol-card {
-      background: #f9fcff;
-      border-radius: 24px;
-      padding: 2rem;
-      margin: 2rem 0;
-      border: 1px solid #e2ecf9;
-    }
-    .cover-image {
-      display: flex;
-      justify-content: center;
-      margin: 2rem 0;
-    }
-    .cover-img-placeholder {
-      max-width: 100%;
-      border-radius: 24px;
-      box-shadow: 0 15px 30px -8px rgba(0,20,40,0.3);
-      border: 1px solid #b0c8dd;
-      padding: 5px;
-    }
-    /* Στυλ για την ενότητα φωτογραφιών */
+    .nav-tab.active { background: white; border-color: #d4deec; border-bottom: 2px solid white; color: #0f3b6a; }
+    .nav-tab.active i { color: #c9a03d; }
+    .content-area { padding: 2.5rem; background: white; }
+    .page { display: none; }
+    .page.active-page { display: block; }
+    h2 { font-size: 2.2rem; font-weight: 700; color: #0c2b4a; border-left: 8px solid #c9a03d; padding-left: 1.5rem; margin-bottom: 2rem; }
+    .protocol-card { background: #f9fcff; border-radius: 24px; padding: 2rem; margin: 2rem 0; border: 1px solid #e2ecf9; }
+    .cover-image { display: flex; justify-content: center; margin: 2rem 0; }
+    .cover-img-placeholder { max-width: 100%; border-radius: 24px; box-shadow: 0 15px 30px -8px rgba(0,20,40,0.3); border: 1px solid #b0c8dd; padding: 5px; }
     .photo-upload-tool {
-      background: #ecf3fa;
-      border-radius: 60px;
-      padding: 0.8rem 1.8rem;
-      margin: 2.5rem 0 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 16px;
+      background: #ecf3fa; border-radius: 60px; padding: 0.8rem 1.8rem; margin: 2.5rem 0 1rem;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 16px;
     }
-    .photo-upload-tool input {
-      flex: 2 1 260px;
-      padding: 12px 20px;
-      border-radius: 40px;
-      border: 1px solid #b8d0e5;
-      outline: none;
-    }
-    .photo-upload-tool button {
-      background: #1d3e63;
-      color: white;
-      padding: 12px 28px;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid #c9a03d;
-    }
-    #gallery-area {
-      margin-top: 25px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 25px;
-    }
-    .gallery-img {
-      max-height: 160px;
-      max-width: 220px;
-      border-radius: 20px;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
-      border: 3px solid white;
-      object-fit: cover;
-    }
-    .site-footer {
-      background: #0f1f30;
-      color: #b0c9e0;
-      padding: 1.5rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      border-top: 2px solid #c9a03d;
-    }
+    .photo-upload-tool input { flex: 2 1 260px; padding: 12px 20px; border-radius: 40px; border: 1px solid #b8d0e5; outline: none; }
+    .photo-upload-tool button { background: #1d3e63; color: white; padding: 12px 28px; border-radius: 40px; font-weight: 600; cursor: pointer; border: 1px solid #c9a03d; }
+    #gallery-area { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 25px; }
+    .gallery-img { max-height: 160px; max-width: 220px; border-radius: 20px; box-shadow: 0 8px 18px rgba(0,0,0,0.2); border: 3px solid white; object-fit: cover; }
+    .site-footer { background: #0f1f30; color: #b0c9e0; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; border-top: 2px solid #c9a03d; }
   </style>
 </head>
 <body>
@@ -497,9 +136,7 @@
         <h3><i class="fas fa-edit"></i> Πλήρης επεξεργασία</h3>
         <button class="close-panel-btn" id="closePanelBtn"><i class="fas fa-times"></i></button>
       </div>
-      <div class="panel-content" id="panelContent">
-        <!-- Θα γεμίσει δυναμικά -->
-      </div>
+      <div class="panel-content" id="panelContent"></div>
       <div class="panel-footer">
         <i class="fas fa-cloud-upload-alt"></i> Firebase live sync
         <span class="save-indicator" id="saveIndicator">Αποθηκεύτηκε</span>
@@ -554,14 +191,28 @@
   </div>
 
   <script type="module">
+    // Ενιαίο module για όλη τη λογική
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const db = window.firebaseDb;
-    const auth = window.firebaseAuth;
-    const contentDocRef = window.contentDocRef;
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCM8zk9I3LOy9VGAqmIgpyDcjes3HWtvYA",
+      authDomain: "policefivem-e368f.firebaseapp.com",
+      projectId: "policefivem-e368f",
+      storageBucket: "policefivem-e368f.firebasestorage.app",
+      messagingSenderId: "553518888871",
+      appId: "1:553518888871:web:033e7d3ba25da5e1386882"
+    };
 
-    // Default content με δυναμικές κατηγορίες
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const contentDocRef = doc(db, "policeSite", "content");
+
+    // Default content (εφεδρικό)
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -572,31 +223,11 @@
         quote: "Κράτος δικαίου, ασφάλεια, σεβασμός"
       },
       categories: [
-        {
-          id: "cat1",
-          title: "ΕΙΣΑΓΩΓΗ",
-          content: "<p>Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.</p><p>Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.</p><p>Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.</p><div class='signature-block'>Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.</div>"
-        },
-        {
-          id: "cat2",
-          title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ",
-          content: "<ul class='article-list'><li>Υπακούει και προασπίζει τους νόμους.</li><li>Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.</li><li>Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.</li><li>Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.</li><li>Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.</li></ul>"
-        },
-        {
-          id: "cat3",
-          title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ",
-          content: "<div class='grid-2col'><div class='protocol-card'><h3>Κανόνες σημάτων</h3><p>Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.</p></div><div class='protocol-card'><h3>Ληστείες – Ομηρίες</h3><ul><li>Άφιξη εντός 5 λεπτών</li><li>2 αστυνομικοί παραπάνω από ληστές</li><li>Άοπλος διαπραγματευτής</li><li>Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.</li></ul></div></div>"
-        },
-        {
-          id: "cat4",
-          title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ",
-          content: "<div class='protocol-card'><h3>📋 Υπό κράτηση/σύλληψη</h3><ul><li>Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»</li><li>Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.</li><li>Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.</li><li>Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.</li></ul></div>"
-        },
-        {
-          id: "cat5",
-          title: "TRAFFIC STOP",
-          content: "<div class='protocol-card'><p><strong>Τι είναι:</strong> Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.</p><h3>Διαδικασία:</h3><ol><li>Ενημέρωση ασυρμάτου.</li><li>Κλείδωμα πινακίδας με radar.</li><li>Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).</li><li>Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.</li><li>Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.</li><li>Έλεγχος MDT, πινακίδων, ποινικού μητρώου.</li><li>Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».</li></ol></div>"
-        }
+        { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", content: "<p>Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.</p><p>Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.</p><p>Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.</p><div class='signature-block'>Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.</div>" },
+        { id: "cat2", title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ", content: "<ul class='article-list'><li>Υπακούει και προασπίζει τους νόμους.</li><li>Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.</li><li>Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.</li><li>Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.</li><li>Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.</li></ul>" },
+        { id: "cat3", title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ", content: "<div class='grid-2col'><div class='protocol-card'><h3>Κανόνες σημάτων</h3><p>Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.</p></div><div class='protocol-card'><h3>Ληστείες – Ομηρίες</h3><ul><li>Άφιξη εντός 5 λεπτών</li><li>2 αστυνομικοί παραπάνω από ληστές</li><li>Άοπλος διαπραγματευτής</li><li>Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.</li></ul></div></div>" },
+        { id: "cat4", title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ", content: "<div class='protocol-card'><h3>📋 Υπό κράτηση/σύλληψη</h3><ul><li>Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»</li><li>Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.</li><li>Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.</li><li>Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.</li></ul></div>" },
+        { id: "cat5", title: "TRAFFIC STOP", content: "<div class='protocol-card'><p><strong>Τι είναι:</strong> Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.</p><h3>Διαδικασία:</h3><ol><li>Ενημέρωση ασυρμάτου.</li><li>Κλείδωμα πινακίδας με radar.</li><li>Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).</li><li>Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.</li><li>Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.</li><li>Έλεγχος MDT, πινακίδων, ποινικού μητρώου.</li><li>Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».</li></ol></div>" }
       ],
       footer: {
         left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
@@ -604,7 +235,8 @@
       }
     };
 
-    let siteContent = { ...defaultContent };
+    // State
+    let siteContent = JSON.parse(JSON.stringify(defaultContent)); // βαθύ αντίγραφο
     let currentUser = null;
     let isAdmin = false;
 
@@ -623,15 +255,12 @@
     const closePanelBtn = document.getElementById('closePanelBtn');
     const navTabs = document.getElementById('navTabs');
     const contentArea = document.getElementById('contentArea');
+    const saveIndicator = document.getElementById('saveIndicator');
 
-    // Έλεγχος admin
-    async function checkIfAdmin(uid) {
-      try {
-        const adminDoc = await getDoc(doc(db, "admins", uid));
-        return adminDoc.exists();
-      } catch (e) {
-        return false;
-      }
+    // Βοηθητικές συναρτήσεις
+    function showSaveIndicator() {
+      saveIndicator.classList.add('show');
+      setTimeout(() => saveIndicator.classList.remove('show'), 2000);
     }
 
     // Φόρτωση από Firebase
@@ -639,12 +268,20 @@
       try {
         const snap = await getDoc(contentDocRef);
         if (snap.exists()) {
-          siteContent = snap.data();
+          // Συγχώνευση με default για να υπάρχουν όλα τα απαραίτητα πεδία
+          const data = snap.data();
+          siteContent = {
+            cover: { ...defaultContent.cover, ...(data.cover || {}) },
+            categories: Array.isArray(data.categories) ? data.categories : defaultContent.categories,
+            footer: { ...defaultContent.footer, ...(data.footer || {}) }
+          };
         } else {
+          // Δεν υπάρχει έγγραφο, αποθηκεύουμε το default
           await setDoc(contentDocRef, defaultContent);
         }
       } catch (e) {
-        console.warn("Firebase load failed, using default", e);
+        console.error("Firebase load error, using default content", e);
+        // Κρατάμε το defaultContent
       }
       renderAll();
     }
@@ -657,47 +294,60 @@
       saveTimeout = setTimeout(async () => {
         try {
           await setDoc(contentDocRef, siteContent);
-          document.getElementById('saveIndicator').classList.add('show');
-          setTimeout(() => document.getElementById('saveIndicator').classList.remove('show'), 2000);
+          showSaveIndicator();
         } catch (e) {
           console.error("Firebase save error", e);
         }
       }, 800);
     }
 
-    // Ανανέωση ολόκληρης της προβολής (tabs + σελίδες)
-    function renderAll() {
-      // Κεντρικά πεδία (εξώφυλλο, footer)
-      document.getElementById('cover-badge-pre').textContent = siteContent.cover.badge;
-      document.getElementById('cover-span-pre').textContent = siteContent.cover.span;
-      document.getElementById('cover-subhead-pre').textContent = siteContent.cover.subhead;
-      document.getElementById('cover-rank-pre').innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank;
-      document.getElementById('cover-sticker-pre').innerHTML = '<i class="fas fa-certificate"></i> ' + siteContent.cover.sticker;
-      document.getElementById('cover-quote-pre').innerHTML = '<i class="fas fa-quote-right" style="color:#c9a03d;"></i> ' + siteContent.cover.quote;
-      document.getElementById('footer-left-pre').textContent = siteContent.footer.left;
-      document.getElementById('footer-right-pre').textContent = siteContent.footer.right;
+    // Έλεγχος admin
+    async function checkIfAdmin(uid) {
+      try {
+        const adminDoc = await getDoc(doc(db, "admins", uid));
+        return adminDoc.exists();
+      } catch (e) {
+        console.error("Error checking admin", e);
+        return false;
+      }
+    }
 
-      // Δυναμικά tabs
+    // Ανανέωση προβολής
+    function renderAll() {
+      // Ενημέρωση στατικών πεδίων
+      document.getElementById('cover-badge-pre').textContent = siteContent.cover.badge || defaultContent.cover.badge;
+      document.getElementById('cover-span-pre').textContent = siteContent.cover.span || defaultContent.cover.span;
+      document.getElementById('cover-subhead-pre').textContent = siteContent.cover.subhead || defaultContent.cover.subhead;
+      document.getElementById('cover-rank-pre').innerHTML = '<i class="fas fa-star"></i> ' + (siteContent.cover.rank || defaultContent.cover.rank);
+      document.getElementById('cover-sticker-pre').innerHTML = '<i class="fas fa-certificate"></i> ' + (siteContent.cover.sticker || defaultContent.cover.sticker);
+      document.getElementById('cover-quote-pre').innerHTML = '<i class="fas fa-quote-right" style="color:#c9a03d;"></i> ' + (siteContent.cover.quote || defaultContent.cover.quote);
+      document.getElementById('footer-left-pre').textContent = siteContent.footer.left || defaultContent.footer.left;
+      document.getElementById('footer-right-pre').textContent = siteContent.footer.right || defaultContent.footer.right;
+
+      // Δημιουργία tabs και σελίδων
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
 
-      siteContent.categories.forEach((cat, index) => {
-        // Δημιουργία tab
+      // Προσθήκη κατηγοριών
+      const categories = siteContent.categories || [];
+      categories.forEach((cat, index) => {
+        if (!cat || !cat.id) return;
+        // Tab
         const tab = document.createElement('div');
         tab.className = `nav-tab ${index === 0 ? 'active' : ''}`;
         tab.dataset.page = `page-${cat.id}`;
-        tab.innerHTML = `<i class="fas fa-file-alt"></i> ${cat.title}`;
+        tab.innerHTML = `<i class="fas fa-file-alt"></i> ${cat.title || 'Ανώνυμο'}`;
         navTabs.appendChild(tab);
 
-        // Δημιουργία σελίδας
+        // Page
         const page = document.createElement('div');
         page.id = `page-${cat.id}`;
         page.className = `page ${index === 0 ? 'active-page' : ''}`;
-        page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${cat.content}</div>`;
+        page.innerHTML = `<h2>${cat.title || ''}</h2><div class="protocol-card">${cat.content || ''}</div>`;
         contentArea.appendChild(page);
       });
 
-      // Προσθήκη σελίδας για φωτογραφίες (σταθερή)
+      // Πάντα προσθέτουμε τη σελίδα φωτογραφιών
       const photoTab = document.createElement('div');
       photoTab.className = 'nav-tab';
       photoTab.dataset.page = 'page-photos';
@@ -707,8 +357,6 @@
       const photoPage = document.createElement('div');
       photoPage.id = 'page-photos';
       photoPage.className = 'page';
-
-      // Μόνο οι admin βλέπουν τη φόρμα προσθήκης
       let uploadHtml = '';
       if (isAdmin) {
         uploadHtml = `
@@ -719,12 +367,10 @@
           </div>
         `;
       }
-
       photoPage.innerHTML = `
         <h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>
         ${uploadHtml}
         <div id="gallery-area">
-          <!-- Προαιρετικές αρχικές φωτογραφίες -->
           <img src="https://images.unsplash.com/photo-1585670149965-2c2b5a8e8b9c?w=200&h=150&fit=crop" class="gallery-img" alt="περίπολο">
           <img src="https://images.unsplash.com/photo-1542756470-3d7f2b2f3e9d?w=200&h=150&fit=crop" class="gallery-img" alt="αστυνομικό τμήμα">
           <img src="https://images.pexels.com/photos/712916/pexels-photo-712916.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop" class="gallery-img" alt="σήμα">
@@ -732,32 +378,34 @@
       `;
       contentArea.appendChild(photoPage);
 
-      // Επαναφορά λειτουργίας tabs
+      // Ενεργοποίηση tabs
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
           document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
           this.classList.add('active');
           const targetId = this.dataset.page;
-          document.getElementById(targetId).classList.add('active-page');
+          const targetPage = document.getElementById(targetId);
+          if (targetPage) targetPage.classList.add('active-page');
         });
       });
 
-      // Αρχικά ενεργό το πρώτο tab ή αν δεν υπάρχουν κατηγορίες, τα φωτογραφιών
-      if (siteContent.categories.length > 0) {
-        document.getElementById(`page-${siteContent.categories[0].id}`).classList.add('active-page');
-      } else {
-        document.getElementById('page-photos').classList.add('active-page');
-        const photoNavTab = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.page === 'page-photos');
-        if (photoNavTab) photoNavTab.classList.add('active');
+      // Αν δεν υπάρχουν κατηγορίες, ενεργοποιούμε τη σελίδα φωτογραφιών
+      if (categories.length === 0) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        const photoTabElem = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.page === 'page-photos');
+        if (photoTabElem) {
+          photoTabElem.classList.add('active');
+          document.getElementById('page-photos').classList.add('active-page');
+        }
       }
 
-      // Ξανασυνδέουμε το κουμπί προσθήκης φωτογραφιών μόνο αν είμαστε admin
+      // Αν είμαστε admin, συνδέουμε το κουμπί προσθήκης φωτογραφιών
       if (isAdmin) {
         const addBtn = document.getElementById('addImageBtn');
         const urlInput = document.getElementById('imageUrlInput');
         const gallery = document.getElementById('gallery-area');
-        if (addBtn) {
+        if (addBtn && urlInput && gallery) {
           addBtn.addEventListener('click', () => {
             const url = urlInput.value.trim();
             if (url) {
@@ -793,7 +441,8 @@
       addCatBtn.className = 'add-category-btn';
       addCatBtn.innerHTML = '<i class="fas fa-plus"></i> Προσθήκη νέας κατηγορίας';
       addCatBtn.addEventListener('click', () => {
-        const newId = 'cat' + Date.now() + Math.random().toString(36).substr(2, 4);
+        const newId = 'cat' + Date.now() + Math.random().toString(36).substring(2, 6);
+        if (!siteContent.categories) siteContent.categories = [];
         siteContent.categories.push({
           id: newId,
           title: 'Νέα κατηγορία',
@@ -805,14 +454,14 @@
       });
       panelDiv.appendChild(addCatBtn);
 
-      siteContent.categories.forEach((cat) => {
+      (siteContent.categories || []).forEach((cat) => {
         const catDiv = document.createElement('div');
         catDiv.className = 'category-item';
         
         const header = document.createElement('div');
         header.className = 'category-header';
         const titleInput = document.createElement('input');
-        titleInput.value = cat.title;
+        titleInput.value = cat.title || '';
         titleInput.placeholder = 'Τίτλος κατηγορίας';
         titleInput.addEventListener('input', (e) => {
           cat.title = e.target.value;
@@ -836,7 +485,7 @@
         contentLabel.textContent = 'Περιεχόμενο (HTML)';
         catDiv.appendChild(contentLabel);
         const contentTextarea = document.createElement('textarea');
-        contentTextarea.value = cat.content;
+        contentTextarea.value = cat.content || '';
         contentTextarea.style.minHeight = '150px';
         contentTextarea.addEventListener('input', (e) => {
           cat.content = e.target.value;
@@ -853,7 +502,6 @@
       panelDiv.appendChild(field('footer.right', 'Δεξί κείμενο', siteContent.footer.right));
     }
 
-    // Βοηθητικές συναρτήσεις για πεδία
     function sectionTitle(text) {
       const div = document.createElement('div');
       div.className = 'edit-section';
@@ -868,12 +516,15 @@
       lab.textContent = label;
       const input = document.createElement('input');
       input.type = 'text';
-      input.value = value;
+      input.value = value || '';
       input.dataset.path = path;
       input.addEventListener('input', (e) => {
         const parts = e.target.dataset.path.split('.');
         let obj = siteContent;
-        for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+        for (let i = 0; i < parts.length - 1; i++) {
+          if (!obj[parts[i]]) obj[parts[i]] = {};
+          obj = obj[parts[i]];
+        }
         obj[parts[parts.length - 1]] = e.target.value;
         renderAll();
         saveToFirebase();
@@ -897,8 +548,7 @@
           toggleEditBtn.classList.remove('visible');
           authStatus.innerHTML += ' (απλός χρήστης)';
         }
-        // Ανανέωση της σελίδας για να εμφανιστεί/κρυφτεί η φόρμα φωτογραφιών
-        renderAll();
+        renderAll(); // ανανέωση για φόρμα φωτογραφιών
       } else {
         authStatus.innerHTML = 'Μη συνδεδεμένος';
         loginBtn.style.display = 'inline-flex';
@@ -907,7 +557,7 @@
         isAdmin = false;
         panel.classList.remove('open');
         mainView.classList.remove('shifted');
-        renderAll(); // ξανατρέχουμε για να κρύψουμε τη φόρμα
+        renderAll();
       }
     });
 
@@ -936,7 +586,7 @@
     });
 
     // Αρχική φόρτωση
-    await loadContent();
+    loadContent();
   </script>
 </body>
 </html>
