@@ -9,11 +9,10 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* Στυλ όπως πριν – συμπυκνωμένα για συντομία, αλλά πλήρη */
+    /* ίδια στυλ (όπως πριν, συνοπτικά) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #e8ecf2; color: #1e1e2f; }
     .app-wrapper { display: flex; min-height: 100vh; }
-    /* Πλαϊνό πάνελ */
     .edit-panel {
       width: 420px; background: #1f2b3a; color: #eef4fc;
       box-shadow: 4px 0 20px rgba(0,0,0,0.3); overflow-y: auto;
@@ -39,18 +38,15 @@
       border: 1px solid #5c748b; border-radius: 12px; color: white;
       font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: vertical;
     }
-    .edit-field textarea { min-height: 70px; }
     .panel-footer {
       padding: 20px; background: #0f1a24; border-top: 1px solid #2d445b;
       font-size: 0.85rem; color: #96aec9; display: flex; align-items: center; gap: 10px;
     }
     .save-indicator { margin-left: auto; background: #2a5f2a; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #d4edda; opacity: 0; transition: opacity 0.3s; }
     .save-indicator.show { opacity: 1; }
-    /* κύρια προβολή */
     .main-view { flex: 1; transition: margin-left 0.3s ease; margin-left: 0; background: #f0f2f5; padding: 20px; }
     .main-view.shifted { margin-left: 420px; }
     .site-container { max-width: 1100px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid rgba(0,45,85,0.15); }
-    /* γραμμή σύνδεσης */
     .auth-bar {
       background: #eef2f6; padding: 10px 25px; display: flex;
       align-items: center; justify-content: flex-end; gap: 15px;
@@ -73,7 +69,6 @@
     .login-card input { width: 100%; padding: 14px 18px; margin-bottom: 15px; border: 2px solid #dde3ec; border-radius: 60px; font-size: 1rem; }
     .login-card button { background: #1d3e63; color: white; border: none; padding: 14px; border-radius: 60px; font-weight: 700; width: 100%; cursor: pointer; }
     .login-card .error { color: #b02e2e; margin-top: 10px; }
-    /* κουμπί επεξεργασίας */
     .toggle-edit-btn {
       position: fixed; bottom: 30px; right: 30px; background: #1d3e63; border: none; color: white;
       width: 60px; height: 60px; border-radius: 60px; box-shadow: 0 8px 18px rgba(0,20,40,0.4);
@@ -81,13 +76,11 @@
       border: 2px solid #c9a03d; transition: 0.2s;
     }
     .toggle-edit-btn.visible { display: flex; }
-    /* κατηγορίες στο panel */
     .category-item { background: #2b3849; border-radius: 16px; padding: 15px; margin-bottom: 20px; border: 1px solid #4d627a; }
     .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .category-header input { flex: 1; margin-right: 10px; background: #1d2a38; border: 1px solid #6e8bb0; color: white; padding: 8px 12px; border-radius: 30px; }
     .delete-cat-btn { background: #a13d3d; border: none; color: white; width: 36px; height: 36px; border-radius: 36px; font-size: 1.2rem; cursor: pointer; }
     .add-category-btn { background: #2a5f2a; color: white; border: none; padding: 12px 20px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
-    /* κύρια στυλ προβολής */
     .main-header {
       background: #0b1a30; background-image: linear-gradient(145deg, #0b1a30 0%, #102b44 100%);
       padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: space-between;
@@ -191,7 +184,6 @@
   </div>
 
   <script type="module">
-    // Ενιαίο module για όλη τη λογική
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -206,13 +198,12 @@
       appId: "1:553518888871:web:033e7d3ba25da5e1386882"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
     const contentDocRef = doc(db, "policeSite", "content");
 
-    // Default content (εφεδρικό)
+    // Default content
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -236,11 +227,11 @@
     };
 
     // State
-    let siteContent = JSON.parse(JSON.stringify(defaultContent)); // βαθύ αντίγραφο
+    let siteContent = JSON.parse(JSON.stringify(defaultContent));
     let currentUser = null;
     let isAdmin = false;
 
-    // DOM elements
+    // DOM elements - τα αποθηκεύουμε σε constants για να βεβαιωθούμε ότι υπάρχουν
     const authStatus = document.getElementById('authStatus');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -257,10 +248,14 @@
     const contentArea = document.getElementById('contentArea');
     const saveIndicator = document.getElementById('saveIndicator');
 
-    // Βοηθητικές συναρτήσεις
+    // Επιπλέον static elements (εξώφυλλο, footer) - τα ελέγχουμε μέσα στη renderAll
+    // Δεν τα αποθηκεύουμε στατικά γιατί μπορεί να αλλάξουν μετά από render, αλλά τα παίρνουμε κάθε φορά.
+
     function showSaveIndicator() {
-      saveIndicator.classList.add('show');
-      setTimeout(() => saveIndicator.classList.remove('show'), 2000);
+      if (saveIndicator) {
+        saveIndicator.classList.add('show');
+        setTimeout(() => saveIndicator.classList.remove('show'), 2000);
+      }
     }
 
     // Φόρτωση από Firebase
@@ -268,20 +263,19 @@
       try {
         const snap = await getDoc(contentDocRef);
         if (snap.exists()) {
-          // Συγχώνευση με default για να υπάρχουν όλα τα απαραίτητα πεδία
           const data = snap.data();
+          // Συγχώνευση με default για ασφάλεια
           siteContent = {
             cover: { ...defaultContent.cover, ...(data.cover || {}) },
             categories: Array.isArray(data.categories) ? data.categories : defaultContent.categories,
             footer: { ...defaultContent.footer, ...(data.footer || {}) }
           };
         } else {
-          // Δεν υπάρχει έγγραφο, αποθηκεύουμε το default
+          // αποθηκεύουμε το default για πρώτη φορά
           await setDoc(contentDocRef, defaultContent);
         }
       } catch (e) {
-        console.error("Firebase load error, using default content", e);
-        // Κρατάμε το defaultContent
+        console.error("Firebase load error, using default", e);
       }
       renderAll();
     }
@@ -312,23 +306,37 @@
       }
     }
 
+    // Συνάρτηση ασφαλούς ενημέρωσης element
+    function safeSetText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+    function safeSetHTML(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = value;
+    }
+
     // Ανανέωση προβολής
     function renderAll() {
-      // Ενημέρωση στατικών πεδίων
-      document.getElementById('cover-badge-pre').textContent = siteContent.cover.badge || defaultContent.cover.badge;
-      document.getElementById('cover-span-pre').textContent = siteContent.cover.span || defaultContent.cover.span;
-      document.getElementById('cover-subhead-pre').textContent = siteContent.cover.subhead || defaultContent.cover.subhead;
-      document.getElementById('cover-rank-pre').innerHTML = '<i class="fas fa-star"></i> ' + (siteContent.cover.rank || defaultContent.cover.rank);
-      document.getElementById('cover-sticker-pre').innerHTML = '<i class="fas fa-certificate"></i> ' + (siteContent.cover.sticker || defaultContent.cover.sticker);
-      document.getElementById('cover-quote-pre').innerHTML = '<i class="fas fa-quote-right" style="color:#c9a03d;"></i> ' + (siteContent.cover.quote || defaultContent.cover.quote);
-      document.getElementById('footer-left-pre').textContent = siteContent.footer.left || defaultContent.footer.left;
-      document.getElementById('footer-right-pre').textContent = siteContent.footer.right || defaultContent.footer.right;
+      // Ενημέρωση στατικών πεδίων - με ελέγχους
+      safeSetText('cover-badge-pre', siteContent.cover.badge || defaultContent.cover.badge);
+      safeSetText('cover-span-pre', siteContent.cover.span || defaultContent.cover.span);
+      safeSetText('cover-subhead-pre', siteContent.cover.subhead || defaultContent.cover.subhead);
+      const rankEl = document.getElementById('cover-rank-pre');
+      if (rankEl) rankEl.innerHTML = '<i class="fas fa-star"></i> ' + (siteContent.cover.rank || defaultContent.cover.rank);
+      const stickerEl = document.getElementById('cover-sticker-pre');
+      if (stickerEl) stickerEl.innerHTML = '<i class="fas fa-certificate"></i> ' + (siteContent.cover.sticker || defaultContent.cover.sticker);
+      const quoteEl = document.getElementById('cover-quote-pre');
+      if (quoteEl) quoteEl.innerHTML = '<i class="fas fa-quote-right" style="color:#c9a03d;"></i> ' + (siteContent.cover.quote || defaultContent.cover.quote);
+      safeSetText('footer-left-pre', siteContent.footer.left || defaultContent.footer.left);
+      safeSetText('footer-right-pre', siteContent.footer.right || defaultContent.footer.right);
 
       // Δημιουργία tabs και σελίδων
+      if (!navTabs || !contentArea) return; // αν δεν υπάρχουν, σταματάμε
+
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
 
-      // Προσθήκη κατηγοριών
       const categories = siteContent.categories || [];
       categories.forEach((cat, index) => {
         if (!cat || !cat.id) return;
@@ -424,9 +432,41 @@
     // Κατασκευή πάνελ επεξεργασίας
     function buildPanel() {
       const panelDiv = document.getElementById('panelContent');
+      if (!panelDiv) return;
       panelDiv.innerHTML = '';
 
-      // Ενότητα Εξώφυλλο
+      function sectionTitle(text) {
+        const div = document.createElement('div');
+        div.className = 'edit-section';
+        div.innerHTML = `<h4>${text}</h4>`;
+        return div;
+      }
+
+      function field(path, label, value) {
+        const div = document.createElement('div');
+        div.className = 'edit-field';
+        const lab = document.createElement('label');
+        lab.textContent = label;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value || '';
+        input.dataset.path = path;
+        input.addEventListener('input', (e) => {
+          const parts = e.target.dataset.path.split('.');
+          let obj = siteContent;
+          for (let i = 0; i < parts.length - 1; i++) {
+            if (!obj[parts[i]]) obj[parts[i]] = {};
+            obj = obj[parts[i]];
+          }
+          obj[parts[parts.length - 1]] = e.target.value;
+          renderAll();
+          saveToFirebase();
+        });
+        div.appendChild(lab);
+        div.appendChild(input);
+        return div;
+      }
+
       panelDiv.appendChild(sectionTitle('Εξώφυλλο'));
       panelDiv.appendChild(field('cover.badge', 'Κεντρικό κείμενο', siteContent.cover.badge));
       panelDiv.appendChild(field('cover.span', 'Span FIVEM RP', siteContent.cover.span));
@@ -435,7 +475,6 @@
       panelDiv.appendChild(field('cover.sticker', 'Sticker', siteContent.cover.sticker));
       panelDiv.appendChild(field('cover.quote', 'Απόφθεγμα', siteContent.cover.quote));
 
-      // Ενότητα Κατηγορίες
       panelDiv.appendChild(sectionTitle('Κατηγορίες'));
       const addCatBtn = document.createElement('button');
       addCatBtn.className = 'add-category-btn';
@@ -496,94 +535,75 @@
         panelDiv.appendChild(catDiv);
       });
 
-      // Ενότητα Υποσέλιδο
       panelDiv.appendChild(sectionTitle('Υποσέλιδο'));
       panelDiv.appendChild(field('footer.left', 'Αριστερό κείμενο', siteContent.footer.left));
       panelDiv.appendChild(field('footer.right', 'Δεξί κείμενο', siteContent.footer.right));
-    }
-
-    function sectionTitle(text) {
-      const div = document.createElement('div');
-      div.className = 'edit-section';
-      div.innerHTML = `<h4>${text}</h4>`;
-      return div;
-    }
-
-    function field(path, label, value) {
-      const div = document.createElement('div');
-      div.className = 'edit-field';
-      const lab = document.createElement('label');
-      lab.textContent = label;
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = value || '';
-      input.dataset.path = path;
-      input.addEventListener('input', (e) => {
-        const parts = e.target.dataset.path.split('.');
-        let obj = siteContent;
-        for (let i = 0; i < parts.length - 1; i++) {
-          if (!obj[parts[i]]) obj[parts[i]] = {};
-          obj = obj[parts[i]];
-        }
-        obj[parts[parts.length - 1]] = e.target.value;
-        renderAll();
-        saveToFirebase();
-      });
-      div.appendChild(lab);
-      div.appendChild(input);
-      return div;
     }
 
     // Authentication
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       if (user) {
-        authStatus.innerHTML = `<i class="fas fa-user-shield"></i> ${user.email}`;
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = 'inline-flex';
+        if (authStatus) authStatus.innerHTML = `<i class="fas fa-user-shield"></i> ${user.email}`;
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-flex';
         isAdmin = await checkIfAdmin(user.uid);
         if (isAdmin) {
-          toggleEditBtn.classList.add('visible');
+          if (toggleEditBtn) toggleEditBtn.classList.add('visible');
         } else {
-          toggleEditBtn.classList.remove('visible');
-          authStatus.innerHTML += ' (απλός χρήστης)';
+          if (toggleEditBtn) toggleEditBtn.classList.remove('visible');
+          if (authStatus) authStatus.innerHTML += ' (απλός χρήστης)';
         }
         renderAll(); // ανανέωση για φόρμα φωτογραφιών
       } else {
-        authStatus.innerHTML = 'Μη συνδεδεμένος';
-        loginBtn.style.display = 'inline-flex';
-        logoutBtn.style.display = 'none';
-        toggleEditBtn.classList.remove('visible');
+        if (authStatus) authStatus.innerHTML = 'Μη συνδεδεμένος';
+        if (loginBtn) loginBtn.style.display = 'inline-flex';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (toggleEditBtn) toggleEditBtn.classList.remove('visible');
         isAdmin = false;
-        panel.classList.remove('open');
-        mainView.classList.remove('shifted');
+        if (panel) panel.classList.remove('open');
+        if (mainView) mainView.classList.remove('shifted');
         renderAll();
       }
     });
 
-    loginBtn.addEventListener('click', () => loginModal.classList.add('show'));
-    submitLogin.addEventListener('click', async () => {
-      try {
-        await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-        loginModal.classList.remove('show');
-        loginError.textContent = '';
-      } catch (error) {
-        loginError.textContent = 'Λάθος email ή κωδικός';
-      }
-    });
-    logoutBtn.addEventListener('click', async () => await signOut(auth));
-    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('show'); });
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        if (loginModal) loginModal.classList.add('show');
+      });
+    }
+    if (submitLogin) {
+      submitLogin.addEventListener('click', async () => {
+        try {
+          await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+          if (loginModal) loginModal.classList.remove('show');
+          if (loginError) loginError.textContent = '';
+        } catch (error) {
+          if (loginError) loginError.textContent = 'Λάθος email ή κωδικός';
+        }
+      });
+    }
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => await signOut(auth));
+    }
+    if (loginModal) {
+      loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('show'); });
+    }
 
-    toggleEditBtn.addEventListener('click', () => {
-      if (!isAdmin) return;
-      panel.classList.toggle('open');
-      mainView.classList.toggle('shifted');
-      if (panel.classList.contains('open')) buildPanel();
-    });
-    closePanelBtn.addEventListener('click', () => {
-      panel.classList.remove('open');
-      mainView.classList.remove('shifted');
-    });
+    if (toggleEditBtn) {
+      toggleEditBtn.addEventListener('click', () => {
+        if (!isAdmin) return;
+        if (panel) panel.classList.toggle('open');
+        if (mainView) mainView.classList.toggle('shifted');
+        if (panel && panel.classList.contains('open')) buildPanel();
+      });
+    }
+    if (closePanelBtn) {
+      closePanelBtn.addEventListener('click', () => {
+        if (panel) panel.classList.remove('open');
+        if (mainView) mainView.classList.remove('shifted');
+      });
+    }
 
     // Αρχική φόρτωση
     loadContent();
