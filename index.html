@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Πλήρης Διαχείριση με σειρά προσωπικού</title>
+  <title>ΕΛ.ΑΣ. | Πλήρης Διαχείριση με Βαθμούς</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
@@ -267,12 +267,17 @@
       gap: 12px;
       margin-bottom: 12px;
     }
-    .officer-fields input {
+    .officer-fields input,
+    .officer-fields select {
       background: #0f1f30;
       border: 1px solid #5b7da0;
       color: white;
       padding: 10px 16px;
       border-radius: 30px;
+      font-family: 'Inter', sans-serif;
+    }
+    .officer-fields select option {
+      background: #1f2f40;
     }
     .officer-actions {
       display: flex;
@@ -494,6 +499,22 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     const contentDocRef = doc(db, "policeSite", "content");
+
+    // Λίστα βαθμών για το dropdown
+    const rankOptions = [
+      "Ταξίαρχος",
+      "Αστυνομικός Διευθυντής",
+      "Αστυνομικός Υποδιευθυντής",
+      "Αστυνόμος Α’",
+      "Αστυνόμος Β’",
+      "Υπαστυνόμος Α’",
+      "Υπαστυνόμος Β’",
+      "Ανθυπαστυνόμος",
+      "Αρχιφύλακας",
+      "Υπαρχιφύλακας",
+      "Αστυφύλακας",
+      "Δόκιμος Αστυφύλακας"
+    ];
 
     // Default content με όλα τα απαραίτητα πεδία
     const defaultContent = {
@@ -896,11 +917,16 @@
               saveToFirebase();
             });
             
-            const rankInput = document.createElement('input');
-            rankInput.type = 'text';
-            rankInput.placeholder = 'Βαθμός';
-            rankInput.value = off.rank || '';
-            rankInput.addEventListener('input', (e) => {
+            // Rank dropdown
+            const rankSelect = document.createElement('select');
+            rankOptions.forEach(rank => {
+              const option = document.createElement('option');
+              option.value = rank;
+              option.textContent = rank;
+              if (off.rank === rank) option.selected = true;
+              rankSelect.appendChild(option);
+            });
+            rankSelect.addEventListener('change', (e) => {
               off.rank = e.target.value;
               renderMain();
               saveToFirebase();
@@ -918,7 +944,7 @@
             
             fieldsDiv.appendChild(firstNameInput);
             fieldsDiv.appendChild(lastNameInput);
-            fieldsDiv.appendChild(rankInput);
+            fieldsDiv.appendChild(rankSelect);
             fieldsDiv.appendChild(discordInput);
             
             const actionsDiv = document.createElement('div');
@@ -975,7 +1001,7 @@
           addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Προσθήκη αστυνομικού';
           addBtn.addEventListener('click', () => {
             if (!cat.officers) cat.officers = [];
-            cat.officers.push({ firstName: '', lastName: '', rank: '', discord: '' });
+            cat.officers.push({ firstName: '', lastName: '', rank: rankOptions[0], discord: '' });
             renderMain();
             saveToFirebase();
             renderAdminPanel();
