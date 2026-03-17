@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Επεξεργασία με Firebase FiveM RP</title>
+  <title>ΕΛ.ΑΣ. | Admin Control FiveM RP</title>
   <!-- Font Awesome 5 -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Firebase SDK ( modular μέσω CDN) -->
+  <!-- Firebase SDK modular -->
   <script type="module">
-    // Import the functions you need from the SDKs (ακριβώς όπως το ζήτησε ο χρήστης, αλλά σε module)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Your web app's Firebase configuration (όπως δόθηκε)
     const firebaseConfig = {
       apiKey: "AIzaSyCM8zk9I3LOy9VGAqmIgpyDcjes3HWtvYA",
       authDomain: "policefivem-e368f.firebaseapp.com",
@@ -24,18 +23,19 @@
       appId: "1:553518888871:web:033e7d3ba25da5e1386882"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    // Κάνουμε τα αντικείμενα διαθέσιμα παγκόσμια για χρήση από το υπόλοιπο script (που δεν είναι module)
+    // αναφορά εγγράφου περιεχομένου
+    const contentDocRef = doc(db, "policeSite", "content");
+
     window.firebaseDb = db;
-    window.firebaseDocRef = doc(db, "policeSite", "content"); // ένα μόνο έγγραφο για όλο το περιεχόμενο
-    window.firebaseReady = true;
-    console.log("Firebase initialized successfully");
+    window.contentDocRef = contentDocRef;
+    window.firebaseAuth = auth;
   </script>
   <style>
-    /* ίδια στυλ με προηγουμένως, συν μικρή προσαρμογή */
+    /* ίδια στυλ με προηγούμενα, συν μερικά προσθήκες */
     * {
       margin: 0;
       padding: 0;
@@ -178,6 +178,90 @@
       overflow: hidden;
       border: 1px solid rgba(0,45,85,0.15);
     }
+    /* κουμπιά ελέγχου ταυτότητας */
+    .auth-bar {
+      background: #eef2f6;
+      padding: 10px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 15px;
+      border-bottom: 1px solid #cbd6e4;
+    }
+    .auth-status {
+      font-size: 0.9rem;
+      color: #1e3b5c;
+      background: white;
+      padding: 5px 16px;
+      border-radius: 30px;
+      border: 1px solid #b0c4db;
+    }
+    .auth-btn {
+      background: #1d3e63;
+      border: none;
+      color: white;
+      padding: 8px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #c9a03d;
+      font-size: 0.9rem;
+    }
+    .auth-btn.logout {
+      background: #5e4c38;
+      border-color: #a69b87;
+    }
+    .login-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .login-modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .login-card {
+      background: white;
+      max-width: 380px;
+      width: 90%;
+      padding: 30px;
+      border-radius: 40px;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+    }
+    .login-card h3 {
+      margin-bottom: 20px;
+      color: #0b1a30;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 15px;
+      border: 2px solid #dde3ec;
+      border-radius: 60px;
+      font-size: 1rem;
+    }
+    .login-card button {
+      background: #1d3e63;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 60px;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+    }
+    .login-card .error {
+      color: #b02e2e;
+      margin-top: 10px;
+    }
+    /* κουμπί επεξεργασίας - αρχικά κρυφό */
     .toggle-edit-btn {
       position: fixed;
       bottom: 30px;
@@ -192,17 +276,16 @@
       font-size: 1.8rem;
       cursor: pointer;
       z-index: 1100;
-      display: flex;
+      display: none; /* κρυφό αρχικά */
       align-items: center;
       justify-content: center;
       border: 2px solid #c9a03d;
       transition: 0.2s;
     }
-    .toggle-edit-btn:hover {
-      transform: scale(1.08);
-      background: #2c527c;
+    .toggle-edit-btn.visible {
+      display: flex;
     }
-    /* υπόλοιπα στυλ προβολής (όπως πριν) */
+    /* υπόλοιπα στυλ προβολής (ίδια) */
     .main-header {
       background: #0b1a30;
       background-image: linear-gradient(145deg, #0b1a30 0%, #102b44 100%);
@@ -417,6 +500,13 @@
 
     <!-- Κύρια προβολή -->
     <div class="main-view" id="mainView">
+      <!-- Γραμμή ταυτοποίησης -->
+      <div class="auth-bar">
+        <span class="auth-status" id="authStatus">Μη συνδεδεμένος</span>
+        <button class="auth-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Σύνδεση Admin</button>
+        <button class="auth-btn logout" id="logoutBtn" style="display:none;"><i class="fas fa-sign-out-alt"></i> Αποσύνδεση</button>
+      </div>
+
       <div class="site-container">
         <!-- Κεφαλίδα -->
         <header class="main-header">
@@ -471,16 +561,28 @@
       </div>
     </div>
 
+    <!-- Κουμπί επεξεργασίας (αρχικά κρυφό) -->
     <button class="toggle-edit-btn" id="togglePanelBtn"><i class="fas fa-pencil-alt"></i></button>
   </div>
 
-  <script type="module">
-    // Κύριο script που χρησιμοποιεί το Firebase (το config έχει ήδη φορτωθεί)
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <!-- Modal σύνδεσης -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-card">
+      <h3><i class="fas fa-lock"></i> Σύνδεση Διαχειριστή</h3>
+      <input type="email" id="loginEmail" placeholder="Email" value="admin@example.com">
+      <input type="password" id="loginPassword" placeholder="Κωδικός">
+      <button id="submitLogin">Σύνδεση</button>
+      <p class="error" id="loginError"></p>
+    </div>
+  </div>
 
-    // Αναμονή για το Firebase (το app έχει ήδη αρχικοποιηθεί)
+  <script type="module">
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
     const db = window.firebaseDb;
-    const docRef = window.firebaseDocRef;
+    const auth = window.firebaseAuth;
+    const contentDocRef = window.contentDocRef;
 
     // Default περιεχόμενο (ίδιο με πριν)
     const defaultContent = {
@@ -552,32 +654,58 @@
       }
     };
 
-    // Φόρτωση από Firebase ή χρήση default
     let siteContent = { ...defaultContent };
+    let currentUser = null;
+    let isAdmin = false;
 
-    async function loadFromFirebase() {
+    // DOM στοιχεία
+    const authStatus = document.getElementById('authStatus');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginModal = document.getElementById('loginModal');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const submitLogin = document.getElementById('submitLogin');
+    const loginError = document.getElementById('loginError');
+    const toggleEditBtn = document.getElementById('togglePanelBtn');
+    const panel = document.getElementById('editPanel');
+    const mainView = document.getElementById('mainView');
+    const closePanelBtn = document.getElementById('closePanelBtn');
+
+    // Έλεγχος αν ένας χρήστης είναι admin (υπάρχει το UID στη συλλογή admins)
+    async function checkIfAdmin(uid) {
       try {
-        const snap = await getDoc(docRef);
+        const adminDoc = await getDoc(doc(db, "admins", uid));
+        return adminDoc.exists();
+      } catch (e) {
+        console.error("Error checking admin", e);
+        return false;
+      }
+    }
+
+    // Φόρτωση περιεχομένου από Firebase
+    async function loadContent() {
+      try {
+        const snap = await getDoc(contentDocRef);
         if (snap.exists()) {
           siteContent = snap.data();
         } else {
-          // πρώτη φορά, αποθηκεύουμε το default
-          await setDoc(docRef, defaultContent);
+          await setDoc(contentDocRef, defaultContent);
         }
       } catch (e) {
         console.warn("Firebase load failed, using default", e);
       }
       renderContent();
-      buildPanel(); // κτίζουμε το panel με τα φορτωμένα δεδομένα
     }
 
-    // Αποθήκευση στο Firebase (με debounce)
+    // Αποθήκευση στο Firebase (μόνο από admin)
     let saveTimeout;
     function saveToFirebase() {
+      if (!isAdmin) return;
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(async () => {
         try {
-          await setDoc(docRef, siteContent);
+          await setDoc(contentDocRef, siteContent);
           document.getElementById('saveIndicator').classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator').classList.remove('show'), 2000);
         } catch (e) {
@@ -586,7 +714,7 @@
       }, 800);
     }
 
-    // Συναρτήσεις render (όπως προηγουμένως)
+    // Συναρτήσεις render
     function renderContent() {
       document.getElementById('cover-badge-pre').textContent = siteContent.cover.badge;
       document.getElementById('cover-span-pre').textContent = siteContent.cover.span;
@@ -620,7 +748,7 @@
       document.getElementById('footer-right-pre').textContent = siteContent.footer.right;
     }
 
-    // Δημιουργία πεδίων στο panel (παρόμοια με πριν, αλλά καλούν saveToFirebase)
+    // Κατασκευή πάνελ επεξεργασίας (μόνο για admin)
     function buildPanel() {
       const panel = document.getElementById('panelContent');
       panel.innerHTML = '';
@@ -691,37 +819,76 @@
       panel.appendChild(field('footer.right', 'Δεξί', siteContent.footer.right, 'input'));
     }
 
-    // Ξεκινάμε φορτώνοντας από Firebase
-    await loadFromFirebase();
+    // Διαχείριση κατάστασης σύνδεσης
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        authStatus.innerHTML = `<i class="fas fa-user-shield"></i> ${user.email}`;
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-flex';
+        isAdmin = await checkIfAdmin(user.uid);
+        if (isAdmin) {
+          toggleEditBtn.classList.add('visible');
+        } else {
+          toggleEditBtn.classList.remove('visible');
+          authStatus.innerHTML += ' (απλός χρήστης)';
+        }
+      } else {
+        authStatus.innerHTML = 'Μη συνδεδεμένος';
+        loginBtn.style.display = 'inline-flex';
+        logoutBtn.style.display = 'none';
+        toggleEditBtn.classList.remove('visible');
+        isAdmin = false;
+        if (panel.classList.contains('open')) {
+          panel.classList.remove('open');
+          mainView.classList.remove('shifted');
+        }
+      }
+    });
 
-    // tabs
-    const tabs = document.querySelectorAll('.nav-tab');
-    const pages = document.querySelectorAll('.page');
-    tabs.forEach(tab => tab.addEventListener('click', function() {
-      const targetId = this.getAttribute('data-page');
-      tabs.forEach(t => t.classList.remove('active'));
-      pages.forEach(p => p.classList.remove('active-page'));
-      this.classList.add('active');
-      document.getElementById(targetId).classList.add('active-page');
-    }));
+    // Σύνδεση
+    loginBtn.addEventListener('click', () => {
+      loginModal.classList.add('show');
+    });
 
-    // πάνελ
-    const panel = document.getElementById('editPanel');
-    const mainView = document.getElementById('mainView');
-    const toggleBtn = document.getElementById('togglePanelBtn');
-    const closeBtn = document.getElementById('closePanelBtn');
+    submitLogin.addEventListener('click', async () => {
+      const email = loginEmail.value;
+      const password = loginPassword.value;
+      loginError.textContent = '';
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        loginModal.classList.remove('show');
+      } catch (error) {
+        loginError.textContent = 'Λάθος email ή κωδικός';
+      }
+    });
 
-    toggleBtn.addEventListener('click', () => {
+    // Αποσύνδεση
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+
+    // Κλείσιμο modal αν κλικ έξω
+    loginModal.addEventListener('click', (e) => {
+      if (e.target === loginModal) loginModal.classList.remove('show');
+    });
+
+    // Κουμπί επεξεργασίας (μόνο admin)
+    toggleEditBtn.addEventListener('click', () => {
+      if (!isAdmin) return;
       panel.classList.toggle('open');
       mainView.classList.toggle('shifted');
-      if (panel.classList.contains('open')) buildPanel();
+      if (panel.classList.contains('open')) {
+        buildPanel();
+      }
     });
-    closeBtn.addEventListener('click', () => {
+
+    closePanelBtn.addEventListener('click', () => {
       panel.classList.remove('open');
       mainView.classList.remove('shifted');
     });
 
-    // gallery
+    // gallery (προσθήκη φωτογραφιών, προσβάσιμο σε όλους)
     const addBtn = document.getElementById('addImageBtn');
     const urlInput = document.getElementById('imageUrlInput');
     const gallery = document.getElementById('gallery-area');
@@ -733,6 +900,20 @@
         gallery.appendChild(img); urlInput.value = '';
       }
     });
+
+    // Φόρτωση περιεχομένου
+    await loadContent();
+
+    // tabs
+    const tabs = document.querySelectorAll('.nav-tab');
+    const pages = document.querySelectorAll('.page');
+    tabs.forEach(tab => tab.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-page');
+      tabs.forEach(t => t.classList.remove('active'));
+      pages.forEach(p => p.classList.remove('active-page'));
+      this.classList.add('active');
+      document.getElementById(targetId).classList.add('active-page');
+    }));
   </script>
 </body>
 </html>
