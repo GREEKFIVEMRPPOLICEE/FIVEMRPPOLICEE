@@ -351,14 +351,17 @@
       display: flex;
       align-items: center;
       gap: 16px;
+      flex-wrap: wrap;
     }
     .penalty-name-input {
       flex: 2;
+      min-width: 200px;
       background: #0f1f30;
       border: 1px solid #5b7da0;
       color: white;
       padding: 10px 16px;
       border-radius: 30px;
+      font-family: 'Inter', sans-serif;
     }
     .penalty-checkboxes {
       display: flex;
@@ -752,6 +755,27 @@
       }
       if (inList) html += '</ul>';
       return html;
+    }
+
+    // Συλλογή όλων των ονομάτων από κατηγορίες προσωπικού
+    function getAllPersonnelNames() {
+      const names = [];
+      const categories = siteContent.categories || [];
+      categories.forEach(cat => {
+        if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
+          cat.officers.forEach(o => {
+            const firstName = o.firstName || '';
+            const lastName = o.lastName || '';
+            const fullName = (firstName + ' ' + lastName).trim();
+            if (fullName) {
+              // Για εμφάνιση στο dropdown, προσθέτουμε και τον βαθμό
+              const displayName = fullName + (o.rank ? ` (${o.rank})` : '');
+              names.push({ value: fullName, display: displayName });
+            }
+          });
+        }
+      });
+      return names;
     }
 
     // Φόρτωση από Firebase
@@ -1164,10 +1188,23 @@
           card.appendChild(officersDiv);
           card.appendChild(addBtn);
         } else if (cat.type === 'penalties') {
-          // Διαχείριση πειθαρχικών
+          // Διαχείριση πειθαρχικών με dropdown ονομάτων
           const penalties = cat.penalties || [];
           const penaltiesDiv = document.createElement('div');
           penaltiesDiv.className = 'penalties-grid';
+
+          // Δημιουργία λίστας ονομάτων για το datalist
+          const namesList = getAllPersonnelNames();
+          const datalistId = `names-datalist-${cat.id}`;
+          const datalist = document.createElement('datalist');
+          datalist.id = datalistId;
+          namesList.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value; // αποθηκεύουμε το πλήρες όνομα
+            option.textContent = item.display; // εμφανίζεται με βαθμό
+            datalist.appendChild(option);
+          });
+          penaltiesDiv.appendChild(datalist);
 
           penalties.forEach((p, pIndex) => {
             const pItem = document.createElement('div');
@@ -1176,8 +1213,9 @@
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.className = 'penalty-name-input';
-            nameInput.placeholder = 'Όνομα';
+            nameInput.placeholder = 'Αναζήτηση ή επιλογή ονόματος';
             nameInput.value = p.name || '';
+            nameInput.setAttribute('list', datalistId);
             nameInput.addEventListener('input', (e) => {
               p.name = e.target.value;
               renderMain();
