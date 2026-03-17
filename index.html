@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Admin Control & Photo Upload</title>
+  <title>ΕΛ.ΑΣ. | Διαχείριση Περιεχομένου</title>
   <!-- Font Awesome 5 -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* ίδια στυλ (όπως πριν, συνοπτικά) */
+    /* Στυλ όπως πριν, συμπυκνωμένα για συντομία - πλήρη */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #e8ecf2; color: #1e1e2f; }
     .app-wrapper { display: flex; min-height: 100vh; }
@@ -38,6 +38,7 @@
       border: 1px solid #5c748b; border-radius: 12px; color: white;
       font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: vertical;
     }
+    .edit-field textarea { min-height: 70px; }
     .panel-footer {
       padding: 20px; background: #0f1a24; border-top: 1px solid #2d445b;
       font-size: 0.85rem; color: #96aec9; display: flex; align-items: center; gap: 10px;
@@ -203,7 +204,7 @@
     const auth = getAuth(app);
     const contentDocRef = doc(db, "policeSite", "content");
 
-    // Default content
+    // Default content (τα πάντα σε plain text)
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -214,11 +215,66 @@
         quote: "Κράτος δικαίου, ασφάλεια, σεβασμός"
       },
       categories: [
-        { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", content: "<p>Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.</p><p>Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.</p><p>Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.</p><div class='signature-block'>Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.</div>" },
-        { id: "cat2", title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ", content: "<ul class='article-list'><li>Υπακούει και προασπίζει τους νόμους.</li><li>Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.</li><li>Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.</li><li>Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.</li><li>Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.</li></ul>" },
-        { id: "cat3", title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ", content: "<div class='grid-2col'><div class='protocol-card'><h3>Κανόνες σημάτων</h3><p>Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.</p></div><div class='protocol-card'><h3>Ληστείες – Ομηρίες</h3><ul><li>Άφιξη εντός 5 λεπτών</li><li>2 αστυνομικοί παραπάνω από ληστές</li><li>Άοπλος διαπραγματευτής</li><li>Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.</li></ul></div></div>" },
-        { id: "cat4", title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ", content: "<div class='protocol-card'><h3>📋 Υπό κράτηση/σύλληψη</h3><ul><li>Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»</li><li>Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.</li><li>Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.</li><li>Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.</li></ul></div>" },
-        { id: "cat5", title: "TRAFFIC STOP", content: "<div class='protocol-card'><p><strong>Τι είναι:</strong> Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.</p><h3>Διαδικασία:</h3><ol><li>Ενημέρωση ασυρμάτου.</li><li>Κλείδωμα πινακίδας με radar.</li><li>Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).</li><li>Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.</li><li>Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.</li><li>Έλεγχος MDT, πινακίδων, ποινικού μητρώου.</li><li>Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».</li></ol></div>" }
+        {
+          id: "cat1",
+          title: "ΕΙΣΑΓΩΓΗ",
+          content: `Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.
+
+Οι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.
+
+Ο Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.
+
+Τη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.`
+        },
+        {
+          id: "cat2",
+          title: "ΚΩΔΙΚΑΣ ΔΕΟΝΤΟΛΟΓΙΑΣ",
+          content: `- Υπακούει και προασπίζει τους νόμους.
+- Διατηρεί ψυχραιμία σε καταστάσεις που ξεφεύγουν από τον έλεγχο.
+- Σέβεται τους πολίτες, απευθύνεται στον πληθυντικό, προστατεύει έστω και με κίνδυνο της ασφάλειάς του.
+- Σέβεται την ιεραρχία και εκτελεί εντολές ανωτέρων.
+- Χρησιμοποιεί τον εξοπλισμό (ρουχισμό, όχημα, οπλισμό) μόνον εν ώρα υπηρεσίας.`
+        },
+        {
+          id: "cat3",
+          title: "ΣΗΜΑΤΑ & ΛΗΣΤΕΙΕΣ",
+          content: `**Κανόνες σημάτων**
+Το σήμα [XX-XX] δίνεται υποχρεωτικά μόνο αν έχουν ληφθεί τα στοιχεία του πολίτη. Ο πολίτης μπορεί να ζητήσει σήμα μόνο αν συντρέχει λόγος· διαφορετικά οφείλει να απευθυνθεί στο τμήμα. Απαγορεύεται να αναφέρεται ονοματεπώνυμο συναδέλφου για αυτοπροστασία.
+
+**Ληστείες – Ομηρίες**
+- Άφιξη εντός 5 λεπτών
+- 2 αστυνομικοί παραπάνω από ληστές
+- Άοπλος διαπραγματευτής
+- Αιτήματα: δευτερόλεπτα, καρφιά, γεράκι, οχήματα. Μετά από 20' δικαίωμα επέμβασης.`
+        },
+        {
+          id: "cat4",
+          title: "ΔΙΚΑΙΩΜΑΤΑ ΠΟΛΙΤΗ",
+          content: `📋 Υπό κράτηση/σύλληψη
+- Διάβασμα δικαιωμάτων: «Βρίσκεστε υπό κράτηση για... Έχετε δικαίωμα σιωπής (εκτός ταυτότητας). Ό,τι πείτε θα χρησιμοποιηθεί εναντίον σας. Δικαίωμα σε ένα τηλεφώνημα και νομική κάλυψη.»
+- Δεν αφαιρείται ποτέ φαγητό/νερό. Αν έχει άδεια οπλοκατοχής, αφαιρείται προσωρινά ο οπλισμός.
+- Ταυτοποίηση μέσω MDT, αναγραφή κατηγοριών, συνολική ποινή και χρηματικό ποσό.
+- Παροχή δικηγόρου αν δεν έχει οικονομική άνεση.`
+        },
+        {
+          id: "cat5",
+          title: "TRAFFIC STOP",
+          content: `Τι είναι: Έλεγχος οχήματος για τροχαία παράβαση ή πιθανή εμπλοκή σε έγκλημα.
+
+Διαδικασία:
+1. Ενημέρωση ασυρμάτου.
+2. Κλείδωμα πινακίδας με radar.
+3. Οδηγός σβήνει μηχανή, κατεβάζει παράθυρα (αν φιμέ, όλα τα τζάμια).
+4. Κατέβασμα οδηγού, μετακίνηση στο πεζοδρόμιο.
+5. Ζητάμε στοιχεία, έγγραφα, λόγο ελέγχου.
+6. Έλεγχος MDT, πινακίδων, ποινικού μητρώου.
+7. Αναφορά ασυρμάτου «traffic stop υπό έλεγχο».`
+        }
+      ],
+      photos: [ // αρχικές φωτογραφίες
+        "https://images.unsplash.com/photo-1585670149965-2c2b5a8e8b9c?w=200&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1542756470-3d7f2b2f3e9d?w=200&h=150&fit=crop",
+        "https://images.pexels.com/photos/712916/pexels-photo-712916.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop"
       ],
       footer: {
         left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
@@ -231,7 +287,7 @@
     let currentUser = null;
     let isAdmin = false;
 
-    // DOM elements - τα αποθηκεύουμε σε constants για να βεβαιωθούμε ότι υπάρχουν
+    // DOM elements references
     const authStatus = document.getElementById('authStatus');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -248,14 +304,54 @@
     const contentArea = document.getElementById('contentArea');
     const saveIndicator = document.getElementById('saveIndicator');
 
-    // Επιπλέον static elements (εξώφυλλο, footer) - τα ελέγχουμε μέσα στη renderAll
-    // Δεν τα αποθηκεύουμε στατικά γιατί μπορεί να αλλάξουν μετά από render, αλλά τα παίρνουμε κάθε φορά.
+    // Βοηθητική συνάρτηση για ασφαλή ενημέρωση
+    function safeSetText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+    function safeSetHTML(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = value;
+    }
 
-    function showSaveIndicator() {
-      if (saveIndicator) {
-        saveIndicator.classList.add('show');
-        setTimeout(() => saveIndicator.classList.remove('show'), 2000);
+    // Μετατροπή plain text σε HTML (απλή υλοποίηση)
+    function textToHTML(text) {
+      if (!text) return '';
+      const lines = text.split('\n');
+      let inList = false;
+      let html = '';
+      for (let line of lines) {
+        line = line.trim();
+        if (line === '') {
+          if (inList) {
+            html += '</ul>';
+            inList = false;
+          }
+          continue;
+        }
+        // Έλεγχος αν είναι λίστα (ξεκινάει με - ή *)
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          if (!inList) {
+            html += '<ul>';
+            inList = true;
+          }
+          html += `<li>${line.substring(2)}</li>`;
+        } else {
+          if (inList) {
+            html += '</ul>';
+            inList = false;
+          }
+          // Έλεγχος αν είναι αριθμημένη λίστα (ξεκινάει με 1. κλπ)
+          const numberedMatch = line.match(/^(\d+)\.\s+(.*)/);
+          if (numberedMatch) {
+            html += `<ol><li>${numberedMatch[2]}</li></ol>`;
+          } else {
+            html += `<p>${line}</p>`;
+          }
+        }
       }
+      if (inList) html += '</ul>';
+      return html;
     }
 
     // Φόρτωση από Firebase
@@ -264,14 +360,14 @@
         const snap = await getDoc(contentDocRef);
         if (snap.exists()) {
           const data = snap.data();
-          // Συγχώνευση με default για ασφάλεια
           siteContent = {
             cover: { ...defaultContent.cover, ...(data.cover || {}) },
             categories: Array.isArray(data.categories) ? data.categories : defaultContent.categories,
+            photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos,
             footer: { ...defaultContent.footer, ...(data.footer || {}) }
           };
         } else {
-          // αποθηκεύουμε το default για πρώτη φορά
+          // πρώτη φορά: αποθηκεύουμε default
           await setDoc(contentDocRef, defaultContent);
         }
       } catch (e) {
@@ -288,7 +384,10 @@
       saveTimeout = setTimeout(async () => {
         try {
           await setDoc(contentDocRef, siteContent);
-          showSaveIndicator();
+          if (saveIndicator) {
+            saveIndicator.classList.add('show');
+            setTimeout(() => saveIndicator.classList.remove('show'), 2000);
+          }
         } catch (e) {
           console.error("Firebase save error", e);
         }
@@ -301,24 +400,13 @@
         const adminDoc = await getDoc(doc(db, "admins", uid));
         return adminDoc.exists();
       } catch (e) {
-        console.error("Error checking admin", e);
         return false;
       }
     }
 
-    // Συνάρτηση ασφαλούς ενημέρωσης element
-    function safeSetText(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = value;
-    }
-    function safeSetHTML(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = value;
-    }
-
     // Ανανέωση προβολής
     function renderAll() {
-      // Ενημέρωση στατικών πεδίων - με ελέγχους
+      // Ενημέρωση στατικών πεδίων
       safeSetText('cover-badge-pre', siteContent.cover.badge || defaultContent.cover.badge);
       safeSetText('cover-span-pre', siteContent.cover.span || defaultContent.cover.span);
       safeSetText('cover-subhead-pre', siteContent.cover.subhead || defaultContent.cover.subhead);
@@ -331,8 +419,7 @@
       safeSetText('footer-left-pre', siteContent.footer.left || defaultContent.footer.left);
       safeSetText('footer-right-pre', siteContent.footer.right || defaultContent.footer.right);
 
-      // Δημιουργία tabs και σελίδων
-      if (!navTabs || !contentArea) return; // αν δεν υπάρχουν, σταματάμε
+      if (!navTabs || !contentArea) return;
 
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
@@ -351,11 +438,12 @@
         const page = document.createElement('div');
         page.id = `page-${cat.id}`;
         page.className = `page ${index === 0 ? 'active-page' : ''}`;
-        page.innerHTML = `<h2>${cat.title || ''}</h2><div class="protocol-card">${cat.content || ''}</div>`;
+        const htmlContent = textToHTML(cat.content || '');
+        page.innerHTML = `<h2>${cat.title || ''}</h2><div class="protocol-card">${htmlContent}</div>`;
         contentArea.appendChild(page);
       });
 
-      // Πάντα προσθέτουμε τη σελίδα φωτογραφιών
+      // Σελίδα φωτογραφιών
       const photoTab = document.createElement('div');
       photoTab.className = 'nav-tab';
       photoTab.dataset.page = 'page-photos';
@@ -365,6 +453,7 @@
       const photoPage = document.createElement('div');
       photoPage.id = 'page-photos';
       photoPage.className = 'page';
+
       let uploadHtml = '';
       if (isAdmin) {
         uploadHtml = `
@@ -375,14 +464,14 @@
           </div>
         `;
       }
+
+      const photos = siteContent.photos || [];
+      const galleryHtml = photos.map(url => `<img src="${url}" class="gallery-img" alt="φωτογραφία">`).join('');
+
       photoPage.innerHTML = `
         <h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>
         ${uploadHtml}
-        <div id="gallery-area">
-          <img src="https://images.unsplash.com/photo-1585670149965-2c2b5a8e8b9c?w=200&h=150&fit=crop" class="gallery-img" alt="περίπολο">
-          <img src="https://images.unsplash.com/photo-1542756470-3d7f2b2f3e9d?w=200&h=150&fit=crop" class="gallery-img" alt="αστυνομικό τμήμα">
-          <img src="https://images.pexels.com/photos/712916/pexels-photo-712916.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop" class="gallery-img" alt="σήμα">
-        </div>
+        <div id="gallery-area">${galleryHtml}</div>
       `;
       contentArea.appendChild(photoPage);
 
@@ -412,16 +501,14 @@
       if (isAdmin) {
         const addBtn = document.getElementById('addImageBtn');
         const urlInput = document.getElementById('imageUrlInput');
-        const gallery = document.getElementById('gallery-area');
-        if (addBtn && urlInput && gallery) {
+        if (addBtn && urlInput) {
           addBtn.addEventListener('click', () => {
             const url = urlInput.value.trim();
             if (url) {
-              const img = document.createElement('img');
-              img.src = url;
-              img.className = 'gallery-img';
-              img.onerror = () => { alert('Μη έγκυρο URL'); img.remove(); };
-              gallery.appendChild(img);
+              if (!siteContent.photos) siteContent.photos = [];
+              siteContent.photos.push(url);
+              renderAll(); // ανανέωση για εμφάνιση της νέας φωτογραφίας
+              saveToFirebase();
               urlInput.value = '';
             }
           });
@@ -429,7 +516,7 @@
       }
     }
 
-    // Κατασκευή πάνελ επεξεργασίας
+    // Κατασκευή πάνελ επεξεργασίας (με textarea για plain text)
     function buildPanel() {
       const panelDiv = document.getElementById('panelContent');
       if (!panelDiv) return;
@@ -442,14 +529,21 @@
         return div;
       }
 
-      function field(path, label, value) {
+      function field(path, label, value, isTextarea = false) {
         const div = document.createElement('div');
         div.className = 'edit-field';
         const lab = document.createElement('label');
         lab.textContent = label;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = value || '';
+        let input;
+        if (isTextarea) {
+          input = document.createElement('textarea');
+          input.value = value || '';
+          input.style.minHeight = '150px';
+        } else {
+          input = document.createElement('input');
+          input.type = 'text';
+          input.value = value || '';
+        }
         input.dataset.path = path;
         input.addEventListener('input', (e) => {
           const parts = e.target.dataset.path.split('.');
@@ -485,7 +579,7 @@
         siteContent.categories.push({
           id: newId,
           title: 'Νέα κατηγορία',
-          content: '<p>Περιεχόμενο...</p>'
+          content: 'Περιεχόμενο...'
         });
         renderAll();
         saveToFirebase();
@@ -521,7 +615,7 @@
         catDiv.appendChild(header);
 
         const contentLabel = document.createElement('label');
-        contentLabel.textContent = 'Περιεχόμενο (HTML)';
+        contentLabel.textContent = 'Περιεχόμενο (απλό κείμενο)';
         catDiv.appendChild(contentLabel);
         const contentTextarea = document.createElement('textarea');
         contentTextarea.value = cat.content || '';
@@ -554,7 +648,7 @@
           if (toggleEditBtn) toggleEditBtn.classList.remove('visible');
           if (authStatus) authStatus.innerHTML += ' (απλός χρήστης)';
         }
-        renderAll(); // ανανέωση για φόρμα φωτογραφιών
+        renderAll();
       } else {
         if (authStatus) authStatus.innerHTML = 'Μη συνδεδεμένος';
         if (loginBtn) loginBtn.style.display = 'inline-flex';
