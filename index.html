@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ΕΛ.ΑΣ. | Πλήρης Διαχείριση με Πειθαρχικά</title>
+  <title>ΕΛ.ΑΣ. | Πλήρης Διαχείριση με Πειθαρχικά & Αίτηση</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
@@ -91,33 +91,77 @@
     .rank-tag i { margin-right: 8px; color: #fbbf24; }
     .nav-tabs {
       background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
-      padding: 0.75rem 2.5rem 0; border-bottom: 1px solid rgba(203,213,225,0.5);
-      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 0.75rem 2.5rem 0;
+      border-bottom: 1px solid rgba(203,213,225,0.5);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .nav-tab {
-      padding: 0.8rem 1.8rem; font-weight: 600; font-size: 0.95rem; color: #334155;
-      border-radius: 30px 30px 0 0; background: transparent; cursor: pointer;
-      transition: all 0.2s; border: 1px solid transparent; border-bottom: none;
-      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #334155;
+      border-radius: 30px 30px 0 0;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      border-bottom: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     .nav-tab i { color: #5f7d9c; }
     .nav-tab:hover { background: rgba(255,255,255,0.9); color: #0b2b44; }
     .nav-tab.active {
-      background: white; border-color: #cbd5e1; border-bottom: 2px solid white;
-      margin-bottom: -1px; color: #1e3a8a; font-weight: 700;
+      background: white;
+      border-color: #cbd5e1;
+      border-bottom: 2px solid white;
+      margin-bottom: -1px;
+      color: #1e3a8a;
+      font-weight: 700;
       box-shadow: 0 -4px 8px rgba(0,0,0,0.02);
     }
     .nav-tab.active i { color: #fbbf24; }
-    .content-area { padding: 2.5rem; background: white; }
-    .page { display: none; animation: fade 0.25s ease; }
-    .page.active-page { display: block; }
-    @keyframes fade { from { opacity: 0.3; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    h2 {
-      font-size: 2.2rem; font-weight: 700; color: #0c2b4a;
-      border-left: 8px solid #fbbf24; padding-left: 1.5rem; margin-bottom: 2rem;
+    .content-area {
+      padding: 2.5rem;
+      background: white;
     }
-    .protocol-card { background: #f8fafc; border-radius: 28px; padding: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 8px 20px -8px rgba(0,20,40,0.1); }
-    .site-footer { background: #0f1f30; color: #b0c9e0; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; border-top: 2px solid #fbbf24; }
+    .page {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+    .page.active-page {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0.3; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0c2b4a;
+      border-left: 8px solid #fbbf24;
+      padding-left: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .protocol-card {
+      background: #f8fafc;
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 20px -8px rgba(0,20,40,0.1);
+    }
+    .site-footer {
+      background: #0f1f30;
+      color: #b0c9e0;
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      border-top: 2px solid #fbbf24;
+    }
 
     /* ADMIN PANEL */
     .admin-panel {
@@ -571,6 +615,21 @@
       font-size: 1.2rem;
       text-align: center;
     }
+
+    /* form iframe */
+    .form-container {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #f8fafc;
+      padding: 1rem;
+    }
+    .form-iframe {
+      width: 100%;
+      height: 2200px;
+      border: none;
+      border-radius: 20px;
+    }
     @media (max-width: 1000px) { .app { flex-direction: column; } }
   </style>
 </head>
@@ -665,7 +724,7 @@
       "Δόκιμος Αστυφύλακας"
     ];
 
-    // Default content με όλα τα απαραίτητα πεδία, συμπεριλαμβανομένου ενός παραδείγματος πειθαρχικών
+    // Default content
     const defaultContent = {
       cover: {
         badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ",
@@ -821,7 +880,7 @@
                   type: c.type || 'text',
                   visibility: c.visibility || 'public',
                   officers: c.officers || [],
-                  penalties: c.penalties || [], // νέο πεδίο για πειθαρχικά
+                  penalties: c.penalties || [],
                   ...c
                 })) 
               : defaultContent.categories,
@@ -952,6 +1011,26 @@
       photoPage.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`;
       contentArea.appendChild(photoPage);
 
+      // Νέα σελίδα: Αίτηση (Google Form)
+      const formTab = document.createElement('div');
+      formTab.className = 'nav-tab';
+      formTab.dataset.page = 'page-form';
+      formTab.innerHTML = '<i class="fas fa-file-signature"></i> ΑΙΤΗΣΗ';
+      navTabs.appendChild(formTab);
+
+      const formPage = document.createElement('div');
+      formPage.id = 'page-form';
+      formPage.className = 'page';
+      formPage.innerHTML = `
+        <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
+        <div class="protocol-card">
+          <div class="form-container">
+            <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Φόρτωση…</iframe>
+          </div>
+        </div>
+      `;
+      contentArea.appendChild(formPage);
+
       // Ενεργοποίηση tabs
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
@@ -964,17 +1043,18 @@
         });
       });
 
+      // Αν δεν υπάρχουν κατηγορίες, κάνε ενεργή την πρώτη διαθέσιμη (π.χ. φωτογραφίες ή φόρμα)
       if (visibleCategories.length === 0) {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const photoTabElem = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.dataset.page === 'page-photos');
-        if (photoTabElem) { 
-          photoTabElem.classList.add('active'); 
-          document.getElementById('page-photos').classList.add('active-page'); 
+        const firstTab = document.querySelector('.nav-tab'); // μπορεί να είναι φωτογραφίες ή φόρμα
+        if (firstTab) {
+          firstTab.classList.add('active');
+          document.getElementById(firstTab.dataset.page).classList.add('active-page');
         }
       }
     }
 
-    // Admin panel - πλήρης διαχείριση
+    // Admin panel - πλήρης διαχείριση (ίδιο με πριν, χωρίς αλλαγές)
     function renderAdminPanel() {
       if (!adminContent) return;
       adminContent.innerHTML = '';
