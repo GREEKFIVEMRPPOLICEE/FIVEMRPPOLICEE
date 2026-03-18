@@ -938,30 +938,50 @@
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
 
+      // 1. Δημιουργία σελίδας Αίτησης (πρώτη)
+      const formTab = document.createElement('div');
+      formTab.className = 'nav-tab active'; // το κάνουμε active αρχικά
+      formTab.dataset.page = 'page-form';
+      formTab.innerHTML = '<i class="fas fa-file-signature"></i> ΑΙΤΗΣΗ';
+      navTabs.appendChild(formTab);
+
+      const formPage = document.createElement('div');
+      formPage.id = 'page-form';
+      formPage.className = 'page active-page'; // ενεργή σελίδα
+      formPage.innerHTML = `
+        <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
+        <div class="protocol-card">
+          <div class="form-container">
+            <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Φόρτωση…</iframe>
+          </div>
+        </div>
+      `;
+      contentArea.appendChild(formPage);
+
+      // 2. Δημιουργία tabs και σελίδων για δυναμικές κατηγορίες
       const categories = siteContent.categories || [];
       // Φιλτράρισμα με βάση την ορατότητα
       const visibleCategories = categories.filter(cat => {
-        if (cat.visibility === 'admin') return isAdmin; // μόνο admin βλέπουν
-        return true; // public ή undefined
+        if (cat.visibility === 'admin') return isAdmin;
+        return true;
       });
 
       visibleCategories.forEach((cat, index) => {
         if (!cat || !cat.id) return;
         const tab = document.createElement('div');
-        tab.className = `nav-tab ${index === 0 ? 'active' : ''}`;
+        tab.className = 'nav-tab'; // όχι active
         tab.dataset.page = `page-${cat.id}`;
         tab.innerHTML = `<i class="fas fa-file-alt"></i> ${cat.title}`;
         navTabs.appendChild(tab);
 
         const page = document.createElement('div');
         page.id = `page-${cat.id}`;
-        page.className = `page ${index === 0 ? 'active-page' : ''}`;
+        page.className = 'page'; // όχι active-page
 
         if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
           // Εμφάνιση καρτών προσωπικού
           let officersHtml = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">';
           cat.officers.forEach(o => {
-            // Το Discord εμφανίζεται μόνο σε admin
             const discordHtml = isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : '';
             officersHtml += `
               <div class="officer-display-card">
@@ -974,7 +994,7 @@
           officersHtml += '</div>';
           page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`;
         } else if (cat.type === 'penalties' && Array.isArray(cat.penalties)) {
-          // Εμφάνιση πίνακα πειθαρχικών με βαθμό κάτω από κάθε όνομα
+          // Εμφάνιση πίνακα πειθαρχικών
           let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>';
           cat.penalties.forEach(p => {
             const rank = findOfficerRank(p.name);
@@ -996,7 +1016,7 @@
         contentArea.appendChild(page);
       });
 
-      // Σελίδα φωτογραφιών (πάντα ορατή)
+      // 3. Σελίδα φωτογραφιών (τελευταία)
       const photoTab = document.createElement('div');
       photoTab.className = 'nav-tab';
       photoTab.dataset.page = 'page-photos';
@@ -1011,27 +1031,7 @@
       photoPage.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`;
       contentArea.appendChild(photoPage);
 
-      // Νέα σελίδα: Αίτηση (Google Form)
-      const formTab = document.createElement('div');
-      formTab.className = 'nav-tab';
-      formTab.dataset.page = 'page-form';
-      formTab.innerHTML = '<i class="fas fa-file-signature"></i> ΑΙΤΗΣΗ';
-      navTabs.appendChild(formTab);
-
-      const formPage = document.createElement('div');
-      formPage.id = 'page-form';
-      formPage.className = 'page';
-      formPage.innerHTML = `
-        <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
-        <div class="protocol-card">
-          <div class="form-container">
-            <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Φόρτωση…</iframe>
-          </div>
-        </div>
-      `;
-      contentArea.appendChild(formPage);
-
-      // Ενεργοποίηση tabs
+      // Ενεργοποίηση tabs (το πρώτο tab είναι ήδη active)
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1042,16 +1042,6 @@
           if (targetPage) targetPage.classList.add('active-page');
         });
       });
-
-      // Αν δεν υπάρχουν κατηγορίες, κάνε ενεργή την πρώτη διαθέσιμη (π.χ. φωτογραφίες ή φόρμα)
-      if (visibleCategories.length === 0) {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const firstTab = document.querySelector('.nav-tab'); // μπορεί να είναι φωτογραφίες ή φόρμα
-        if (firstTab) {
-          firstTab.classList.add('active');
-          document.getElementById(firstTab.dataset.page).classList.add('active-page');
-        }
-      }
     }
 
     // Admin panel - πλήρης διαχείριση (ίδιο με πριν, χωρίς αλλαγές)
@@ -1174,7 +1164,7 @@
         card.appendChild(header);
 
         if (cat.type === 'personnel') {
-          // Διαχείριση προσωπικού (ίδιο με πριν)
+          // Διαχείριση προσωπικού
           const officers = cat.officers || [];
           const officersDiv = document.createElement('div');
           officersDiv.className = 'officers-grid';
@@ -1206,7 +1196,6 @@
               saveToFirebase();
             });
             
-            // Rank dropdown
             const rankSelect = document.createElement('select');
             rankOptions.forEach(rank => {
               const option = document.createElement('option');
@@ -1239,7 +1228,6 @@
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'officer-actions';
             
-            // Κουμπιά μετακίνησης
             if (offIndex > 0) {
               const upBtn = document.createElement('button');
               upBtn.className = 'category-btn move';
@@ -1299,20 +1287,19 @@
           card.appendChild(officersDiv);
           card.appendChild(addBtn);
         } else if (cat.type === 'penalties') {
-          // Διαχείριση πειθαρχικών με dropdown ονομάτων
+          // Διαχείριση πειθαρχικών
           const penalties = cat.penalties || [];
           const penaltiesDiv = document.createElement('div');
           penaltiesDiv.className = 'penalties-grid';
 
-          // Δημιουργία λίστας ονομάτων για το datalist
           const namesList = getAllPersonnelNames();
           const datalistId = `names-datalist-${cat.id}`;
           const datalist = document.createElement('datalist');
           datalist.id = datalistId;
           namesList.forEach(item => {
             const option = document.createElement('option');
-            option.value = item.value; // αποθηκεύουμε το πλήρες όνομα
-            option.textContent = item.display; // εμφανίζεται με βαθμό
+            option.value = item.value;
+            option.textContent = item.display;
             datalist.appendChild(option);
           });
           penaltiesDiv.appendChild(datalist);
@@ -1336,7 +1323,6 @@
             const checkboxesDiv = document.createElement('div');
             checkboxesDiv.className = 'penalty-checkboxes';
 
-            // Τρεις στήλες
             [1,2,3].forEach(col => {
               const box = document.createElement('div');
               box.className = `penalty-checkbox ${p['p'+col] ? 'active' : ''}`;
@@ -1345,7 +1331,7 @@
                 p['p'+col] = !p['p'+col];
                 renderMain();
                 saveToFirebase();
-                renderAdminPanel(); // ανανέωση για ενημέρωση της κλάσης
+                renderAdminPanel();
               });
               checkboxesDiv.appendChild(box);
             });
@@ -1353,7 +1339,6 @@
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'penalty-actions';
             
-            // Κουμπιά μετακίνησης
             if (pIndex > 0) {
               const upBtn = document.createElement('button');
               upBtn.className = 'category-btn move';
@@ -1482,7 +1467,6 @@
       adminContent.appendChild(field('footer.left', 'Αριστερό κείμενο', siteContent.footer.left));
       adminContent.appendChild(field('footer.right', 'Δεξί κείμενο', siteContent.footer.right));
 
-      // Event listeners φωτογραφιών (πρέπει να είναι μετά την προσθήκη τους στο DOM)
       setTimeout(() => {
         const addPhotoBtn = document.getElementById('adminAddPhotoBtn');
         const photoUrlInput = document.getElementById('adminPhotoUrl');
