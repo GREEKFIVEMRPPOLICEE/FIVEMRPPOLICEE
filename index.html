@@ -843,7 +843,7 @@
           type: "text",
           visibility: "public",
           content: `Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος αποτελεί μία από τις βασικές συνιστώσες του κράτους δικαίου.\n\nΟι Αστυνομικοί είναι οι θεματοφύλακες των πολυτιμότερων αγαθών και δικαιωμάτων του Πολίτη. Στη σύγχρονη κοινωνική πραγματικότητα, ο ρόλος του Αστυνομικού καθίσταται πλέον πολυδιάστατος, πολύμορφος και καθοριστικός.\n\nΟ Αστυνομικός καλείται σήμερα να λειτουργήσει όχι ως απρόσωπος εκφραστής ενός μηχανισμού, αλλά μέσα από συλλογικές διαδικασίες που στηρίζονται στη συνεργασία Αστυνομίας και κοινωνίας, με απόλυτο πάντα σεβασμό στα ανθρώπινα δικαιώματα και τις ατομικές ελευθερίες.\n\nΤη σχέση αυτή ενδυναμώνει η έκδοση του παρόντος Κώδικα Δεοντολογίας. Είναι ένα πλαίσιο αρχών και κανόνων, που επισφραγίζει την αμοιβαία αναγνώριση και εμπιστοσύνη μεταξύ Αστυνομικών και Πολιτών.`,
-          subcategories: [] // optional
+          subcategories: []
         },
         {
           id: "cat2",
@@ -987,7 +987,7 @@
                   visibility: c.visibility || 'public',
                   officers: c.officers || [],
                   penalties: c.penalties || [],
-                  subcategories: c.subcategories || [], // ΝΕΟ
+                  subcategories: c.subcategories || [],
                   ...c
                 })) 
               : defaultContent.categories,
@@ -1028,7 +1028,7 @@
       }
     }
 
-    // ΝΕΑ συνάρτηση renderMain με υποστήριξη υποκατηγοριών
+    // Κεντρική συνάρτηση renderMain με υποστήριξη υποκατηγοριών
     function renderMain() {
       safeSetText('cover-badge-pre', siteContent.cover.badge);
       safeSetText('cover-span-pre', siteContent.cover.span);
@@ -1046,10 +1046,9 @@
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
 
-      // Δημιουργία λίστας tabs
       const tabs = [];
 
-      // 1. Φόρμα αίτησης (αν είναι ορατή)
+      // 1. Φόρμα αίτησης
       const showForm = (siteContent.formVisibility === 'public') || isAdmin;
       if (showForm) {
         tabs.push({
@@ -1072,7 +1071,7 @@
         });
       }
 
-      // 2. Κατηγορίες (φιλτράρισμα)
+      // 2. Κατηγορίες
       const categories = siteContent.categories || [];
       const visibleCategories = categories.filter(cat => {
         if (cat.visibility === 'admin') return isAdmin;
@@ -1118,9 +1117,8 @@
               tableHtml += '</tbody></table>';
               page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`;
             } else {
-              // text category: check for subcategories
+              // text category: check subcategories
               if (cat.subcategories && cat.subcategories.length > 0) {
-                // Build subcategory tabs and pages
                 let subHtml = `<h2>${cat.title}</h2><div class="protocol-card">`;
                 subHtml += `<div class="subcategory-tabs" id="subtabs-${cat.id}">`;
                 cat.subcategories.forEach((sub, idx) => {
@@ -1132,16 +1130,12 @@
                 });
                 subHtml += '</div></div>';
                 page.innerHTML = subHtml;
-
-                // Add event listeners for subcategory tabs after element is attached
                 setTimeout(() => {
                   const subtabs = document.querySelectorAll(`#subtabs-${cat.id} .subcategory-tab`);
                   subtabs.forEach(tab => {
                     tab.addEventListener('click', (e) => {
-                      // Deactivate all subtabs and subpages
                       subtabs.forEach(t => t.classList.remove('active'));
                       document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page'));
-                      // Activate current
                       tab.classList.add('active');
                       const subId = tab.dataset.subcat;
                       const subPage = document.getElementById(`subpage-${subId}`);
@@ -1150,7 +1144,6 @@
                   });
                 }, 0);
               } else {
-                // No subcategories, show simple content
                 const htmlContent = textToHTML(cat.content || '');
                 page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${htmlContent}</div>`;
               }
@@ -1175,7 +1168,6 @@
         }
       });
 
-      // Δημιουργία tabs και σελίδων
       tabs.forEach((tab, index) => {
         const tabEl = document.createElement('div');
         tabEl.className = 'nav-tab';
@@ -1189,7 +1181,6 @@
         contentArea.appendChild(pageEl);
       });
 
-      // Ενεργοποίηση αλλαγής main tab
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1202,7 +1193,7 @@
       });
     }
 
-    // Admin panel - με διαχείριση υποκατηγοριών
+    // Admin panel - πλήρης υλοποίηση με όλους τους τύπους
     function renderAdminPanel() {
       if (!adminContent) return;
       adminContent.innerHTML = '';
@@ -1215,7 +1206,7 @@
       adminContent.appendChild(field('cover.sticker', 'Sticker', siteContent.cover.sticker));
       adminContent.appendChild(field('cover.quote', 'Απόφθεγμα', siteContent.cover.quote));
 
-      // Ορατότητα φόρμας αίτησης
+      // Ορατότητα φόρμας
       adminContent.appendChild(sectionTitle('Φόρμα Αίτησης'));
       const formVisDiv = document.createElement('div');
       formVisDiv.className = 'visibility-toggle';
@@ -1265,10 +1256,10 @@
           cat.type = e.target.value;
           if (cat.type === 'personnel' && !cat.officers) cat.officers = [];
           if (cat.type === 'penalties' && !cat.penalties) cat.penalties = [];
-          if (cat.type === 'text' && !cat.subcategories) cat.subcategories = []; // ensure subcategories array
+          if (cat.type === 'text' && !cat.subcategories) cat.subcategories = [];
           renderMain();
           saveToFirebase();
-          renderAdminPanel();
+          renderAdminPanel(); // ανανέωση για εμφάνιση κατάλληλων πεδίων
         });
 
         const visDiv = document.createElement('div');
@@ -1334,17 +1325,242 @@
         card.appendChild(header);
 
         if (cat.type === 'personnel') {
-          // Υπάρχον UI για προσωπικό (ίδιο)
+          // Διαχείριση προσωπικού
           const officers = cat.officers || [];
           const officersDiv = document.createElement('div');
           officersDiv.className = 'officers-grid';
-          // ... (ο κώδικας για officers παραμένει ίδιος - παραλείπεται για συντομία, αλλά υπάρχει στο τελικό αρχείο)
-          // Για πλήρη κώδικα δείτε το συνημμένο αρχείο
-          // (εδώ θα μπει ολόκληρη η υλοποίηση)
+
+          officers.forEach((off, offIndex) => {
+            const offCard = document.createElement('div');
+            offCard.className = 'officer-card';
+            
+            const fieldsDiv = document.createElement('div');
+            fieldsDiv.className = 'officer-fields';
+            
+            const firstNameInput = document.createElement('input');
+            firstNameInput.type = 'text';
+            firstNameInput.placeholder = 'Όνομα';
+            firstNameInput.value = off.firstName || '';
+            firstNameInput.addEventListener('input', (e) => {
+              off.firstName = e.target.value;
+              renderMain();
+              saveToFirebase();
+            });
+            
+            const lastNameInput = document.createElement('input');
+            lastNameInput.type = 'text';
+            lastNameInput.placeholder = 'Επώνυμο';
+            lastNameInput.value = off.lastName || '';
+            lastNameInput.addEventListener('input', (e) => {
+              off.lastName = e.target.value;
+              renderMain();
+              saveToFirebase();
+            });
+            
+            const rankSelect = document.createElement('select');
+            rankOptions.forEach(rank => {
+              const option = document.createElement('option');
+              option.value = rank;
+              option.textContent = rank;
+              if (off.rank === rank) option.selected = true;
+              rankSelect.appendChild(option);
+            });
+            rankSelect.addEventListener('change', (e) => {
+              off.rank = e.target.value;
+              renderMain();
+              saveToFirebase();
+            });
+            
+            const discordInput = document.createElement('input');
+            discordInput.type = 'text';
+            discordInput.placeholder = 'Discord';
+            discordInput.value = off.discord || '';
+            discordInput.addEventListener('input', (e) => {
+              off.discord = e.target.value;
+              renderMain();
+              saveToFirebase();
+            });
+            
+            fieldsDiv.appendChild(firstNameInput);
+            fieldsDiv.appendChild(lastNameInput);
+            fieldsDiv.appendChild(rankSelect);
+            fieldsDiv.appendChild(discordInput);
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'officer-actions';
+            
+            if (offIndex > 0) {
+              const upBtn = document.createElement('button');
+              upBtn.className = 'category-btn move';
+              upBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+              upBtn.addEventListener('click', () => {
+                const temp = officers[offIndex];
+                officers[offIndex] = officers[offIndex-1];
+                officers[offIndex-1] = temp;
+                renderMain();
+                saveToFirebase();
+                renderAdminPanel();
+              });
+              actionsDiv.appendChild(upBtn);
+            }
+            if (offIndex < officers.length - 1) {
+              const downBtn = document.createElement('button');
+              downBtn.className = 'category-btn move';
+              downBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+              downBtn.addEventListener('click', () => {
+                const temp = officers[offIndex];
+                officers[offIndex] = officers[offIndex+1];
+                officers[offIndex+1] = temp;
+                renderMain();
+                saveToFirebase();
+                renderAdminPanel();
+              });
+              actionsDiv.appendChild(downBtn);
+            }
+
+            const deleteOffBtn = document.createElement('button');
+            deleteOffBtn.className = 'category-btn delete';
+            deleteOffBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteOffBtn.addEventListener('click', () => {
+              cat.officers.splice(offIndex, 1);
+              renderMain();
+              saveToFirebase();
+              renderAdminPanel();
+            });
+            actionsDiv.appendChild(deleteOffBtn);
+            
+            offCard.appendChild(fieldsDiv);
+            offCard.appendChild(actionsDiv);
+            officersDiv.appendChild(offCard);
+          });
+
+          const addBtn = document.createElement('button');
+          addBtn.className = 'add-officer-btn';
+          addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Προσθήκη αστυνομικού';
+          addBtn.addEventListener('click', () => {
+            if (!cat.officers) cat.officers = [];
+            cat.officers.push({ firstName: '', lastName: '', rank: rankOptions[0], discord: '' });
+            renderMain();
+            saveToFirebase();
+            renderAdminPanel();
+          });
+
+          card.appendChild(officersDiv);
+          card.appendChild(addBtn);
         } else if (cat.type === 'penalties') {
-          // Υπάρχον UI για πειθαρχικά (ίδιο)
+          // Διαχείριση πειθαρχικών
+          const penalties = cat.penalties || [];
+          const penaltiesDiv = document.createElement('div');
+          penaltiesDiv.className = 'penalties-grid';
+
+          const namesList = getAllPersonnelNames();
+          const datalistId = `names-datalist-${cat.id}`;
+          const datalist = document.createElement('datalist');
+          datalist.id = datalistId;
+          namesList.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.display;
+            datalist.appendChild(option);
+          });
+          penaltiesDiv.appendChild(datalist);
+
+          penalties.forEach((p, pIndex) => {
+            const pItem = document.createElement('div');
+            pItem.className = 'penalty-item';
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'penalty-name-input';
+            nameInput.placeholder = 'Αναζήτηση ή επιλογή ονόματος';
+            nameInput.value = p.name || '';
+            nameInput.setAttribute('list', datalistId);
+            nameInput.addEventListener('input', (e) => {
+              p.name = e.target.value;
+              renderMain();
+              saveToFirebase();
+            });
+
+            const checkboxesDiv = document.createElement('div');
+            checkboxesDiv.className = 'penalty-checkboxes';
+
+            [1,2,3].forEach(col => {
+              const box = document.createElement('div');
+              box.className = `penalty-checkbox ${p['p'+col] ? 'active' : ''}`;
+              box.textContent = p['p'+col] ? '✗' : '';
+              box.addEventListener('click', () => {
+                p['p'+col] = !p['p'+col];
+                renderMain();
+                saveToFirebase();
+                renderAdminPanel();
+              });
+              checkboxesDiv.appendChild(box);
+            });
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'penalty-actions';
+            
+            if (pIndex > 0) {
+              const upBtn = document.createElement('button');
+              upBtn.className = 'category-btn move';
+              upBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+              upBtn.addEventListener('click', () => {
+                const temp = penalties[pIndex];
+                penalties[pIndex] = penalties[pIndex-1];
+                penalties[pIndex-1] = temp;
+                renderMain();
+                saveToFirebase();
+                renderAdminPanel();
+              });
+              actionsDiv.appendChild(upBtn);
+            }
+            if (pIndex < penalties.length - 1) {
+              const downBtn = document.createElement('button');
+              downBtn.className = 'category-btn move';
+              downBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+              downBtn.addEventListener('click', () => {
+                const temp = penalties[pIndex];
+                penalties[pIndex] = penalties[pIndex+1];
+                penalties[pIndex+1] = temp;
+                renderMain();
+                saveToFirebase();
+                renderAdminPanel();
+              });
+              actionsDiv.appendChild(downBtn);
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'category-btn delete';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.addEventListener('click', () => {
+              cat.penalties.splice(pIndex, 1);
+              renderMain();
+              saveToFirebase();
+              renderAdminPanel();
+            });
+            actionsDiv.appendChild(deleteBtn);
+
+            pItem.appendChild(nameInput);
+            pItem.appendChild(checkboxesDiv);
+            pItem.appendChild(actionsDiv);
+            penaltiesDiv.appendChild(pItem);
+          });
+
+          const addBtn = document.createElement('button');
+          addBtn.className = 'add-penalty-btn';
+          addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Προσθήκη προσώπου';
+          addBtn.addEventListener('click', () => {
+            if (!cat.penalties) cat.penalties = [];
+            cat.penalties.push({ name: '', p1: false, p2: false, p3: false });
+            renderMain();
+            saveToFirebase();
+            renderAdminPanel();
+          });
+
+          card.appendChild(penaltiesDiv);
+          card.appendChild(addBtn);
         } else {
-          // text category – show normal content + subcategories management
+          // text category – περιεχόμενο + υποκατηγορίες
           const contentLabel = document.createElement('label');
           contentLabel.textContent = 'Περιεχόμενο (αν δεν υπάρχουν υποκατηγορίες)';
           contentLabel.style.display = 'block';
@@ -1362,7 +1578,7 @@
           });
           card.appendChild(textarea);
 
-          // Subcategories section
+          // Υποκατηγορίες
           const subSection = document.createElement('div');
           subSection.className = 'subcategories-section';
           subSection.innerHTML = '<h5 style="color:#fbbf24; margin:16px 0 8px;"><i class="fas fa-folder-open"></i> Υποκατηγορίες</h5>';
@@ -1577,7 +1793,7 @@
       return div;
     }
 
-    // Authentication (ίδιο)
+    // Authentication
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       if (user) {
@@ -1619,7 +1835,7 @@
     // Αρχική φόρτωση
     loadContent();
 
-    // Fake loading screen
+    // Loading screen
     setTimeout(() => {
       const loadingScreen = document.getElementById('loading-screen');
       if (loadingScreen) {
