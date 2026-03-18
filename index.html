@@ -553,11 +553,23 @@
     .penalties-table td {
       padding: 12px;
       border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    .penalty-name-cell {
+      font-weight: 700;
+      color: #0c2b4a;
+    }
+    .penalty-rank-cell {
+      font-size: 0.9rem;
+      color: #fbbf24;
+      font-weight: 500;
+      margin-top: 4px;
     }
     .penalty-x {
       color: #b91c1c;
       font-weight: bold;
       font-size: 1.2rem;
+      text-align: center;
     }
     @media (max-width: 1000px) { .app { flex-direction: column; } }
   </style>
@@ -770,12 +782,29 @@
             if (fullName) {
               // Για εμφάνιση στο dropdown, προσθέτουμε και τον βαθμό
               const displayName = fullName + (o.rank ? ` (${o.rank})` : '');
-              names.push({ value: fullName, display: displayName });
+              names.push({ value: fullName, display: displayName, rank: o.rank });
             }
           });
         }
       });
       return names;
+    }
+
+    // Εύρεση βαθμού από όνομα (πλήρες όνομα)
+    function findOfficerRank(name) {
+      if (!name) return '';
+      const categories = siteContent.categories || [];
+      for (const cat of categories) {
+        if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
+          for (const o of cat.officers) {
+            const fullName = (o.firstName + ' ' + o.lastName).trim();
+            if (fullName === name) {
+              return o.rank || '';
+            }
+          }
+        }
+      }
+      return '';
     }
 
     // Φόρτωση από Firebase
@@ -886,11 +915,13 @@
           officersHtml += '</div>';
           page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`;
         } else if (cat.type === 'penalties' && Array.isArray(cat.penalties)) {
-          // Εμφάνιση πίνακα πειθαρχικών
+          // Εμφάνιση πίνακα πειθαρχικών με βαθμό κάτω από κάθε όνομα
           let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>';
           cat.penalties.forEach(p => {
+            const rank = findOfficerRank(p.name);
+            const rankHtml = rank ? `<div class="penalty-rank-cell">${rank}</div>` : '';
             tableHtml += `<tr>
-              <td>${p.name || ''}</td>
+              <td><div class="penalty-name-cell">${p.name || ''}</div>${rankHtml}</td>
               <td class="penalty-x">${p.p1 ? '✗' : ''}</td>
               <td class="penalty-x">${p.p2 ? '✗' : ''}</td>
               <td class="penalty-x">${p.p3 ? '✗' : ''}</td>
