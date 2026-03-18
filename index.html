@@ -152,7 +152,7 @@
       border-radius: 28px;
       padding: 2rem;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 8px 20px -8px rgba(0,20,40,0.1);
+      box-shadow: 0 8px 20px -8px rgba(0,0,20,0.1);
     }
     .site-footer {
       background: #0f1f30;
@@ -775,7 +775,8 @@
       footer: {
         left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο Ελληνικής Αστυνομίας",
         right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης"
-      }
+      },
+      formVisibility: "public"  // ΝΕΟ: ορατότητα φόρμας αίτησης
     };
 
     // State
@@ -885,7 +886,8 @@
                 })) 
               : defaultContent.categories,
             photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos,
-            footer: { ...defaultContent.footer, ...(data.footer || {}) }
+            footer: { ...defaultContent.footer, ...(data.footer || {}) },
+            formVisibility: data.formVisibility || "public"   // ΝΕΟ
           };
         } else {
           // πρώτη φορά: αποθηκεύουμε default
@@ -921,6 +923,7 @@
       }
     }
 
+    // ΝΕΑ συνάρτηση renderMain με δυναμική ορατότητα φόρμας
     function renderMain() {
       safeSetText('cover-badge-pre', siteContent.cover.badge);
       safeSetText('cover-span-pre', siteContent.cover.span);
@@ -938,100 +941,116 @@
       navTabs.innerHTML = '';
       contentArea.innerHTML = '';
 
-      // 1. Δημιουργία σελίδας Αίτησης (πρώτη)
-      const formTab = document.createElement('div');
-      formTab.className = 'nav-tab active'; // το κάνουμε active αρχικά
-      formTab.dataset.page = 'page-form';
-      formTab.innerHTML = '<i class="fas fa-file-signature"></i> ΑΙΤΗΣΗ';
-      navTabs.appendChild(formTab);
+      // --- Δημιουργία λίστας tabs με βάση την ορατότητα ---
+      const tabs = []; // κάθε στοιχείο: { id, title, type, contentGenerator }
 
-      const formPage = document.createElement('div');
-      formPage.id = 'page-form';
-      formPage.className = 'page active-page'; // ενεργή σελίδα
-      formPage.innerHTML = `
-        <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
-        <div class="protocol-card">
-          <div class="form-container">
-            <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Φόρτωση…</iframe>
-          </div>
-        </div>
-      `;
-      contentArea.appendChild(formPage);
+      // 1. Φόρμα αίτησης (αν είναι ορατή)
+      const showForm = (siteContent.formVisibility === 'public') || isAdmin;
+      if (showForm) {
+        tabs.push({
+          id: 'page-form',
+          title: 'ΑΙΤΗΣΗ',
+          generator: () => {
+            const page = document.createElement('div');
+            page.id = 'page-form';
+            page.className = 'page';
+            page.innerHTML = `
+              <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
+              <div class="protocol-card">
+                <div class="form-container">
+                  <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Φόρτωση…</iframe>
+                </div>
+              </div>
+            `;
+            return page;
+          }
+        });
+      }
 
-      // 2. Δημιουργία tabs και σελίδων για δυναμικές κατηγορίες
+      // 2. Κατηγορίες (φιλτράρισμα με βάση την ορατότητα)
       const categories = siteContent.categories || [];
-      // Φιλτράρισμα με βάση την ορατότητα
       const visibleCategories = categories.filter(cat => {
         if (cat.visibility === 'admin') return isAdmin;
         return true;
       });
 
-      visibleCategories.forEach((cat, index) => {
+      visibleCategories.forEach(cat => {
         if (!cat || !cat.id) return;
-        const tab = document.createElement('div');
-        tab.className = 'nav-tab'; // όχι active
-        tab.dataset.page = `page-${cat.id}`;
-        tab.innerHTML = `<i class="fas fa-file-alt"></i> ${cat.title}`;
-        navTabs.appendChild(tab);
+        tabs.push({
+          id: `page-${cat.id}`,
+          title: cat.title,
+          generator: () => {
+            const page = document.createElement('div');
+            page.id = `page-${cat.id}`;
+            page.className = 'page';
 
-        const page = document.createElement('div');
-        page.id = `page-${cat.id}`;
-        page.className = 'page'; // όχι active-page
-
-        if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
-          // Εμφάνιση καρτών προσωπικού
-          let officersHtml = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">';
-          cat.officers.forEach(o => {
-            const discordHtml = isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : '';
-            officersHtml += `
-              <div class="officer-display-card">
-                <div class="name">${o.firstName || ''} ${o.lastName || ''}</div>
-                <div class="rank">${o.rank || ''}</div>
-                ${discordHtml}
-              </div>
-            `;
-          });
-          officersHtml += '</div>';
-          page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`;
-        } else if (cat.type === 'penalties' && Array.isArray(cat.penalties)) {
-          // Εμφάνιση πίνακα πειθαρχικών
-          let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>';
-          cat.penalties.forEach(p => {
-            const rank = findOfficerRank(p.name);
-            const rankHtml = rank ? `<div class="penalty-rank-cell">${rank}</div>` : '';
-            tableHtml += `<tr>
-              <td><div class="penalty-name-cell">${p.name || ''}</div>${rankHtml}</td>
-              <td class="penalty-x">${p.p1 ? '✗' : ''}</td>
-              <td class="penalty-x">${p.p2 ? '✗' : ''}</td>
-              <td class="penalty-x">${p.p3 ? '✗' : ''}</td>
-            </tr>`;
-          });
-          tableHtml += '</tbody></table>';
-          page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`;
-        } else {
-          // Προβολή κειμένου
-          const htmlContent = textToHTML(cat.content || '');
-          page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${htmlContent}</div>`;
-        }
-        contentArea.appendChild(page);
+            if (cat.type === 'personnel' && Array.isArray(cat.officers)) {
+              let officersHtml = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">';
+              cat.officers.forEach(o => {
+                const discordHtml = isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : '';
+                officersHtml += `
+                  <div class="officer-display-card">
+                    <div class="name">${o.firstName || ''} ${o.lastName || ''}</div>
+                    <div class="rank">${o.rank || ''}</div>
+                    ${discordHtml}
+                  </div>
+                `;
+              });
+              officersHtml += '</div>';
+              page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`;
+            } else if (cat.type === 'penalties' && Array.isArray(cat.penalties)) {
+              let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>';
+              cat.penalties.forEach(p => {
+                const rank = findOfficerRank(p.name);
+                const rankHtml = rank ? `<div class="penalty-rank-cell">${rank}</div>` : '';
+                tableHtml += `<tr>
+                  <td><div class="penalty-name-cell">${p.name || ''}</div>${rankHtml}</td>
+                  <td class="penalty-x">${p.p1 ? '✗' : ''}</td>
+                  <td class="penalty-x">${p.p2 ? '✗' : ''}</td>
+                  <td class="penalty-x">${p.p3 ? '✗' : ''}</td>
+                </tr>`;
+              });
+              tableHtml += '</tbody></table>';
+              page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`;
+            } else {
+              const htmlContent = textToHTML(cat.content || '');
+              page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${htmlContent}</div>`;
+            }
+            return page;
+          }
+        });
       });
 
-      // 3. Σελίδα φωτογραφιών (τελευταία)
-      const photoTab = document.createElement('div');
-      photoTab.className = 'nav-tab';
-      photoTab.dataset.page = 'page-photos';
-      photoTab.innerHTML = '<i class="fas fa-images"></i> ΦΩΤΟΓΡΑΦΙΕΣ';
-      navTabs.appendChild(photoTab);
+      // 3. Φωτογραφίες (πάντα ορατές)
+      tabs.push({
+        id: 'page-photos',
+        title: 'ΦΩΤΟΓΡΑΦΙΕΣ',
+        generator: () => {
+          const page = document.createElement('div');
+          page.id = 'page-photos';
+          page.className = 'page';
+          const photos = siteContent.photos || [];
+          const galleryHtml = photos.map(url => `<img src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`).join('');
+          page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`;
+          return page;
+        }
+      });
 
-      const photoPage = document.createElement('div');
-      photoPage.id = 'page-photos';
-      photoPage.className = 'page';
-      const photos = siteContent.photos || [];
-      const galleryHtml = photos.map(url => `<img src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`).join('');
-      photoPage.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`;
-      contentArea.appendChild(photoPage);
+      // Δημιουργία tabs και σελίδων
+      tabs.forEach((tab, index) => {
+        const tabEl = document.createElement('div');
+        tabEl.className = 'nav-tab';
+        if (index === 0) tabEl.classList.add('active'); // πρώτο tab ενεργό
+        tabEl.dataset.page = tab.id;
+        tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${tab.title}`;
+        navTabs.appendChild(tabEl);
 
-      // Ενεργοποίηση tabs (το πρώτο tab είναι ήδη active)
+        const pageEl = tab.generator();
+        if (index === 0) pageEl.classList.add('active-page');
+        contentArea.appendChild(pageEl);
+      });
+
+      // Ενεργοποίηση αλλαγής tab
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function(e) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1044,7 +1063,7 @@
       });
     }
 
-    // Admin panel - πλήρης διαχείριση (ίδιο με πριν, χωρίς αλλαγές)
+    // Admin panel - πλήρης διαχείριση (προσθήκη ελέγχου για φόρμα)
     function renderAdminPanel() {
       if (!adminContent) return;
       adminContent.innerHTML = '';
@@ -1056,6 +1075,23 @@
       adminContent.appendChild(field('cover.rank', 'Rank tag', siteContent.cover.rank));
       adminContent.appendChild(field('cover.sticker', 'Sticker', siteContent.cover.sticker));
       adminContent.appendChild(field('cover.quote', 'Απόφθεγμα', siteContent.cover.quote));
+
+      // ΝΕΟ: Ορατότητα φόρμας αίτησης
+      adminContent.appendChild(sectionTitle('Φόρμα Αίτησης'));
+      const formVisDiv = document.createElement('div');
+      formVisDiv.className = 'visibility-toggle';
+      formVisDiv.style.marginBottom = '20px';
+      formVisDiv.innerHTML = `
+        <label>Μόνο σε Admin</label>
+        <input type="checkbox" id="formVisibilityCheck" ${siteContent.formVisibility === 'admin' ? 'checked' : ''}>
+      `;
+      const formCheck = formVisDiv.querySelector('#formVisibilityCheck');
+      formCheck.addEventListener('change', (e) => {
+        siteContent.formVisibility = e.target.checked ? 'admin' : 'public';
+        renderMain();
+        saveToFirebase();
+      });
+      adminContent.appendChild(formVisDiv);
 
       adminContent.appendChild(sectionTitle('Κατηγορίες'));
       const categoriesContainer = document.createElement('div');
