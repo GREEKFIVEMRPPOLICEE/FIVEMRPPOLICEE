@@ -206,7 +206,7 @@
     .subcategory-page.active-page {
       display: block;
     }
-    /* Officer / penalty display (unchanged) */
+    /* Officer display card with photo */
     .officer-display-card {
       background: white;
       border-radius: 24px;
@@ -214,11 +214,41 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: center;
+      gap: 20px;
+      transition: 0.2s;
     }
-    .officer-display-card .name { font-size: 1.4rem; font-weight: 700; color: #0c2b4a; }
-    .officer-display-card .rank { font-size: 1.1rem; color: #fbbf24; font-weight: 600; }
+    .officer-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fbbf24;
+      background: #f1f5f9;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .officer-info {
+      flex: 1;
+    }
+    .officer-info .name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0c2b4a;
+    }
+    .officer-info .rank {
+      font-size: 1.1rem;
+      color: #fbbf24;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .officer-info .discord {
+      background: #f1f5f9;
+      padding: 5px 12px;
+      border-radius: 40px;
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
     .penalties-table { width: 100%; border-collapse: collapse; }
     .penalties-table th { text-align: left; padding: 12px; background: #f1f5f9; color: #0c2b4a; }
     .penalties-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
@@ -259,7 +289,7 @@
     .login-card button { background: #1d3e63; color: white; border: none; padding: 16px; border-radius: 60px; font-weight: 700; width: 100%; cursor: pointer; }
     .login-card .error { color: #b02e2e; margin-top: 16px; }
 
-    /* Lightbox styles for image enlargement */
+    /* Lightbox styles */
     .lightbox {
       position: fixed;
       top: 0;
@@ -302,7 +332,6 @@
       color: #fbbf24;
       transform: scale(1.1);
     }
-    /* Gallery images become pointer */
     .photo-gallery-img {
       cursor: pointer;
       transition: transform 0.2s;
@@ -312,7 +341,7 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
-    /* ========== REDESIGNED ADMIN PANEL – PROFESSIONAL, MODERN, FULLY FUNCTIONAL ========== */
+    /* ========== REDESIGNED ADMIN PANEL ========== */
     .admin-panel {
       width: 540px;
       background: #0f172a;
@@ -509,6 +538,39 @@
       padding: 8px 14px;
       color: white;
     }
+    /* New photo field styling */
+    .officer-photo-field {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .photo-preview {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fbbf24;
+      background: #0f172a;
+    }
+    .photo-upload-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 30px;
+      padding: 8px 14px;
+      color: white;
+    }
+    .photo-file-btn {
+      background: #334155;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 30px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
     .penalties-grid-modern { display: flex; flex-direction: column; gap: 12px; }
     .penalty-item-modern {
       background: #1e293b;
@@ -632,11 +694,7 @@
   </div>
   <div class="login-modal" id="loginModal"><div class="login-card"><h3><i class="fas fa-lock"></i> Σύνδεση</h3><input type="email" id="loginEmail" placeholder="Email" value="admin@example.com"><input type="password" id="loginPassword" placeholder="Κωδικός"><button id="submitLogin">Σύνδεση</button><p class="error" id="loginError"></p></div></div>
 
-  <!-- Lightbox for image enlargement -->
-  <div class="lightbox" id="lightbox">
-    <div class="lightbox-close">&times;</div>
-    <img id="lightbox-img" src="" alt="Μεγέθυνση">
-  </div>
+  <div class="lightbox" id="lightbox"><div class="lightbox-close">&times;</div><img id="lightbox-img" src="" alt="Μεγέθυνση"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -649,19 +707,9 @@
     const defaultContent = { cover: { badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ", span: "FIVEM RP", subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ", rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ", sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ.", quote: "Κράτος δικαίου, ασφάλεια, σεβασμός" }, categories: [ { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", type: "text", visibility: "public", content: "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος...", subcategories: [] } ], photos: [], footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" }, formVisibility: "public" };
     let siteContent = JSON.parse(JSON.stringify(defaultContent)); let currentUser = null; let isAdmin = false;
     const authStatus = document.getElementById('authStatus'), loginBtn = document.getElementById('loginBtn'), logoutBtn = document.getElementById('logoutBtn'), loginModal = document.getElementById('loginModal'), loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword'), submitLogin = document.getElementById('submitLogin'), loginError = document.getElementById('loginError'), adminPanel = document.getElementById('adminPanel'), adminContent = document.getElementById('adminContent'), navTabs = document.getElementById('navTabs'), contentArea = document.getElementById('contentArea');
-    // Lightbox elements
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxClose = document.querySelector('.lightbox-close');
-    
-    function showLightbox(src) {
-      lightboxImg.src = src;
-      lightbox.classList.add('active');
-    }
-    function hideLightbox() {
-      lightbox.classList.remove('active');
-      lightboxImg.src = '';
-    }
+    const lightbox = document.getElementById('lightbox'), lightboxImg = document.getElementById('lightbox-img'), lightboxClose = document.querySelector('.lightbox-close');
+    function showLightbox(src) { lightboxImg.src = src; lightbox.classList.add('active'); }
+    function hideLightbox() { lightbox.classList.remove('active'); lightboxImg.src = ''; }
     lightboxClose.addEventListener('click', hideLightbox);
     lightbox.addEventListener('click', (e) => { if (e.target === lightbox) hideLightbox(); });
     
@@ -673,39 +721,29 @@
     let saveTimeout; function saveToFirebase() { if (!isAdmin) return; clearTimeout(saveTimeout); saveTimeout = setTimeout(async () => { try { await setDoc(contentDocRef, siteContent); } catch(e) { console.error(e); } }, 800); }
     async function checkIfAdmin(uid) { try { const adminDoc = await getDoc(doc(db, "admins", uid)); return adminDoc.exists(); } catch(e) { return false; } }
 
-    // MAIN RENDER (preserves original subcategory functionality)
     function renderMain() {
       safeSetText('cover-badge-pre', siteContent.cover.badge); safeSetText('cover-span-pre', siteContent.cover.span); safeSetText('cover-subhead-pre', siteContent.cover.subhead); const rankEl = document.getElementById('cover-rank-pre'); if (rankEl) rankEl.innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank; safeSetText('footer-left-pre', siteContent.footer.left); safeSetText('footer-right-pre', siteContent.footer.right);
       if (!navTabs || !contentArea) return; navTabs.innerHTML = ''; contentArea.innerHTML = ''; const tabs = [];
       if ((siteContent.formVisibility === 'public') || isAdmin) tabs.push({ id: 'page-form', title: 'ΑΙΤΗΣΗ', generator: () => { const page = document.createElement('div'); page.id = 'page-form'; page.className = 'page'; page.innerHTML = `<h2>Αίτηση για την Ελληνική Αστυνομία</h2><div class="protocol-card"><div class="form-container"><iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0"></iframe></div></div>`; return page; } });
       const visibleCategories = (siteContent.categories || []).filter(cat => cat.visibility !== 'admin' || isAdmin);
       visibleCategories.forEach(cat => { tabs.push({ id: `page-${cat.id}`, title: cat.title, generator: () => { const page = document.createElement('div'); page.id = `page-${cat.id}`; page.className = 'page';
-        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">'; cat.officers.forEach(o => { officersHtml += `<div class="officer-display-card"><div class="name">${o.firstName || ''} ${o.lastName || ''}</div><div class="rank">${o.rank || ''}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : ''}</div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`; }
+        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:2rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${o.firstName || ''} ${o.lastName || ''}</div><div class="rank">${o.rank || ''}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`; }
         else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += `<tr><td><div class="penalty-name-cell">${p.name || ''}</div>${rank ? `<div class="penalty-rank-cell">${rank}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`; }
         else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${cat.title}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${sub.title}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
       tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
-        // Attach click listeners for lightbox after DOM update
-        setTimeout(() => {
-          const galleryImages = page.querySelectorAll('.photo-gallery-img');
-          galleryImages.forEach(img => {
-            img.addEventListener('click', (e) => {
-              e.stopPropagation();
-              showLightbox(img.src);
-            });
-          });
-        }, 0);
+        setTimeout(() => { page.querySelectorAll('.photo-gallery-img').forEach(img => img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); })); }, 0);
         return page;
       } });
       tabs.forEach((tab, index) => { const tabEl = document.createElement('div'); tabEl.className = 'nav-tab'; if (index === 0) tabEl.classList.add('active'); tabEl.dataset.page = tab.id; tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${tab.title}`; navTabs.appendChild(tabEl); const pageEl = tab.generator(); if (index === 0) pageEl.classList.add('active-page'); contentArea.appendChild(pageEl); });
       document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', function() { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); this.classList.add('active'); const targetPage = document.getElementById(this.dataset.page); if (targetPage) targetPage.classList.add('active-page'); }); });
     }
 
-    // REDESIGNED ADMIN PANEL with full subcategory support (unchanged)
+    // ADMIN PANEL with photo upload for personnel
     function renderAdminPanel() {
       if (!adminContent) return; adminContent.innerHTML = '';
       const addField = (label, path, value) => { const div = document.createElement('div'); div.className = 'admin-field-group'; const lbl = document.createElement('label'); lbl.textContent = label; const inp = document.createElement('input'); inp.type = 'text'; inp.value = value || ''; inp.addEventListener('input', (e) => { const parts = path.split('.'); let obj = siteContent; for (let i = 0; i < parts.length-1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; } obj[parts[parts.length-1]] = e.target.value; renderMain(); saveToFirebase(); }); div.appendChild(lbl); div.appendChild(inp); return div; };
       const section = (title, icon) => { const sec = document.createElement('div'); sec.className = 'admin-section-modern'; sec.innerHTML = `<div class="admin-section-title"><i class="${icon}"></i> ${title}</div>`; return sec; };
-      // Cover
+      // Cover section
       const coverSec = section('Εξώφυλλο & Ταυτότητα', 'fas fa-flag-checkered');
       coverSec.appendChild(addField('Κεντρικό λογότυπο', 'cover.badge', siteContent.cover.badge));
       coverSec.appendChild(addField('Span FIVEM RP', 'cover.span', siteContent.cover.span));
@@ -745,15 +783,22 @@
             const rSel = document.createElement('select'); rankOptions.forEach(r=>{const opt=document.createElement('option'); opt.value=r; opt.textContent=r; if(off.rank===r) opt.selected=true; rSel.appendChild(opt);}); rSel.addEventListener('change',e=>{off.rank=e.target.value; renderMain(); saveToFirebase();});
             const dc = document.createElement('input'); dc.placeholder='Discord'; dc.value=off.discord||''; dc.addEventListener('input',e=>{off.discord=e.target.value; renderMain(); saveToFirebase();});
             fields.append(fn, ln, rSel, dc);
+            // Photo field
+            const photoDiv = document.createElement('div'); photoDiv.className = 'officer-photo-field';
+            const preview = document.createElement('img'); preview.className = 'photo-preview'; preview.src = off.photoUrl || ''; if(!off.photoUrl) preview.style.display = 'none';
+            const urlInput = document.createElement('input'); urlInput.className = 'photo-upload-input'; urlInput.placeholder = 'URL φωτογραφίας ή βάσης64'; urlInput.value = off.photoUrl || ''; urlInput.addEventListener('input', e => { off.photoUrl = e.target.value; preview.src = e.target.value; preview.style.display = e.target.value ? 'block' : 'none'; renderMain(); saveToFirebase(); });
+            const fileBtn = document.createElement('button'); fileBtn.className = 'photo-file-btn'; fileBtn.innerHTML = '<i class="fas fa-upload"></i> Αρχείο'; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none'; fileInput.addEventListener('change', e => { const file = e.target.files[0]; if(file && file.type.startsWith('image/')){ const reader = new FileReader(); reader.onload = ev => { const dataUrl = ev.target.result; off.photoUrl = dataUrl; urlInput.value = dataUrl; preview.src = dataUrl; preview.style.display = 'block'; renderMain(); saveToFirebase(); }; reader.readAsDataURL(file); } }); fileBtn.addEventListener('click', () => fileInput.click());
+            const clearBtn = document.createElement('button'); clearBtn.className = 'photo-file-btn'; clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i>'; clearBtn.addEventListener('click', () => { off.photoUrl = ''; urlInput.value = ''; preview.src = ''; preview.style.display = 'none'; renderMain(); saveToFirebase(); });
+            photoDiv.append(preview, urlInput, fileBtn, fileInput, clearBtn);
             const actDiv = document.createElement('div'); actDiv.style.display='flex'; actDiv.style.gap='8px'; actDiv.style.justifyContent='flex-end';
             if(offIdx>0){ const upOff = document.createElement('button'); upOff.className='icon-btn move'; upOff.innerHTML='<i class="fas fa-arrow-up"></i>'; upOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx-1]; cat.officers[offIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(upOff); }
             if(offIdx<cat.officers.length-1){ const downOff = document.createElement('button'); downOff.className='icon-btn move'; downOff.innerHTML='<i class="fas fa-arrow-down"></i>'; downOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx+1]; cat.officers[offIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(downOff); }
             const delOff = document.createElement('button'); delOff.className='icon-btn delete'; delOff.innerHTML='<i class="fas fa-trash"></i>'; delOff.addEventListener('click',()=>{ cat.officers.splice(offIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(delOff);
-            offCard.append(fields, actDiv); officersDiv.appendChild(offCard);
+            offCard.append(fields, photoDiv, actDiv); officersDiv.appendChild(offCard);
           });
-          const addOff = document.createElement('button'); addOff.className='btn-secondary'; addOff.innerHTML='<i class="fas fa-user-plus"></i> Προσθήκη'; addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+          const addOff = document.createElement('button'); addOff.className='btn-secondary'; addOff.innerHTML='<i class="fas fa-user-plus"></i> Προσθήκη'; addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:'', photoUrl:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(officersDiv, addOff);
-        } else if(cat.type === 'penalties'){
+        } else if(cat.type === 'penalties'){ /* ... unchanged ... */ 
           const penaltiesDiv = document.createElement('div'); penaltiesDiv.className = 'penalties-grid-modern';
           const allNames = getAllPersonnelNames(); const dlId = `names-datalist-${cat.id}`; const datalist = document.createElement('datalist'); datalist.id = dlId; allNames.forEach(n=>{ const opt=document.createElement('option'); opt.value=n.value; opt.textContent=n.display; datalist.appendChild(opt); }); penaltiesDiv.appendChild(datalist);
           (cat.penalties || []).forEach((p, pIdx) => {
