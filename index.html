@@ -206,48 +206,54 @@
     .subcategory-page.active-page {
       display: block;
     }
-    /* Officer display card with photo */
+    /* Officer display card with larger image */
     .officer-display-card {
       background: white;
-      border-radius: 24px;
+      border-radius: 28px;
       padding: 1.5rem;
       box-shadow: 0 8px 20px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
-      gap: 20px;
-      transition: 0.2s;
+      gap: 24px;
+      transition: all 0.2s;
+    }
+    .officer-display-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
     }
     .officer-avatar {
-      width: 70px;
-      height: 70px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #fbbf24;
       background: #f1f5f9;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      flex-shrink: 0;
     }
     .officer-info {
       flex: 1;
     }
     .officer-info .name {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: #0c2b4a;
+      margin-bottom: 6px;
     }
     .officer-info .rank {
       font-size: 1.1rem;
       color: #fbbf24;
       font-weight: 600;
-      margin-top: 4px;
+      margin-bottom: 8px;
     }
     .officer-info .discord {
       background: #f1f5f9;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 40px;
       display: inline-block;
-      margin-top: 8px;
       font-size: 0.85rem;
+      color: #1e293b;
     }
     .penalties-table { width: 100%; border-collapse: collapse; }
     .penalties-table th { text-align: left; padding: 12px; background: #f1f5f9; color: #0c2b4a; }
@@ -678,6 +684,10 @@
       cursor: pointer;
     }
     @media (max-width: 1000px) { .app { flex-direction: column; } }
+    @media (max-width: 640px) {
+      .officer-display-card { flex-direction: column; text-align: center; }
+      .officer-avatar { width: 120px; height: 120px; }
+    }
   </style>
 </head>
 <body>
@@ -739,16 +749,17 @@
         `; return page; } });
       const visibleCategories = (siteContent.categories || []).filter(cat => cat.visibility !== 'admin' || isAdmin);
       visibleCategories.forEach(cat => { tabs.push({ id: `page-${cat.id}`, title: cat.title, generator: () => { const page = document.createElement('div'); page.id = `page-${cat.id}`; page.className = 'page';
-        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:2rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${o.firstName || ''} ${o.lastName || ''}</div><div class="rank">${o.rank || ''}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`; }
-        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th>tr</thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += ` tr><td><div class="penalty-name-cell">${p.name || ''}</div>${rank ? `<div class="penalty-rank-cell">${rank}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`; }
-        else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${cat.title}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${sub.title}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
-      tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
+        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:3rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${escapeHtml(o.firstName || '')} ${escapeHtml(o.lastName || '')}</div><div class="rank">${escapeHtml(o.rank || '')}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${escapeHtml(o.discord || '')}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${officersHtml}</div>`; }
+        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th>tr</thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += ` tr> <td><div class="penalty-name-cell">${escapeHtml(p.name || '')}</div>${rank ? `<div class="penalty-rank-cell">${escapeHtml(rank)}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td> </tr>`; }); tableHtml += '</tbody> </table>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${tableHtml}</div>`; }
+        else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${escapeHtml(sub.title)}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
+      tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
         setTimeout(() => { page.querySelectorAll('.photo-gallery-img').forEach(img => img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); })); }, 0);
         return page;
       } });
-      tabs.forEach((tab, index) => { const tabEl = document.createElement('div'); tabEl.className = 'nav-tab'; if (index === 0) tabEl.classList.add('active'); tabEl.dataset.page = tab.id; tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${tab.title}`; navTabs.appendChild(tabEl); const pageEl = tab.generator(); if (index === 0) pageEl.classList.add('active-page'); contentArea.appendChild(pageEl); });
+      tabs.forEach((tab, index) => { const tabEl = document.createElement('div'); tabEl.className = 'nav-tab'; if (index === 0) tabEl.classList.add('active'); tabEl.dataset.page = tab.id; tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${escapeHtml(tab.title)}`; navTabs.appendChild(tabEl); const pageEl = tab.generator(); if (index === 0) pageEl.classList.add('active-page'); contentArea.appendChild(pageEl); });
       document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', function() { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); this.classList.add('active'); const targetPage = document.getElementById(this.dataset.page); if (targetPage) targetPage.classList.add('active-page'); }); });
     }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
     // ADMIN PANEL with photo upload for personnel
     function renderAdminPanel() {
@@ -858,7 +869,7 @@
       const uploadDiv = document.createElement('div'); uploadDiv.className = 'admin-field-group'; uploadDiv.innerHTML = `<label>URL εικόνας</label><div style="display:flex; gap:8px;"><input type="text" id="photoUrlInput" placeholder="https://..."><button id="addPhotoBtnAdmin" class="btn-secondary"><i class="fas fa-plus"></i> Προσθήκη</button></div>`;
       photoSec.appendChild(uploadDiv);
       const photoGrid = document.createElement('div'); photoGrid.className = 'photos-grid-modern';
-      (siteContent.photos || []).forEach((url, i) => { const item = document.createElement('div'); item.className='photo-item-modern'; item.innerHTML=`<img src="${url}"><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-times"></i></button>`; photoGrid.appendChild(item); });
+      (siteContent.photos || []).forEach((url, i) => { const item = document.createElement('div'); item.className='photo-item-modern'; item.innerHTML=`<img src="${escapeHtml(url)}"><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-times"></i></button>`; photoGrid.appendChild(item); });
       photoSec.appendChild(photoGrid);
       adminContent.appendChild(photoSec);
       const footSec = section('Υποσέλιδο', 'fas fa-credit-card');
