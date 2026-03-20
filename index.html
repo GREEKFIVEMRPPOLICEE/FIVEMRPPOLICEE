@@ -161,7 +161,7 @@
       justify-content: space-between;
       border-top: 2px solid #fbbf24;
     }
-    /* Subcategory tabs styling (unchanged) */
+    /* Subcategory tabs styling */
     .subcategory-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -256,7 +256,7 @@
     .penalty-rank-cell { font-size: 0.9rem; color: #fbbf24; font-weight: 500; margin-top: 4px; }
     .penalty-x { color: #b91c1c; font-weight: bold; font-size: 1.2rem; text-align: center; }
     .form-iframe { width: 100%; height: 2200px; border: none; border-radius: 20px; }
-    /* Auth bar & modal (unchanged) */
+    /* Auth bar & modal */
     .auth-bar {
       background: #eef2f6; padding: 12px 25px;
       display: flex; align-items: center; justify-content: flex-end; gap: 16px;
@@ -538,7 +538,6 @@
       padding: 8px 14px;
       color: white;
     }
-    /* New photo field styling */
     .officer-photo-field {
       display: flex;
       align-items: center;
@@ -724,11 +723,24 @@
     function renderMain() {
       safeSetText('cover-badge-pre', siteContent.cover.badge); safeSetText('cover-span-pre', siteContent.cover.span); safeSetText('cover-subhead-pre', siteContent.cover.subhead); const rankEl = document.getElementById('cover-rank-pre'); if (rankEl) rankEl.innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank; safeSetText('footer-left-pre', siteContent.footer.left); safeSetText('footer-right-pre', siteContent.footer.right);
       if (!navTabs || !contentArea) return; navTabs.innerHTML = ''; contentArea.innerHTML = ''; const tabs = [];
-      if ((siteContent.formVisibility === 'public') || isAdmin) tabs.push({ id: 'page-form', title: 'ΑΙΤΗΣΗ', generator: () => { const page = document.createElement('div'); page.id = 'page-form'; page.className = 'page'; page.innerHTML = `<h2>Αίτηση για την Ελληνική Αστυνομία</h2><div class="protocol-card"><div class="form-container"><iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0"></iframe></div></div>`; return page; } });
+      if ((siteContent.formVisibility === 'public') || isAdmin) tabs.push({ id: 'page-form', title: 'ΑΙΤΗΣΗ', generator: () => { const page = document.createElement('div'); page.id = 'page-form'; page.className = 'page'; page.innerHTML = `
+          <h2>Αίτηση για την Ελληνική Αστυνομία</h2>
+          <div class="protocol-card">
+            <div class="form-container">
+              <iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0"></iframe>
+              <p style="margin-top: 1rem; font-size: 0.9rem; text-align: center;">
+                Αν η φόρμα δεν εμφανίζεται, 
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform" target="_blank" rel="noopener noreferrer">
+                  κάντε κλικ εδώ
+                </a>.
+              </p>
+            </div>
+          </div>
+        `; return page; } });
       const visibleCategories = (siteContent.categories || []).filter(cat => cat.visibility !== 'admin' || isAdmin);
       visibleCategories.forEach(cat => { tabs.push({ id: `page-${cat.id}`, title: cat.title, generator: () => { const page = document.createElement('div'); page.id = `page-${cat.id}`; page.className = 'page';
         if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:2rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${o.firstName || ''} ${o.lastName || ''}</div><div class="rank">${o.rank || ''}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`; }
-        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += `<tr><td><div class="penalty-name-cell">${p.name || ''}</div>${rank ? `<div class="penalty-rank-cell">${rank}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`; }
+        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th>tr</thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += ` tr><td><div class="penalty-name-cell">${p.name || ''}</div>${rank ? `<div class="penalty-rank-cell">${rank}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`; }
         else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${cat.title}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${sub.title}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
       tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
         setTimeout(() => { page.querySelectorAll('.photo-gallery-img').forEach(img => img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); })); }, 0);
@@ -798,7 +810,7 @@
           });
           const addOff = document.createElement('button'); addOff.className='btn-secondary'; addOff.innerHTML='<i class="fas fa-user-plus"></i> Προσθήκη'; addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:'', photoUrl:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(officersDiv, addOff);
-        } else if(cat.type === 'penalties'){ /* ... unchanged ... */ 
+        } else if(cat.type === 'penalties'){
           const penaltiesDiv = document.createElement('div'); penaltiesDiv.className = 'penalties-grid-modern';
           const allNames = getAllPersonnelNames(); const dlId = `names-datalist-${cat.id}`; const datalist = document.createElement('datalist'); datalist.id = dlId; allNames.forEach(n=>{ const opt=document.createElement('option'); opt.value=n.value; opt.textContent=n.display; datalist.appendChild(opt); }); penaltiesDiv.appendChild(datalist);
           (cat.penalties || []).forEach((p, pIdx) => {
