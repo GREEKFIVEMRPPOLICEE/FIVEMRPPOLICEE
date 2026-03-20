@@ -259,6 +259,59 @@
     .login-card button { background: #1d3e63; color: white; border: none; padding: 16px; border-radius: 60px; font-weight: 700; width: 100%; cursor: pointer; }
     .login-card .error { color: #b02e2e; margin-top: 16px; }
 
+    /* Lightbox styles for image enlargement */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.2s;
+      cursor: pointer;
+    }
+    .lightbox.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      cursor: default;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2.5rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 10001;
+    }
+    .lightbox-close:hover {
+      color: #fbbf24;
+      transform: scale(1.1);
+    }
+    /* Gallery images become pointer */
+    .photo-gallery-img {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .photo-gallery-img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
     /* ========== REDESIGNED ADMIN PANEL – PROFESSIONAL, MODERN, FULLY FUNCTIONAL ========== */
     .admin-panel {
       width: 540px;
@@ -578,6 +631,13 @@
     <div class="admin-panel" id="adminPanel" style="display: none;"><div class="admin-header-modern"><h3><i class="fas fa-crown"></i> Πίνακας Διαχειριστή</h3><p>Πλήρης έλεγχος περιεχομένου, προσωπικού, πειθαρχικών & υποκατηγοριών</p></div><div class="admin-content-modern" id="adminContent"></div></div>
   </div>
   <div class="login-modal" id="loginModal"><div class="login-card"><h3><i class="fas fa-lock"></i> Σύνδεση</h3><input type="email" id="loginEmail" placeholder="Email" value="admin@example.com"><input type="password" id="loginPassword" placeholder="Κωδικός"><button id="submitLogin">Σύνδεση</button><p class="error" id="loginError"></p></div></div>
+
+  <!-- Lightbox for image enlargement -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-close">&times;</div>
+    <img id="lightbox-img" src="" alt="Μεγέθυνση">
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -589,6 +649,22 @@
     const defaultContent = { cover: { badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ", span: "FIVEM RP", subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ", rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ", sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ.", quote: "Κράτος δικαίου, ασφάλεια, σεβασμός" }, categories: [ { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", type: "text", visibility: "public", content: "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος...", subcategories: [] } ], photos: [], footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" }, formVisibility: "public" };
     let siteContent = JSON.parse(JSON.stringify(defaultContent)); let currentUser = null; let isAdmin = false;
     const authStatus = document.getElementById('authStatus'), loginBtn = document.getElementById('loginBtn'), logoutBtn = document.getElementById('logoutBtn'), loginModal = document.getElementById('loginModal'), loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword'), submitLogin = document.getElementById('submitLogin'), loginError = document.getElementById('loginError'), adminPanel = document.getElementById('adminPanel'), adminContent = document.getElementById('adminContent'), navTabs = document.getElementById('navTabs'), contentArea = document.getElementById('contentArea');
+    // Lightbox elements
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    
+    function showLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.classList.add('active');
+    }
+    function hideLightbox() {
+      lightbox.classList.remove('active');
+      lightboxImg.src = '';
+    }
+    lightboxClose.addEventListener('click', hideLightbox);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) hideLightbox(); });
+    
     function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
     function textToHTML(text) { if (!text) return ''; const lines = text.split('\n'); let inList = false, html = ''; for (let line of lines) { line = line.trim(); if (line === '') { if (inList) { html += '</ul>'; inList = false; } continue; } if (line.startsWith('- ') || line.startsWith('* ')) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${line.substring(2)}</li>`; } else { if (inList) { html += '</ul>'; inList = false; } const numberedMatch = line.match(/^(\d+)\.\s+(.*)/); if (numberedMatch) html += `<ol><li>${numberedMatch[2]}</li></ol>`; else html += `<p>${line}</p>`; } } if (inList) html += '</ul>'; return html; }
     function getAllPersonnelNames() { const names = []; (siteContent.categories || []).forEach(cat => { if (cat.type === 'personnel' && cat.officers) cat.officers.forEach(o => { const fullName = (o.firstName + ' ' + o.lastName).trim(); if (fullName) names.push({ value: fullName, display: fullName + (o.rank ? ` (${o.rank})` : ''), rank: o.rank }); }); }); return names; }
@@ -607,12 +683,24 @@
         if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">'; cat.officers.forEach(o => { officersHtml += `<div class="officer-display-card"><div class="name">${o.firstName || ''} ${o.lastName || ''}</div><div class="rank">${o.rank || ''}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${o.discord || ''}</div>` : ''}</div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${officersHtml}</div>`; }
         else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += `<tr><td><div class="penalty-name-cell">${p.name || ''}</div>${rank ? `<div class="penalty-rank-cell">${rank}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${tableHtml}</div>`; }
         else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${cat.title}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${sub.title}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${cat.title}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
-      tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; const galleryHtml = (siteContent.photos || []).map(url => `<img src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`).join(''); page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2><div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">${galleryHtml}</div>`; return page; } });
+      tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${url}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
+        // Attach click listeners for lightbox after DOM update
+        setTimeout(() => {
+          const galleryImages = page.querySelectorAll('.photo-gallery-img');
+          galleryImages.forEach(img => {
+            img.addEventListener('click', (e) => {
+              e.stopPropagation();
+              showLightbox(img.src);
+            });
+          });
+        }, 0);
+        return page;
+      } });
       tabs.forEach((tab, index) => { const tabEl = document.createElement('div'); tabEl.className = 'nav-tab'; if (index === 0) tabEl.classList.add('active'); tabEl.dataset.page = tab.id; tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${tab.title}`; navTabs.appendChild(tabEl); const pageEl = tab.generator(); if (index === 0) pageEl.classList.add('active-page'); contentArea.appendChild(pageEl); });
       document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', function() { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); this.classList.add('active'); const targetPage = document.getElementById(this.dataset.page); if (targetPage) targetPage.classList.add('active-page'); }); });
     }
 
-    // REDESIGNED ADMIN PANEL with full subcategory support
+    // REDESIGNED ADMIN PANEL with full subcategory support (unchanged)
     function renderAdminPanel() {
       if (!adminContent) return; adminContent.innerHTML = '';
       const addField = (label, path, value) => { const div = document.createElement('div'); div.className = 'admin-field-group'; const lbl = document.createElement('label'); lbl.textContent = label; const inp = document.createElement('input'); inp.type = 'text'; inp.value = value || ''; inp.addEventListener('input', (e) => { const parts = path.split('.'); let obj = siteContent; for (let i = 0; i < parts.length-1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; } obj[parts[parts.length-1]] = e.target.value; renderMain(); saveToFirebase(); }); div.appendChild(lbl); div.appendChild(inp); return div; };
