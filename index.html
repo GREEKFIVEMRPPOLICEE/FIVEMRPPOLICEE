@@ -231,6 +231,12 @@
       background: #f1f5f9;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .officer-avatar:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     .officer-info {
       flex: 1;
@@ -749,8 +755,21 @@
         `; return page; } });
       const visibleCategories = (siteContent.categories || []).filter(cat => cat.visibility !== 'admin' || isAdmin);
       visibleCategories.forEach(cat => { tabs.push({ id: `page-${cat.id}`, title: cat.title, generator: () => { const page = document.createElement('div'); page.id = `page-${cat.id}`; page.className = 'page';
-        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:3rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${escapeHtml(o.firstName || '')} ${escapeHtml(o.lastName || '')}</div><div class="rank">${escapeHtml(o.rank || '')}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${escapeHtml(o.discord || '')}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${officersHtml}</div>`; }
-        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th>tr</thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += ` tr> <td><div class="penalty-name-cell">${escapeHtml(p.name || '')}</div>${rank ? `<div class="penalty-rank-cell">${escapeHtml(rank)}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td> </tr>`; }); tableHtml += '</tbody> </table>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${tableHtml}</div>`; }
+        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:3rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${escapeHtml(o.firstName || '')} ${escapeHtml(o.lastName || '')}</div><div class="rank">${escapeHtml(o.rank || '')}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${escapeHtml(o.discord || '')}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${officersHtml}</div>`;
+          // Add lightbox click to officer avatars (only for real images)
+          setTimeout(() => {
+            const avatars = page.querySelectorAll('.officer-avatar');
+            avatars.forEach(img => {
+              if (img.tagName === 'IMG' && img.src && img.src !== '') {
+                img.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  showLightbox(img.src);
+                });
+              }
+            });
+          }, 0);
+        }
+        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead><tr><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></tr></thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += `<tr><td><div class="penalty-name-cell">${escapeHtml(p.name || '')}</div>${rank ? `<div class="penalty-rank-cell">${escapeHtml(rank)}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${tableHtml}</div>`; }
         else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${escapeHtml(sub.title)}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
       tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; (siteContent.photos || []).forEach(url => { galleryHtml += `<img class="photo-gallery-img" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
         setTimeout(() => { page.querySelectorAll('.photo-gallery-img').forEach(img => img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); })); }, 0);
@@ -761,7 +780,7 @@
     }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-    // ADMIN PANEL with photo upload for personnel
+    // ADMIN PANEL with photo upload for personnel (unchanged functionality)
     function renderAdminPanel() {
       if (!adminContent) return; adminContent.innerHTML = '';
       const addField = (label, path, value) => { const div = document.createElement('div'); div.className = 'admin-field-group'; const lbl = document.createElement('label'); lbl.textContent = label; const inp = document.createElement('input'); inp.type = 'text'; inp.value = value || ''; inp.addEventListener('input', (e) => { const parts = path.split('.'); let obj = siteContent; for (let i = 0; i < parts.length-1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; } obj[parts[parts.length-1]] = e.target.value; renderMain(); saveToFirebase(); }); div.appendChild(lbl); div.appendChild(inp); return div; };
