@@ -12,7 +12,8 @@
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <style>
-    /* Loading screen (unchanged) */
+    /* (all CSS remains exactly as in the previous version – unchanged) */
+    /* Loading screen */
     #loading-screen {
       position: fixed;
       top: 0;
@@ -203,7 +204,6 @@
     body.dark .site-footer {
       background: #020617;
     }
-    /* Subcategory tabs styling */
     .subcategory-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -258,7 +258,6 @@
     .subcategory-page.active-page {
       display: block;
     }
-    /* Officer display card with larger image */
     .officer-display-card {
       background: white;
       border-radius: 28px;
@@ -334,7 +333,6 @@
     .penalty-rank-cell { font-size: 0.9rem; color: #fbbf24; font-weight: 500; margin-top: 4px; }
     .penalty-x { color: #b91c1c; font-weight: bold; font-size: 1.2rem; text-align: center; }
     .form-iframe { width: 100%; height: 2200px; border: none; border-radius: 20px; }
-    /* Auth bar & modal */
     .auth-bar {
       background: #eef2f6; padding: 12px 25px;
       display: flex; align-items: center; justify-content: flex-end; gap: 16px;
@@ -380,8 +378,6 @@
     body.dark .login-card input { background: #0f172a; border-color: #475569; color: white; }
     .login-card button { background: #1d3e63; color: white; border: none; padding: 16px; border-radius: 60px; font-weight: 700; width: 100%; cursor: pointer; }
     .login-card .error { color: #b02e2e; margin-top: 16px; }
-
-    /* Lightbox styles */
     .lightbox {
       position: fixed;
       top: 0;
@@ -453,8 +449,6 @@
       transform: scale(1.02);
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-
-    /* Admin Panel styles (modern) */
     .admin-panel {
       width: 540px;
       background: #0f172a;
@@ -535,7 +529,6 @@
     .admin-content-modern::-webkit-scrollbar { width: 6px; }
     .admin-content-modern::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
     .admin-content-modern::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
-
     .admin-section-modern {
       background: #1e293b;
       border-radius: 24px;
@@ -592,7 +585,6 @@
     }
     .admin-toggle span { color: #e2e8f0; font-size: 0.9rem; font-weight: 500; }
     .admin-toggle input { width: 44px; height: 22px; accent-color: #fbbf24; cursor: pointer; }
-
     .category-card-modern {
       background: #0f172a;
       border-radius: 20px;
@@ -836,7 +828,6 @@
       font-size: 0.8rem;
       cursor: pointer;
     }
-    /* blacklist table */
     .blacklist-table {
       width: 100%;
       border-collapse: collapse;
@@ -863,7 +854,6 @@
       color: #fbbf24;
       font-weight: 500;
     }
-    /* import/export message */
     .import-export-status {
       font-size: 0.8rem;
       margin-top: 12px;
@@ -872,7 +862,6 @@
       background: #0f172a;
       color: #cbd5e1;
     }
-    /* announcement banner */
     .announcement-banner {
       background: #fbbf24;
       color: #0f172a;
@@ -899,7 +888,6 @@
       padding: 6px 12px;
       cursor: pointer;
     }
-    /* stats widgets */
     .stats-widgets {
       display: flex;
       gap: 15px;
@@ -924,7 +912,6 @@
       font-size: 0.8rem;
       color: #94a3b8;
     }
-    /* search filter */
     .search-filter {
       margin-bottom: 16px;
     }
@@ -971,14 +958,46 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
     const firebaseConfig = { apiKey: "AIzaSyCM8zk9I3LOy9VGAqmIgpyDcjes3HWtvYA", authDomain: "policefivem-e368f.firebaseapp.com", projectId: "policefivem-e368f", storageBucket: "policefivem-e368f.firebasestorage.app", messagingSenderId: "553518888871", appId: "1:553518888871:web:033e7d3ba25da5e1386882" };
-    const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app); const storage = getStorage(app); const contentDocRef = doc(db, "policeSite", "content");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const contentDocRef = doc(db, "policeSite", "content");
     const rankOptions = ["Ταξίαρχος","Αστυνομικός Διευθυντής","Αστυνομικός Υποδιευθυντής","Αστυνόμος Α’","Αστυνόμος Β’","Υπαστυνόμος Α’","Υπαστυνόμος Β’","Ανθυπαστυνόμος","Αρχιφύλακας","Υπαρχιφύλακας","Αστυφύλακας","Δόκιμος Αστυφύλακας"];
-    const defaultContent = { cover: { badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ", span: "FIVEM RP", subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ", rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ", sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ.", quote: "Κράτος δικαίου, ασφάλεια, σεβασμός" }, categories: [ { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", type: "text", visibility: "public", content: "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος...", subcategories: [] } ], photos: [], footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" }, formVisibility: "public", announcement: { text: "", active: false } };
-    let siteContent = JSON.parse(JSON.stringify(defaultContent)); let currentUser = null; let isAdmin = false;
-    const authStatus = document.getElementById('authStatus'), loginBtn = document.getElementById('loginBtn'), logoutBtn = document.getElementById('logoutBtn'), loginModal = document.getElementById('loginModal'), loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword'), submitLogin = document.getElementById('submitLogin'), loginError = document.getElementById('loginError'), adminPanel = document.getElementById('adminPanel'), adminContent = document.getElementById('adminContent'), navTabs = document.getElementById('navTabs'), contentArea = document.getElementById('contentArea');
-    const lightbox = document.getElementById('lightbox'), lightboxImg = document.getElementById('lightbox-img'), lightboxClose = document.querySelector('.lightbox-close'), lightboxPrev = document.querySelector('.lightbox-nav.prev'), lightboxNext = document.querySelector('.lightbox-nav.next');
+    const defaultContent = {
+      cover: { badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ", span: "FIVEM RP", subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ", rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ", sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ.", quote: "Κράτος δικαίου, ασφάλεια, σεβασμός" },
+      categories: [ { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", type: "text", visibility: "public", content: "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος...", subcategories: [] } ],
+      photos: [],
+      footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" },
+      formVisibility: "public",
+      announcement: { text: "", active: false }
+    };
+    let siteContent = JSON.parse(JSON.stringify(defaultContent));
+    let currentUser = null;
+    let isAdmin = false;
+
+    // DOM elements
+    const authStatus = document.getElementById('authStatus');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginModal = document.getElementById('loginModal');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const submitLogin = document.getElementById('submitLogin');
+    const loginError = document.getElementById('loginError');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminContent = document.getElementById('adminContent');
+    const navTabs = document.getElementById('navTabs');
+    const contentArea = document.getElementById('contentArea');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    const lightboxPrev = document.querySelector('.lightbox-nav.prev');
+    const lightboxNext = document.querySelector('.lightbox-nav.next');
+
     let currentGalleryImages = [];
     let currentGalleryIndex = 0;
+
     function showLightbox(src, allImages = null, startIndex = 0) {
       if (allImages) {
         currentGalleryImages = allImages;
@@ -989,11 +1008,7 @@
       }
       lightbox.classList.add('active');
     }
-    function updateLightboxImage() {
-      if (currentGalleryImages.length) {
-        lightboxImg.src = currentGalleryImages[currentGalleryIndex];
-      }
-    }
+    function updateLightboxImage() { if (currentGalleryImages.length) lightboxImg.src = currentGalleryImages[currentGalleryIndex]; }
     function nextImage() { if (currentGalleryImages.length) { currentGalleryIndex = (currentGalleryIndex + 1) % currentGalleryImages.length; updateLightboxImage(); } }
     function prevImage() { if (currentGalleryImages.length) { currentGalleryIndex = (currentGalleryIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length; updateLightboxImage(); } }
     function hideLightbox() { lightbox.classList.remove('active'); lightboxImg.src = ''; currentGalleryImages = []; }
@@ -1001,38 +1016,294 @@
     lightboxPrev.addEventListener('click', prevImage);
     lightboxNext.addEventListener('click', nextImage);
     lightbox.addEventListener('click', (e) => { if (e.target === lightbox) hideLightbox(); });
-    
+
     function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
-    function textToHTML(text) { if (!text) return ''; const lines = text.split('\n'); let inList = false, html = ''; for (let line of lines) { line = line.trim(); if (line === '') { if (inList) { html += '</ul>'; inList = false; } continue; } if (line.startsWith('- ') || line.startsWith('* ')) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${line.substring(2)}</li>`; } else { if (inList) { html += '</ul>'; inList = false; } const numberedMatch = line.match(/^(\d+)\.\s+(.*)/); if (numberedMatch) html += `<ol><li>${numberedMatch[2]}</li></ol>`; else html += `<p>${line}</p>`; } } if (inList) html += '</ul>'; return html; }
-    function getAllPersonnelNames() { const names = []; (siteContent.categories || []).forEach(cat => { if (cat.type === 'personnel' && cat.officers) cat.officers.forEach(o => { const fullName = (o.firstName + ' ' + o.lastName).trim(); if (fullName) names.push({ value: fullName, display: fullName + (o.rank ? ` (${o.rank})` : ''), rank: o.rank }); }); }); return names; }
-    function findOfficerRank(name) { if (!name) return ''; for (const cat of siteContent.categories || []) if (cat.type === 'personnel' && cat.officers) for (const o of cat.officers) if ((o.firstName + ' ' + o.lastName).trim() === name) return o.rank || ''; return ''; }
-    async function logAction(action, details) { if (!isAdmin) return; try { await addDoc(collection(db, "auditLogs"), { user: currentUser?.email || "unknown", action, details, timestamp: new Date() }); } catch(e) { console.error("Audit log error", e); } }
-    async function loadContent() { try { const snap = await getDoc(contentDocRef); if (snap.exists()) { const data = snap.data(); siteContent = { cover: { ...defaultContent.cover, ...(data.cover || {}) }, categories: Array.isArray(data.categories) ? data.categories.map(c => ({ type: c.type || 'text', visibility: c.visibility || 'public', officers: c.officers || [], penalties: c.penalties || [], blacklist: c.blacklist || [], subcategories: c.subcategories || [], ...c })) : defaultContent.categories, photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos, footer: { ...defaultContent.footer, ...(data.footer || {}) }, formVisibility: data.formVisibility || "public", announcement: data.announcement || { text: "", active: false } }; } else await setDoc(contentDocRef, defaultContent); } catch(e) { console.error(e); } renderMain(); if (isAdmin) renderAdminPanel(); renderAnnouncement(); }
-    let saveTimeout; function saveToFirebase() { if (!isAdmin) return; clearTimeout(saveTimeout); saveTimeout = setTimeout(async () => { try { await setDoc(contentDocRef, siteContent); await logAction("save_content", "Αποθήκευση περιεχομένου"); showToast("Αποθηκεύτηκε", "success"); } catch(e) { console.error(e); showToast("Σφάλμα αποθήκευσης", "error"); } }, 800); }
-    async function checkIfAdmin(uid) { try { const adminDoc = await getDoc(doc(db, "admins", uid)); return adminDoc.exists(); } catch(e) { return false; } }
-    async function verifyImportExportCode(inputCode) { try { const trimmedInput = inputCode ? inputCode.trim() : ""; const codeDoc = await getDoc(doc(db, "settings", "importExportCode")); if (!codeDoc.exists()) return false; const storedCodeRaw = codeDoc.data().code; const storedCode = storedCodeRaw ? storedCodeRaw.trim() : ""; return trimmedInput === storedCode; } catch(e) { return false; } }
-    function showToast(msg, type) { const toast = document.createElement('div'); toast.textContent = msg; toast.style.position = 'fixed'; toast.style.bottom = '20px'; toast.style.left = '50%'; toast.style.transform = 'translateX(-50%)'; toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444'; toast.style.color = 'white'; toast.style.padding = '12px 24px'; toast.style.borderRadius = '40px'; toast.style.zIndex = '10000'; toast.style.fontWeight = 'bold'; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
-    function renderAnnouncement() { const container = document.getElementById('announcementContainer'); if (!container) return; if (siteContent.announcement?.active && siteContent.announcement.text) { container.innerHTML = `<div class="announcement-banner"><span><i class="fas fa-bullhorn"></i> ${escapeHtml(siteContent.announcement.text)}</span><button id="closeAnnouncement"><i class="fas fa-times"></i></button></div>`; document.getElementById('closeAnnouncement')?.addEventListener('click', () => { siteContent.announcement.active = false; saveToFirebase(); renderAnnouncement(); }); } else container.innerHTML = ''; }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+    function textToHTML(text) {
+      if (!text) return '';
+      const lines = text.split('\n');
+      let inList = false, html = '';
+      for (let line of lines) {
+        line = line.trim();
+        if (line === '') { if (inList) { html += '</ul>'; inList = false; } continue; }
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          if (!inList) { html += '<ul>'; inList = true; }
+          html += `<li>${line.substring(2)}</li>`;
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          const numberedMatch = line.match(/^(\d+)\.\s+(.*)/);
+          if (numberedMatch) html += `<ol><li>${numberedMatch[2]}</li></ol>`;
+          else html += `<p>${line}</p>`;
+        }
+      }
+      if (inList) html += '</ul>';
+      return html;
+    }
+    function getAllPersonnelNames() {
+      const names = [];
+      (siteContent.categories || []).forEach(cat => {
+        if (cat.type === 'personnel' && cat.officers) cat.officers.forEach(o => {
+          const fullName = (o.firstName + ' ' + o.lastName).trim();
+          if (fullName) names.push({ value: fullName, display: fullName + (o.rank ? ` (${o.rank})` : ''), rank: o.rank });
+        });
+      });
+      return names;
+    }
+    function findOfficerRank(name) {
+      if (!name) return '';
+      for (const cat of siteContent.categories || [])
+        if (cat.type === 'personnel' && cat.officers)
+          for (const o of cat.officers)
+            if ((o.firstName + ' ' + o.lastName).trim() === name) return o.rank || '';
+      return '';
+    }
+    async function logAction(action, details) {
+      if (!isAdmin) return;
+      try { await addDoc(collection(db, "auditLogs"), { user: currentUser?.email || "unknown", action, details, timestamp: new Date() }); } catch(e) { console.error("Audit log error", e); }
+    }
+    async function loadContent() {
+      try {
+        const snap = await getDoc(contentDocRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          siteContent = {
+            cover: { ...defaultContent.cover, ...(data.cover || {}) },
+            categories: Array.isArray(data.categories) ? data.categories.map(c => ({
+              type: c.type || 'text',
+              visibility: c.visibility || 'public',
+              officers: c.officers || [],
+              penalties: c.penalties || [],
+              blacklist: c.blacklist || [],
+              subcategories: c.subcategories || [],
+              ...c
+            })) : defaultContent.categories,
+            photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos,
+            footer: { ...defaultContent.footer, ...(data.footer || {}) },
+            formVisibility: data.formVisibility || "public",
+            announcement: data.announcement || { text: "", active: false }
+          };
+        } else {
+          await setDoc(contentDocRef, defaultContent);
+        }
+      } catch(e) { console.error(e); }
+      renderMain();
+      if (isAdmin) renderAdminPanel();
+      renderAnnouncement();
+    }
+    let saveTimeout;
+    function saveToFirebase() {
+      if (!isAdmin) return;
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        try {
+          await setDoc(contentDocRef, siteContent);
+          await logAction("save_content", "Αποθήκευση περιεχομένου");
+          showToast("Αποθηκεύτηκε", "success");
+        } catch(e) { console.error(e); showToast("Σφάλμα αποθήκευσης", "error"); }
+      }, 800);
+    }
+    async function checkIfAdmin(uid) {
+      try { const adminDoc = await getDoc(doc(db, "admins", uid)); return adminDoc.exists(); } catch(e) { return false; }
+    }
+    async function verifyImportExportCode(inputCode) {
+      try {
+        const trimmedInput = inputCode ? inputCode.trim() : "";
+        const codeDoc = await getDoc(doc(db, "settings", "importExportCode"));
+        if (!codeDoc.exists()) return false;
+        const storedCodeRaw = codeDoc.data().code;
+        const storedCode = storedCodeRaw ? storedCodeRaw.trim() : "";
+        return trimmedInput === storedCode;
+      } catch(e) { return false; }
+    }
+    function showToast(msg, type) {
+      const toast = document.createElement('div');
+      toast.textContent = msg;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+      toast.style.color = 'white';
+      toast.style.padding = '12px 24px';
+      toast.style.borderRadius = '40px';
+      toast.style.zIndex = '10000';
+      toast.style.fontWeight = 'bold';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+    function renderAnnouncement() {
+      const container = document.getElementById('announcementContainer');
+      if (!container) return;
+      if (siteContent.announcement?.active && siteContent.announcement.text) {
+        container.innerHTML = `<div class="announcement-banner"><span><i class="fas fa-bullhorn"></i> ${escapeHtml(siteContent.announcement.text)}</span><button id="closeAnnouncement"><i class="fas fa-times"></i></button></div>`;
+        document.getElementById('closeAnnouncement')?.addEventListener('click', () => {
+          siteContent.announcement.active = false;
+          saveToFirebase();
+          renderAnnouncement();
+        });
+      } else container.innerHTML = '';
+    }
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
 
     function renderMain() {
-      safeSetText('cover-badge-pre', siteContent.cover.badge); safeSetText('cover-span-pre', siteContent.cover.span); safeSetText('cover-subhead-pre', siteContent.cover.subhead); const rankEl = document.getElementById('cover-rank-pre'); if (rankEl) rankEl.innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank; safeSetText('footer-left-pre', siteContent.footer.left); safeSetText('footer-right-pre', siteContent.footer.right);
-      if (!navTabs || !contentArea) return; navTabs.innerHTML = ''; contentArea.innerHTML = ''; const tabs = [];
-      if ((siteContent.formVisibility === 'public') || isAdmin) tabs.push({ id: 'page-form', title: 'ΑΙΤΗΣΗ', generator: () => { const page = document.createElement('div'); page.id = 'page-form'; page.className = 'page'; page.innerHTML = `<h2>Αίτηση για την Ελληνική Αστυνομία</h2><div class="protocol-card"><div class="form-container"><iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0"></iframe><p style="margin-top: 1rem; font-size: 0.9rem; text-align: center;">Αν η φόρμα δεν εμφανίζεται, <a href="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform" target="_blank">κάντε κλικ εδώ</a>.</p></div></div>`; return page; } });
+      safeSetText('cover-badge-pre', siteContent.cover.badge);
+      safeSetText('cover-span-pre', siteContent.cover.span);
+      safeSetText('cover-subhead-pre', siteContent.cover.subhead);
+      const rankEl = document.getElementById('cover-rank-pre');
+      if (rankEl) rankEl.innerHTML = '<i class="fas fa-star"></i> ' + siteContent.cover.rank;
+      safeSetText('footer-left-pre', siteContent.footer.left);
+      safeSetText('footer-right-pre', siteContent.footer.right);
+      if (!navTabs || !contentArea) return;
+      navTabs.innerHTML = '';
+      contentArea.innerHTML = '';
+      const tabs = [];
+
+      if ((siteContent.formVisibility === 'public') || isAdmin) {
+        tabs.push({
+          id: 'page-form',
+          title: 'ΑΙΤΗΣΗ',
+          generator: () => {
+            const page = document.createElement('div');
+            page.id = 'page-form';
+            page.className = 'page';
+            page.innerHTML = `<h2>Αίτηση για την Ελληνική Αστυνομία</h2><div class="protocol-card"><div class="form-container"><iframe class="form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform?embedded=true" frameborder="0"></iframe><p style="margin-top: 1rem; font-size: 0.9rem; text-align: center;">Αν η φόρμα δεν εμφανίζεται, <a href="https://docs.google.com/forms/d/e/1FAIpQLSdX2aoFRqU1qmDqx-6Fi8K5xSEjKF6OU4lOKTfm0jZCr9oB2w/viewform" target="_blank">κάντε κλικ εδώ</a>.</p></div></div>`;
+            return page;
+          }
+        });
+      }
+
       const visibleCategories = (siteContent.categories || []).filter(cat => cat.visibility !== 'admin' || isAdmin);
-      visibleCategories.forEach(cat => { tabs.push({ id: `page-${cat.id}`, title: cat.title, generator: () => { const page = document.createElement('div'); page.id = `page-${cat.id}`; page.className = 'page';
-        if (cat.type === 'personnel' && cat.officers) { let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;">'; cat.officers.forEach(o => { const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:3rem; color:#64748b;"></i></div>`; officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${escapeHtml(o.firstName || '')} ${escapeHtml(o.lastName || '')}</div><div class="rank">${escapeHtml(o.rank || '')}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${escapeHtml(o.discord || '')}</div><div class="discord"><i class="fas fa-phone"></i> ${escapeHtml(o.phone || '')}</div><div class="discord"><i class="fas fa-envelope"></i> ${escapeHtml(o.email || '')}</div>` : ''}</div></div>`; }); officersHtml += '</div>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${officersHtml}</div>`; setTimeout(() => { page.querySelectorAll('.officer-avatar').forEach(img => { if(img.tagName === 'IMG' && img.src) img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); }); }); }, 0); }
-        else if (cat.type === 'penalties' && cat.penalties) { let tableHtml = '<table class="penalties-table"><thead> <th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th> </thead><tbody>'; cat.penalties.forEach(p => { const rank = findOfficerRank(p.name); tableHtml += `<tr><td><div class="penalty-name-cell">${escapeHtml(p.name || '')}</div>${rank ? `<div class="penalty-rank-cell">${escapeHtml(rank)}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`; }); tableHtml += '</tbody></table>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${tableHtml}</div>`; }
-        else if (cat.type === 'blacklist' && cat.blacklist) { let blHtml = '<table class="blacklist-table"><thead><tr><th>Όνομα</th><th>Βαθμός</th><th>Ημερομηνία Αποχώρησης</th><th>Αιτία / Σημειώσεις</th></tr></thead><tbody>'; cat.blacklist.forEach(b => { blHtml += `<tr><td><strong>${escapeHtml(b.name)}</strong></td><td class="blacklist-rank">${escapeHtml(b.rank)}</td><td>${escapeHtml(b.dismissalDate || '-')}</td><td>${escapeHtml(b.reason || '-')}</td></tr>`; }); blHtml += '</tbody></table>'; page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${blHtml || '<p>Δεν υπάρχουν καταχωρημένοι απολυμένοι.</p>'}</div>`; }
-        else { if (cat.subcategories && cat.subcategories.length) { let subHtml = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${escapeHtml(sub.title)}</div>`; }); subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`; cat.subcategories.forEach((sub, idx) => { subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`; }); subHtml += '</div></div>'; page.innerHTML = subHtml; setTimeout(() => { const container = document.querySelector(`#subtabs-${cat.id}`); if(container){ const subtabs = container.querySelectorAll('.subcategory-tab'); subtabs.forEach(tab => tab.addEventListener('click', () => { subtabs.forEach(t => t.classList.remove('active')); document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page')); tab.classList.add('active'); const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`); if (subPage) subPage.classList.add('active-page'); })); } }, 0); } else { page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`; } } return page; } }); });
-      tabs.push({ id: 'page-photos', title: 'ΦΩΤΟΓΡΑΦΙΕΣ', generator: () => { const page = document.createElement('div'); page.id = 'page-photos'; page.className = 'page'; let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">'; const allPhotoUrls = (siteContent.photos || []).map(p => typeof p === 'string' ? p : p.url); allPhotoUrls.forEach((url, idx) => { galleryHtml += `<img class="photo-gallery-img" data-index="${idx}" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`; }); galleryHtml += '</div>'; page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`; setTimeout(() => { page.querySelectorAll('.photo-gallery-img').forEach(img => { img.addEventListener('click', (e) => { e.stopPropagation(); const idx = parseInt(img.dataset.index); showLightbox(allPhotoUrls[idx], allPhotoUrls, idx); }); }); }, 0); return page; } });
-      tabs.forEach((tab, index) => { const tabEl = document.createElement('div'); tabEl.className = 'nav-tab'; if (index === 0) tabEl.classList.add('active'); tabEl.dataset.page = tab.id; tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${escapeHtml(tab.title)}`; navTabs.appendChild(tabEl); const pageEl = tab.generator(); if (index === 0) pageEl.classList.add('active-page'); contentArea.appendChild(pageEl); });
-      document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', function() { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); this.classList.add('active'); const targetPage = document.getElementById(this.dataset.page); if (targetPage) targetPage.classList.add('active-page'); }); });
+      visibleCategories.forEach(cat => {
+        tabs.push({
+          id: `page-${cat.id}`,
+          title: cat.title,
+          generator: () => {
+            const page = document.createElement('div');
+            page.id = `page-${cat.id}`;
+            page.className = 'page';
+            if (cat.type === 'personnel' && cat.officers) {
+              let officersHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;">';
+              cat.officers.forEach(o => {
+                const photoHtml = o.photoUrl ? `<img class="officer-avatar" src="${o.photoUrl}" alt="φωτογραφία">` : `<div class="officer-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-shield" style="font-size:3rem; color:#64748b;"></i></div>`;
+                officersHtml += `<div class="officer-display-card">${photoHtml}<div class="officer-info"><div class="name">${escapeHtml(o.firstName || '')} ${escapeHtml(o.lastName || '')}</div><div class="rank">${escapeHtml(o.rank || '')}</div>${isAdmin ? `<div class="discord"><i class="fab fa-discord"></i> ${escapeHtml(o.discord || '')}</div><div class="discord"><i class="fas fa-phone"></i> ${escapeHtml(o.phone || '')}</div><div class="discord"><i class="fas fa-envelope"></i> ${escapeHtml(o.email || '')}</div>` : ''}</div></div>`;
+              });
+              officersHtml += '</div>';
+              page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${officersHtml}</div>`;
+              setTimeout(() => {
+                page.querySelectorAll('.officer-avatar').forEach(img => {
+                  if(img.tagName === 'IMG' && img.src) img.addEventListener('click', (e) => { e.stopPropagation(); showLightbox(img.src); });
+                });
+              }, 0);
+            } else if (cat.type === 'penalties' && cat.penalties) {
+              let tableHtml = '<table class="penalties-table"><thead><th>Όνομα</th><th>Πειθαρχικό 1</th><th>Πειθαρχικό 2</th><th>Πειθαρχικό 3</th></thead><tbody>';
+              cat.penalties.forEach(p => {
+                const rank = findOfficerRank(p.name);
+                tableHtml += `<tr><td><div class="penalty-name-cell">${escapeHtml(p.name || '')}</div>${rank ? `<div class="penalty-rank-cell">${escapeHtml(rank)}</div>` : ''}</td><td class="penalty-x">${p.p1 ? '✗' : ''}</td><td class="penalty-x">${p.p2 ? '✗' : ''}</td><td class="penalty-x">${p.p3 ? '✗' : ''}</td></tr>`;
+              });
+              tableHtml += '</tbody></table>';
+              page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${tableHtml}</div>`;
+            } else if (cat.type === 'blacklist' && cat.blacklist) {
+              let blHtml = '<table class="blacklist-table"><thead><th>Όνομα</th><th>Βαθμός</th><th>Ημερομηνία Αποχώρησης</th><th>Αιτία / Σημειώσεις</th></thead><tbody>';
+              cat.blacklist.forEach(b => {
+                blHtml += `<tr><td><strong>${escapeHtml(b.name)}</strong></td><td class="blacklist-rank">${escapeHtml(b.rank)}</td><td>${escapeHtml(b.dismissalDate || '-')}</td><td>${escapeHtml(b.reason || '-')}</td></tr>`;
+              });
+              blHtml += '</tbody></table>';
+              page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${blHtml || '<p>Δεν υπάρχουν καταχωρημένοι απολυμένοι.</p>'}</div>`;
+            } else {
+              if (cat.subcategories && cat.subcategories.length) {
+                let subHtml = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card"><div class="subcategory-tabs" id="subtabs-${cat.id}">`;
+                cat.subcategories.forEach((sub, idx) => {
+                  subHtml += `<div class="subcategory-tab ${idx === 0 ? 'active' : ''}" data-subcat="${sub.id}"><i class="fas fa-file"></i> ${escapeHtml(sub.title)}</div>`;
+                });
+                subHtml += `</div><div class="subcategory-pages" id="subpages-${cat.id}">`;
+                cat.subcategories.forEach((sub, idx) => {
+                  subHtml += `<div class="subcategory-page ${idx === 0 ? 'active-page' : ''}" id="subpage-${sub.id}">${textToHTML(sub.content)}</div>`;
+                });
+                subHtml += '</div></div>';
+                page.innerHTML = subHtml;
+                setTimeout(() => {
+                  const container = document.querySelector(`#subtabs-${cat.id}`);
+                  if(container){
+                    const subtabs = container.querySelectorAll('.subcategory-tab');
+                    subtabs.forEach(tab => tab.addEventListener('click', () => {
+                      subtabs.forEach(t => t.classList.remove('active'));
+                      document.querySelectorAll(`#subpages-${cat.id} .subcategory-page`).forEach(p => p.classList.remove('active-page'));
+                      tab.classList.add('active');
+                      const subPage = document.getElementById(`subpage-${tab.dataset.subcat}`);
+                      if (subPage) subPage.classList.add('active-page');
+                    }));
+                  }
+                }, 0);
+              } else {
+                page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${textToHTML(cat.content || '')}</div>`;
+              }
+            }
+            return page;
+          }
+        });
+      });
+
+      tabs.push({
+        id: 'page-photos',
+        title: 'ΦΩΤΟΓΡΑΦΙΕΣ',
+        generator: () => {
+          const page = document.createElement('div');
+          page.id = 'page-photos';
+          page.className = 'page';
+          let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">';
+          const allPhotoUrls = (siteContent.photos || []).map(p => typeof p === 'string' ? p : p.url);
+          allPhotoUrls.forEach((url, idx) => {
+            galleryHtml += `<img class="photo-gallery-img" data-index="${idx}" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`;
+          });
+          galleryHtml += '</div>';
+          page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${galleryHtml}`;
+          setTimeout(() => {
+            page.querySelectorAll('.photo-gallery-img').forEach(img => {
+              img.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(img.dataset.index);
+                showLightbox(allPhotoUrls[idx], allPhotoUrls, idx);
+              });
+            });
+          }, 0);
+          return page;
+        }
+      });
+
+      tabs.forEach((tab, index) => {
+        const tabEl = document.createElement('div');
+        tabEl.className = 'nav-tab';
+        if (index === 0) tabEl.classList.add('active');
+        tabEl.dataset.page = tab.id;
+        tabEl.innerHTML = `<i class="fas fa-file-alt"></i> ${escapeHtml(tab.title)}`;
+        navTabs.appendChild(tabEl);
+        const pageEl = tab.generator();
+        if (index === 0) pageEl.classList.add('active-page');
+        contentArea.appendChild(pageEl);
+      });
+
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+          this.classList.add('active');
+          const targetPage = document.getElementById(this.dataset.page);
+          if (targetPage) targetPage.classList.add('active-page');
+        });
+      });
     }
 
     function renderAdminPanel() {
       if (!adminContent) return;
       adminContent.innerHTML = '';
+
       // Stats widgets
       const stats = { officers: 0, penalties: 0, blacklisted: 0, photos: (siteContent.photos || []).length };
       siteContent.categories.forEach(cat => {
@@ -1042,9 +1313,27 @@
       });
       const statsHtml = `<div class="stats-widgets"><div class="stat-card"><div class="stat-number">${stats.officers}</div><div class="stat-label">Αστυνομικοί</div></div><div class="stat-card"><div class="stat-number">${stats.penalties}</div><div class="stat-label">Ενεργά Πειθαρχικά</div></div><div class="stat-card"><div class="stat-number">${stats.blacklisted}</div><div class="stat-label">Μαύρη Λίστα</div></div><div class="stat-card"><div class="stat-number">${stats.photos}</div><div class="stat-label">Φωτογραφίες</div></div></div>`;
       adminContent.insertAdjacentHTML('beforeend', statsHtml);
-      // Helper for simple fields
-      const addField = (label, path, value) => { const div = document.createElement('div'); div.className = 'admin-field-group'; const lbl = document.createElement('label'); lbl.textContent = label; const inp = document.createElement('input'); inp.type = 'text'; inp.value = value || ''; inp.addEventListener('input', (e) => { const parts = path.split('.'); let obj = siteContent; for (let i = 0; i < parts.length-1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; } obj[parts[parts.length-1]] = e.target.value; renderMain(); saveToFirebase(); }); div.appendChild(lbl); div.appendChild(inp); return div; };
-      const section = (title, icon) => { const sec = document.createElement('div'); sec.className = 'admin-section-modern'; sec.innerHTML = `<div class="admin-section-title"><i class="${icon}"></i> ${title}</div>`; return sec; };
+
+      const addField = (label, path, value) => {
+        const div = document.createElement('div'); div.className = 'admin-field-group';
+        const lbl = document.createElement('label'); lbl.textContent = label;
+        const inp = document.createElement('input'); inp.type = 'text'; inp.value = value || '';
+        inp.addEventListener('input', (e) => {
+          const parts = path.split('.');
+          let obj = siteContent;
+          for (let i = 0; i < parts.length-1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; }
+          obj[parts[parts.length-1]] = e.target.value;
+          renderMain(); saveToFirebase();
+        });
+        div.appendChild(lbl); div.appendChild(inp);
+        return div;
+      };
+      const section = (title, icon) => {
+        const sec = document.createElement('div'); sec.className = 'admin-section-modern';
+        sec.innerHTML = `<div class="admin-section-title"><i class="${icon}"></i> ${title}</div>`;
+        return sec;
+      };
+
       // Cover section
       const coverSec = section('Εξώφυλλο & Ταυτότητα', 'fas fa-flag-checkered');
       coverSec.appendChild(addField('Κεντρικό λογότυπο', 'cover.badge', siteContent.cover.badge));
@@ -1054,6 +1343,7 @@
       coverSec.appendChild(addField('Sticker', 'cover.sticker', siteContent.cover.sticker));
       coverSec.appendChild(addField('Απόφθεγμα', 'cover.quote', siteContent.cover.quote));
       adminContent.appendChild(coverSec);
+
       // Announcement
       const annSec = section('Ανακοίνωση', 'fas fa-bullhorn');
       const annDiv = document.createElement('div'); annDiv.className = 'admin-field-group';
@@ -1062,103 +1352,224 @@
       annText.addEventListener('input', e => { siteContent.announcement = siteContent.announcement || { text: '', active: false }; siteContent.announcement.text = e.target.value; saveToFirebase(); renderAnnouncement(); });
       annActive.addEventListener('change', e => { siteContent.announcement = siteContent.announcement || { text: '', active: false }; siteContent.announcement.active = e.target.checked; saveToFirebase(); renderAnnouncement(); });
       annSec.appendChild(annDiv); adminContent.appendChild(annSec);
+
       // Form visibility
       const formSec = section('Φόρμα Αίτησης', 'fas fa-file-signature');
-      const toggleDiv = document.createElement('div'); toggleDiv.className = 'admin-toggle'; toggleDiv.innerHTML = `<span><i class="fas fa-user-lock"></i> Ορατότητα μόνο σε διαχειριστές</span><input type="checkbox" id="adminFormVis" ${siteContent.formVisibility === 'admin' ? 'checked' : ''}>`;
+      const toggleDiv = document.createElement('div'); toggleDiv.className = 'admin-toggle';
+      toggleDiv.innerHTML = `<span><i class="fas fa-user-lock"></i> Ορατότητα μόνο σε διαχειριστές</span><input type="checkbox" id="adminFormVis" ${siteContent.formVisibility === 'admin' ? 'checked' : ''}>`;
       toggleDiv.querySelector('input').addEventListener('change', (e) => { siteContent.formVisibility = e.target.checked ? 'admin' : 'public'; renderMain(); saveToFirebase(); });
       formSec.appendChild(toggleDiv); adminContent.appendChild(formSec);
+
       // Categories
       const catSec = section('Κατηγορίες Περιεχομένου', 'fas fa-layer-group');
       const categoriesContainer = document.createElement('div'); categoriesContainer.className = 'categories-grid';
       const categories = siteContent.categories || [];
+
       categories.forEach((cat, idx) => {
         const card = document.createElement('div'); card.className = 'category-card-modern';
         const header = document.createElement('div'); header.className = 'category-header-modern';
-        const titleInput = document.createElement('input'); titleInput.className = 'category-title-modern'; titleInput.value = cat.title || ''; titleInput.placeholder = 'Τίτλος'; titleInput.addEventListener('input', (e) => { cat.title = e.target.value; renderMain(); saveToFirebase(); });
-        const typeSelect = document.createElement('select'); typeSelect.className = 'category-type-select'; typeSelect.innerHTML = `<option value="text" ${cat.type==='text'?'selected':''}>Κείμενο</option><option value="personnel" ${cat.type==='personnel'?'selected':''}>Προσωπικό</option><option value="penalties" ${cat.type==='penalties'?'selected':''}>Πειθαρχικά</option><option value="blacklist" ${cat.type==='blacklist'?'selected':''}>Μαύρη Λίστα (Απολυμένοι)</option>`; typeSelect.addEventListener('change', (e) => { cat.type = e.target.value; if(cat.type==='personnel' && !cat.officers) cat.officers=[]; if(cat.type==='penalties' && !cat.penalties) cat.penalties=[]; if(cat.type==='blacklist' && !cat.blacklist) cat.blacklist=[]; if(cat.type==='text' && !cat.subcategories) cat.subcategories=[]; if(cat.type==='blacklist') cat.visibility = 'admin'; renderMain(); saveToFirebase(); renderAdminPanel(); });
-        const visDiv = document.createElement('div'); visDiv.className = 'visibility-badge'; visDiv.innerHTML = `<label>Admin only</label><input type="checkbox" ${cat.visibility==='admin'?'checked':''}>`; visDiv.querySelector('input').addEventListener('change', (e) => { cat.visibility = e.target.checked ? 'admin' : 'public'; renderMain(); saveToFirebase(); });
+        const titleInput = document.createElement('input'); titleInput.className = 'category-title-modern'; titleInput.value = cat.title || ''; titleInput.placeholder = 'Τίτλος';
+        titleInput.addEventListener('input', (e) => { cat.title = e.target.value; renderMain(); saveToFirebase(); });
+        const typeSelect = document.createElement('select'); typeSelect.className = 'category-type-select';
+        typeSelect.innerHTML = `<option value="text" ${cat.type==='text'?'selected':''}>Κείμενο</option><option value="personnel" ${cat.type==='personnel'?'selected':''}>Προσωπικό</option><option value="penalties" ${cat.type==='penalties'?'selected':''}>Πειθαρχικά</option><option value="blacklist" ${cat.type==='blacklist'?'selected':''}>Μαύρη Λίστα (Απολυμένοι)</option>`;
+        typeSelect.addEventListener('change', (e) => {
+          cat.type = e.target.value;
+          if(cat.type==='personnel' && !cat.officers) cat.officers=[];
+          if(cat.type==='penalties' && !cat.penalties) cat.penalties=[];
+          if(cat.type==='blacklist' && !cat.blacklist) cat.blacklist=[];
+          if(cat.type==='text' && !cat.subcategories) cat.subcategories=[];
+          if(cat.type==='blacklist') cat.visibility = 'admin';
+          renderMain(); saveToFirebase(); renderAdminPanel();
+        });
+        const visDiv = document.createElement('div'); visDiv.className = 'visibility-badge';
+        visDiv.innerHTML = `<label>Admin only</label><input type="checkbox" ${cat.visibility==='admin'?'checked':''}>`;
+        visDiv.querySelector('input').addEventListener('change', (e) => { cat.visibility = e.target.checked ? 'admin' : 'public'; renderMain(); saveToFirebase(); });
         const actions = document.createElement('div'); actions.className = 'category-actions-modern';
-        if(idx>0){ const up = document.createElement('button'); up.className='icon-btn move'; up.innerHTML='<i class="fas fa-arrow-up"></i>'; up.addEventListener('click',()=>{ const t=categories[idx]; categories[idx]=categories[idx-1]; categories[idx-1]=t; renderMain(); saveToFirebase(); renderAdminPanel(); }); actions.appendChild(up); }
-        if(idx<categories.length-1){ const down = document.createElement('button'); down.className='icon-btn move'; down.innerHTML='<i class="fas fa-arrow-down"></i>'; down.addEventListener('click',()=>{ const t=categories[idx]; categories[idx]=categories[idx+1]; categories[idx+1]=t; renderMain(); saveToFirebase(); renderAdminPanel(); }); actions.appendChild(down); }
-        const del = document.createElement('button'); del.className='icon-btn delete'; del.innerHTML='<i class="fas fa-trash"></i>'; del.addEventListener('click',()=>{ siteContent.categories = categories.filter(c=>c.id!==cat.id); renderMain(); saveToFirebase(); renderAdminPanel(); }); actions.appendChild(del);
-        header.append(titleInput, typeSelect, visDiv, actions); card.appendChild(header);
+        if(idx>0){
+          const up = document.createElement('button'); up.className='icon-btn move'; up.innerHTML='<i class="fas fa-arrow-up"></i>';
+          up.addEventListener('click',()=>{ const t=categories[idx]; categories[idx]=categories[idx-1]; categories[idx-1]=t; renderMain(); saveToFirebase(); renderAdminPanel(); });
+          actions.appendChild(up);
+        }
+        if(idx<categories.length-1){
+          const down = document.createElement('button'); down.className='icon-btn move'; down.innerHTML='<i class="fas fa-arrow-down"></i>';
+          down.addEventListener('click',()=>{ const t=categories[idx]; categories[idx]=categories[idx+1]; categories[idx+1]=t; renderMain(); saveToFirebase(); renderAdminPanel(); });
+          actions.appendChild(down);
+        }
+        const del = document.createElement('button'); del.className='icon-btn delete'; del.innerHTML='<i class="fas fa-trash"></i>';
+        del.addEventListener('click',()=>{ siteContent.categories = categories.filter(c=>c.id!==cat.id); renderMain(); saveToFirebase(); renderAdminPanel(); });
+        actions.appendChild(del);
+        header.append(titleInput, typeSelect, visDiv, actions);
+        card.appendChild(header);
         const body = document.createElement('div'); body.className = 'category-body-modern';
+
         if (cat.type === 'personnel') {
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση αστυνομικού..." class="search-input">';
           const officersDiv = document.createElement('div'); officersDiv.className = 'officers-grid-modern';
-          const renderOfficers = (filter = '') => { officersDiv.innerHTML = ''; const filtered = (cat.officers || []).filter(o => (o.firstName + ' ' + o.lastName).toLowerCase().includes(filter.toLowerCase())); filtered.forEach((off, offIdx) => {
-            const offCard = document.createElement('div'); offCard.className = 'officer-card-modern';
-            const fields = document.createElement('div'); fields.className = 'officer-fields-modern';
-            const fn = document.createElement('input'); fn.placeholder='Όνομα'; fn.value=off.firstName||''; fn.addEventListener('input',e=>{off.firstName=e.target.value; renderMain(); saveToFirebase();});
-            const ln = document.createElement('input'); ln.placeholder='Επώνυμο'; ln.value=off.lastName||''; ln.addEventListener('input',e=>{off.lastName=e.target.value; renderMain(); saveToFirebase();});
-            const rSel = document.createElement('select'); rankOptions.forEach(r=>{const opt=document.createElement('option'); opt.value=r; opt.textContent=r; if(off.rank===r) opt.selected=true; rSel.appendChild(opt);}); rSel.addEventListener('change',e=>{off.rank=e.target.value; renderMain(); saveToFirebase();});
-            const dc = document.createElement('input'); dc.placeholder='Discord'; dc.value=off.discord||''; dc.addEventListener('input',e=>{off.discord=e.target.value; renderMain(); saveToFirebase();});
-            const phone = document.createElement('input'); phone.placeholder='Τηλέφωνο'; phone.value=off.phone||''; phone.addEventListener('input',e=>{off.phone=e.target.value; renderMain(); saveToFirebase();});
-            const email = document.createElement('input'); email.placeholder='Email'; email.value=off.email||''; email.addEventListener('input',e=>{off.email=e.target.value; renderMain(); saveToFirebase();});
-            fields.append(fn, ln, rSel, dc, phone, email);
-            const photoDiv = document.createElement('div'); photoDiv.className = 'officer-photo-field';
-            const preview = document.createElement('img'); preview.className = 'photo-preview'; preview.src = off.photoUrl || ''; if(!off.photoUrl) preview.style.display = 'none';
-            const urlInput = document.createElement('input'); urlInput.className = 'photo-upload-input'; urlInput.placeholder = 'URL φωτογραφίας ή βάσης64'; urlInput.value = off.photoUrl || ''; urlInput.addEventListener('input', e => { off.photoUrl = e.target.value; preview.src = e.target.value; preview.style.display = e.target.value ? 'block' : 'none'; renderMain(); saveToFirebase(); });
-            const fileBtn = document.createElement('button'); fileBtn.className = 'photo-file-btn'; fileBtn.innerHTML = '<i class="fas fa-upload"></i> Αρχείο'; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none'; fileInput.addEventListener('change', async e => { const file = e.target.files[0]; if(file && file.type.startsWith('image/')){ const storageRef = ref(storage, `officers/${Date.now()}_${file.name}`); const snapshot = await uploadBytes(storageRef, file); const url = await getDownloadURL(snapshot.ref); off.photoUrl = url; urlInput.value = url; preview.src = url; preview.style.display = 'block'; renderMain(); saveToFirebase(); } }); fileBtn.addEventListener('click', () => fileInput.click()); const clearBtn = document.createElement('button'); clearBtn.className = 'photo-file-btn'; clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i>'; clearBtn.addEventListener('click', () => { off.photoUrl = ''; urlInput.value = ''; preview.src = ''; preview.style.display = 'none'; renderMain(); saveToFirebase(); });
-            photoDiv.append(preview, urlInput, fileBtn, fileInput, clearBtn);
-            const actDiv = document.createElement('div'); actDiv.style.display='flex'; actDiv.style.gap='8px'; actDiv.style.justifyContent='flex-end';
-            if(offIdx>0){ const upOff = document.createElement('button'); upOff.className='icon-btn move'; upOff.innerHTML='<i class="fas fa-arrow-up"></i>'; upOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx-1]; cat.officers[offIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(upOff); }
-            if(offIdx<cat.officers.length-1){ const downOff = document.createElement('button'); downOff.className='icon-btn move'; downOff.innerHTML='<i class="fas fa-arrow-down"></i>'; downOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx+1]; cat.officers[offIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(downOff); }
-            const delOff = document.createElement('button'); delOff.className='icon-btn delete'; delOff.innerHTML='<i class="fas fa-trash"></i>'; delOff.addEventListener('click',()=>{ cat.officers.splice(offIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(delOff);
-            offCard.append(fields, photoDiv, actDiv); officersDiv.appendChild(offCard);
-          }); };
+          const renderOfficers = (filter = '') => {
+            officersDiv.innerHTML = '';
+            const filtered = (cat.officers || []).filter(o => (o.firstName + ' ' + o.lastName).toLowerCase().includes(filter.toLowerCase()));
+            filtered.forEach((off, offIdx) => {
+              const offCard = document.createElement('div'); offCard.className = 'officer-card-modern';
+              const fields = document.createElement('div'); fields.className = 'officer-fields-modern';
+              const fn = document.createElement('input'); fn.placeholder='Όνομα'; fn.value=off.firstName||''; fn.addEventListener('input',e=>{off.firstName=e.target.value; renderMain(); saveToFirebase();});
+              const ln = document.createElement('input'); ln.placeholder='Επώνυμο'; ln.value=off.lastName||''; ln.addEventListener('input',e=>{off.lastName=e.target.value; renderMain(); saveToFirebase();});
+              const rSel = document.createElement('select'); rankOptions.forEach(r=>{const opt=document.createElement('option'); opt.value=r; opt.textContent=r; if(off.rank===r) opt.selected=true; rSel.appendChild(opt);}); rSel.addEventListener('change',e=>{off.rank=e.target.value; renderMain(); saveToFirebase();});
+              const dc = document.createElement('input'); dc.placeholder='Discord'; dc.value=off.discord||''; dc.addEventListener('input',e=>{off.discord=e.target.value; renderMain(); saveToFirebase();});
+              const phone = document.createElement('input'); phone.placeholder='Τηλέφωνο'; phone.value=off.phone||''; phone.addEventListener('input',e=>{off.phone=e.target.value; renderMain(); saveToFirebase();});
+              const email = document.createElement('input'); email.placeholder='Email'; email.value=off.email||''; email.addEventListener('input',e=>{off.email=e.target.value; renderMain(); saveToFirebase();});
+              fields.append(fn, ln, rSel, dc, phone, email);
+              const photoDiv = document.createElement('div'); photoDiv.className = 'officer-photo-field';
+              const preview = document.createElement('img'); preview.className = 'photo-preview'; preview.src = off.photoUrl || ''; if(!off.photoUrl) preview.style.display = 'none';
+              const urlInput = document.createElement('input'); urlInput.className = 'photo-upload-input'; urlInput.placeholder = 'URL φωτογραφίας ή βάσης64'; urlInput.value = off.photoUrl || ''; urlInput.addEventListener('input', e => { off.photoUrl = e.target.value; preview.src = e.target.value; preview.style.display = e.target.value ? 'block' : 'none'; renderMain(); saveToFirebase(); });
+              const fileBtn = document.createElement('button'); fileBtn.className = 'photo-file-btn'; fileBtn.innerHTML = '<i class="fas fa-upload"></i> Αρχείο'; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none'; fileInput.addEventListener('change', async e => { const file = e.target.files[0]; if(file && file.type.startsWith('image/')){ const storageRef = ref(storage, `officers/${Date.now()}_${file.name}`); const snapshot = await uploadBytes(storageRef, file); const url = await getDownloadURL(snapshot.ref); off.photoUrl = url; urlInput.value = url; preview.src = url; preview.style.display = 'block'; renderMain(); saveToFirebase(); } }); fileBtn.addEventListener('click', () => fileInput.click()); const clearBtn = document.createElement('button'); clearBtn.className = 'photo-file-btn'; clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i>'; clearBtn.addEventListener('click', () => { off.photoUrl = ''; urlInput.value = ''; preview.src = ''; preview.style.display = 'none'; renderMain(); saveToFirebase(); });
+              photoDiv.append(preview, urlInput, fileBtn, fileInput, clearBtn);
+              const actDiv = document.createElement('div'); actDiv.style.display='flex'; actDiv.style.gap='8px'; actDiv.style.justifyContent='flex-end';
+              if(offIdx>0){ const upOff = document.createElement('button'); upOff.className='icon-btn move'; upOff.innerHTML='<i class="fas fa-arrow-up"></i>'; upOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx-1]; cat.officers[offIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(upOff); }
+              if(offIdx<cat.officers.length-1){ const downOff = document.createElement('button'); downOff.className='icon-btn move'; downOff.innerHTML='<i class="fas fa-arrow-down"></i>'; downOff.addEventListener('click',()=>{ const tmp=cat.officers[offIdx]; cat.officers[offIdx]=cat.officers[offIdx+1]; cat.officers[offIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(downOff); }
+              const delOff = document.createElement('button'); delOff.className='icon-btn delete'; delOff.innerHTML='<i class="fas fa-trash"></i>'; delOff.addEventListener('click',()=>{ cat.officers.splice(offIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(delOff);
+              offCard.append(fields, photoDiv, actDiv); officersDiv.appendChild(offCard);
+            });
+          };
           const searchInput = searchDiv.querySelector('.search-input'); searchInput.addEventListener('input', e => renderOfficers(e.target.value));
           renderOfficers();
-          const addOff = document.createElement('button'); addOff.className='btn-secondary'; addOff.innerHTML='<i class="fas fa-user-plus"></i> Προσθήκη'; addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:'', phone:'', email:'', photoUrl:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+          const addOff = document.createElement('button'); addOff.className='btn-secondary'; addOff.innerHTML='<i class="fas fa-user-plus"></i> Προσθήκη';
+          addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:'', phone:'', email:'', photoUrl:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(searchDiv, officersDiv, addOff);
         } else if (cat.type === 'penalties') {
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση ονόματος..." class="search-input">';
-          const penaltiesDiv = document.createElement('div'); penaltiesDiv.className = 'penalties-grid-modern'; const allNames = getAllPersonnelNames(); const dlId = `names-datalist-${cat.id}`; const datalist = document.createElement('datalist'); datalist.id = dlId; allNames.forEach(n=>{ const opt=document.createElement('option'); opt.value=n.value; opt.textContent=n.display; datalist.appendChild(opt); }); penaltiesDiv.appendChild(datalist);
-          const renderPenalties = (filter = '') => { penaltiesDiv.innerHTML = ''; penaltiesDiv.appendChild(datalist); const filtered = (cat.penalties || []).filter(p => p.name.toLowerCase().includes(filter.toLowerCase())); filtered.forEach((p, pIdx) => { const pItem = document.createElement('div'); pItem.className = 'penalty-item-modern'; const nameInp = document.createElement('input'); nameInp.className = 'penalty-name-modern'; nameInp.placeholder='Όνομα'; nameInp.value=p.name||''; nameInp.setAttribute('list',dlId); nameInp.addEventListener('input',e=>{p.name=e.target.value; renderMain(); saveToFirebase();}); const chkDiv = document.createElement('div'); chkDiv.className = 'penalty-checkboxes-modern'; [1,2,3].forEach(col => { const box = document.createElement('div'); box.className = `penalty-badge ${p['p'+col] ? 'active' : ''}`; box.textContent = p['p'+col] ? '✗' : ''; box.addEventListener('click',()=>{ p['p'+col]=!p['p'+col]; renderMain(); saveToFirebase(); renderAdminPanel(); }); chkDiv.appendChild(box); }); const actP = document.createElement('div'); actP.style.display='flex'; actP.style.gap='8px'; if(pIdx>0){ const upP = document.createElement('button'); upP.className='icon-btn move'; upP.innerHTML='<i class="fas fa-arrow-up"></i>'; upP.addEventListener('click',()=>{ const tmp=cat.penalties[pIdx]; cat.penalties[pIdx]=cat.penalties[pIdx-1]; cat.penalties[pIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(upP); } if(pIdx<cat.penalties.length-1){ const downP = document.createElement('button'); downP.className='icon-btn move'; downP.innerHTML='<i class="fas fa-arrow-down"></i>'; downP.addEventListener('click',()=>{ const tmp=cat.penalties[pIdx]; cat.penalties[pIdx]=cat.penalties[pIdx+1]; cat.penalties[pIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(downP); } const delP = document.createElement('button'); delP.className='icon-btn delete'; delP.innerHTML='<i class="fas fa-trash"></i>'; delP.addEventListener('click',()=>{ cat.penalties.splice(pIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(delP); pItem.append(nameInp, chkDiv, actP); penaltiesDiv.appendChild(pItem); }); };
+          const penaltiesDiv = document.createElement('div'); penaltiesDiv.className = 'penalties-grid-modern';
+          const allNames = getAllPersonnelNames(); const dlId = `names-datalist-${cat.id}`; const datalist = document.createElement('datalist'); datalist.id = dlId; allNames.forEach(n=>{ const opt=document.createElement('option'); opt.value=n.value; opt.textContent=n.display; datalist.appendChild(opt); });
+          penaltiesDiv.appendChild(datalist);
+          const renderPenalties = (filter = '') => {
+            penaltiesDiv.innerHTML = ''; penaltiesDiv.appendChild(datalist);
+            const filtered = (cat.penalties || []).filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+            filtered.forEach((p, pIdx) => {
+              const pItem = document.createElement('div'); pItem.className = 'penalty-item-modern';
+              const nameInp = document.createElement('input'); nameInp.className = 'penalty-name-modern'; nameInp.placeholder='Όνομα'; nameInp.value=p.name||''; nameInp.setAttribute('list',dlId); nameInp.addEventListener('input',e=>{p.name=e.target.value; renderMain(); saveToFirebase();});
+              const chkDiv = document.createElement('div'); chkDiv.className = 'penalty-checkboxes-modern';
+              [1,2,3].forEach(col => {
+                const box = document.createElement('div'); box.className = `penalty-badge ${p['p'+col] ? 'active' : ''}`; box.textContent = p['p'+col] ? '✗' : '';
+                box.addEventListener('click',()=>{ p['p'+col]=!p['p'+col]; renderMain(); saveToFirebase(); renderAdminPanel(); });
+                chkDiv.appendChild(box);
+              });
+              const actP = document.createElement('div'); actP.style.display='flex'; actP.style.gap='8px';
+              if(pIdx>0){ const upP = document.createElement('button'); upP.className='icon-btn move'; upP.innerHTML='<i class="fas fa-arrow-up"></i>'; upP.addEventListener('click',()=>{ const tmp=cat.penalties[pIdx]; cat.penalties[pIdx]=cat.penalties[pIdx-1]; cat.penalties[pIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(upP); }
+              if(pIdx<cat.penalties.length-1){ const downP = document.createElement('button'); downP.className='icon-btn move'; downP.innerHTML='<i class="fas fa-arrow-down"></i>'; downP.addEventListener('click',()=>{ const tmp=cat.penalties[pIdx]; cat.penalties[pIdx]=cat.penalties[pIdx+1]; cat.penalties[pIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(downP); }
+              const delP = document.createElement('button'); delP.className='icon-btn delete'; delP.innerHTML='<i class="fas fa-trash"></i>'; delP.addEventListener('click',()=>{ cat.penalties.splice(pIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actP.appendChild(delP);
+              pItem.append(nameInp, chkDiv, actP); penaltiesDiv.appendChild(pItem);
+            });
+          };
           const searchInput = searchDiv.querySelector('.search-input'); searchInput.addEventListener('input', e => renderPenalties(e.target.value));
           renderPenalties();
-          const addPen = document.createElement('button'); addPen.className='btn-secondary'; addPen.innerHTML='<i class="fas fa-plus-circle"></i> Προσθήκη προσώπου'; addPen.addEventListener('click',()=>{ if(!cat.penalties) cat.penalties=[]; cat.penalties.push({name:'',p1:false,p2:false,p3:false}); renderMain(); saveToFirebase(); renderAdminPanel(); }); body.append(searchDiv, penaltiesDiv, addPen);
+          const addPen = document.createElement('button'); addPen.className='btn-secondary'; addPen.innerHTML='<i class="fas fa-plus-circle"></i> Προσθήκη προσώπου';
+          addPen.addEventListener('click',()=>{ if(!cat.penalties) cat.penalties=[]; cat.penalties.push({name:'',p1:false,p2:false,p3:false}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+          body.append(searchDiv, penaltiesDiv, addPen);
         } else if (cat.type === 'blacklist') {
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση απολυμένου..." class="search-input">';
           const blDiv = document.createElement('div'); blDiv.className = 'penalties-grid-modern';
-          const renderBlacklist = (filter = '') => { blDiv.innerHTML = ''; const filtered = (cat.blacklist || []).filter(b => b.name.toLowerCase().includes(filter.toLowerCase())); filtered.forEach((item, idxBl) => { const cardBl = document.createElement('div'); cardBl.className = 'penalty-item-modern'; const nameInp = document.createElement('input'); nameInp.placeholder='Ονοματεπώνυμο'; nameInp.value = item.name || ''; nameInp.className = 'penalty-name-modern'; nameInp.addEventListener('input', e => { item.name = e.target.value; renderMain(); saveToFirebase(); }); const rankSel = document.createElement('select'); rankSel.className = 'penalty-name-modern'; rankSel.style.minWidth='140px'; rankOptions.forEach(r => { const opt = document.createElement('option'); opt.value=r; opt.textContent=r; if(item.rank === r) opt.selected=true; rankSel.appendChild(opt); }); rankSel.addEventListener('change', e => { item.rank = e.target.value; renderMain(); saveToFirebase(); }); const dateInp = document.createElement('input'); dateInp.placeholder='Ημ/νία αποχώρησης'; dateInp.value = item.dismissalDate || ''; dateInp.className = 'penalty-name-modern'; dateInp.addEventListener('input', e => { item.dismissalDate = e.target.value; renderMain(); saveToFirebase(); }); const reasonInp = document.createElement('input'); reasonInp.placeholder='Αιτία / Σημειώσεις'; reasonInp.value = item.reason || ''; reasonInp.className = 'penalty-name-modern'; reasonInp.style.flex = '2'; reasonInp.addEventListener('input', e => { item.reason = e.target.value; renderMain(); saveToFirebase(); }); const actDiv = document.createElement('div'); actDiv.style.display='flex'; actDiv.style.gap='8px'; if(idxBl>0){ const upBl = document.createElement('button'); upBl.className='icon-btn move'; upBl.innerHTML='<i class="fas fa-arrow-up"></i>'; upBl.addEventListener('click',()=>{ const tmp=cat.blacklist[idxBl]; cat.blacklist[idxBl]=cat.blacklist[idxBl-1]; cat.blacklist[idxBl-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(upBl); } if(idxBl<cat.blacklist.length-1){ const downBl = document.createElement('button'); downBl.className='icon-btn move'; downBl.innerHTML='<i class="fas fa-arrow-down"></i>'; downBl.addEventListener('click',()=>{ const tmp=cat.blacklist[idxBl]; cat.blacklist[idxBl]=cat.blacklist[idxBl+1]; cat.blacklist[idxBl+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(downBl); } const delBl = document.createElement('button'); delBl.className='icon-btn delete'; delBl.innerHTML='<i class="fas fa-trash"></i>'; delBl.addEventListener('click',()=>{ cat.blacklist.splice(idxBl,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(delBl); cardBl.append(nameInp, rankSel, dateInp, reasonInp, actDiv); blDiv.appendChild(cardBl); }); };
+          const renderBlacklist = (filter = '') => {
+            blDiv.innerHTML = '';
+            const filtered = (cat.blacklist || []).filter(b => b.name.toLowerCase().includes(filter.toLowerCase()));
+            filtered.forEach((item, idxBl) => {
+              const cardBl = document.createElement('div'); cardBl.className = 'penalty-item-modern';
+              const nameInp = document.createElement('input'); nameInp.placeholder='Ονοματεπώνυμο'; nameInp.value = item.name || ''; nameInp.className = 'penalty-name-modern'; nameInp.addEventListener('input', e => { item.name = e.target.value; renderMain(); saveToFirebase(); });
+              const rankSel = document.createElement('select'); rankSel.className = 'penalty-name-modern'; rankSel.style.minWidth='140px'; rankOptions.forEach(r => { const opt = document.createElement('option'); opt.value=r; opt.textContent=r; if(item.rank === r) opt.selected=true; rankSel.appendChild(opt); }); rankSel.addEventListener('change', e => { item.rank = e.target.value; renderMain(); saveToFirebase(); });
+              const dateInp = document.createElement('input'); dateInp.placeholder='Ημ/νία αποχώρησης'; dateInp.value = item.dismissalDate || ''; dateInp.className = 'penalty-name-modern'; dateInp.addEventListener('input', e => { item.dismissalDate = e.target.value; renderMain(); saveToFirebase(); });
+              const reasonInp = document.createElement('input'); reasonInp.placeholder='Αιτία / Σημειώσεις'; reasonInp.value = item.reason || ''; reasonInp.className = 'penalty-name-modern'; reasonInp.style.flex = '2'; reasonInp.addEventListener('input', e => { item.reason = e.target.value; renderMain(); saveToFirebase(); });
+              const actDiv = document.createElement('div'); actDiv.style.display='flex'; actDiv.style.gap='8px';
+              if(idxBl>0){ const upBl = document.createElement('button'); upBl.className='icon-btn move'; upBl.innerHTML='<i class="fas fa-arrow-up"></i>'; upBl.addEventListener('click',()=>{ const tmp=cat.blacklist[idxBl]; cat.blacklist[idxBl]=cat.blacklist[idxBl-1]; cat.blacklist[idxBl-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(upBl); }
+              if(idxBl<cat.blacklist.length-1){ const downBl = document.createElement('button'); downBl.className='icon-btn move'; downBl.innerHTML='<i class="fas fa-arrow-down"></i>'; downBl.addEventListener('click',()=>{ const tmp=cat.blacklist[idxBl]; cat.blacklist[idxBl]=cat.blacklist[idxBl+1]; cat.blacklist[idxBl+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(downBl); }
+              const delBl = document.createElement('button'); delBl.className='icon-btn delete'; delBl.innerHTML='<i class="fas fa-trash"></i>'; delBl.addEventListener('click',()=>{ cat.blacklist.splice(idxBl,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); actDiv.appendChild(delBl);
+              cardBl.append(nameInp, rankSel, dateInp, reasonInp, actDiv); blDiv.appendChild(cardBl);
+            });
+          };
           const searchInput = searchDiv.querySelector('.search-input'); searchInput.addEventListener('input', e => renderBlacklist(e.target.value));
           renderBlacklist();
-          const addBl = document.createElement('button'); addBl.className='btn-secondary'; addBl.innerHTML='<i class="fas fa-user-slash"></i> Προσθήκη απολυμένου'; addBl.addEventListener('click',()=>{ if(!cat.blacklist) cat.blacklist=[]; cat.blacklist.push({name:'', rank:rankOptions[0], dismissalDate:'', reason:''}); renderMain(); saveToFirebase(); renderAdminPanel(); }); body.append(searchDiv, blDiv, addBl);
+          const addBl = document.createElement('button'); addBl.className='btn-secondary'; addBl.innerHTML='<i class="fas fa-user-slash"></i> Προσθήκη απολυμένου';
+          addBl.addEventListener('click',()=>{ if(!cat.blacklist) cat.blacklist=[]; cat.blacklist.push({name:'', rank:rankOptions[0], dismissalDate:'', reason:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+          body.append(searchDiv, blDiv, addBl);
         } else {
           // Text category with rich editor
           const txtLabel = document.createElement('label'); txtLabel.textContent='Περιεχόμενο (εμπλουτισμένο κείμενο)'; txtLabel.style.color='#cbd5e1'; txtLabel.style.fontSize='0.8rem'; txtLabel.style.display='block'; txtLabel.style.marginBottom='6px';
           const editorDiv = document.createElement('div'); editorDiv.style.backgroundColor = '#0f172a'; editorDiv.style.borderRadius = '20px'; editorDiv.style.marginBottom = '20px';
-          const quill = new Quill(editorDiv, { theme: 'snow', placeholder: 'Γράψτε το περιεχόμενο...' });
-          quill.root.innerHTML = cat.content || '';
-          quill.on('text-change', () => { cat.content = quill.root.innerHTML; renderMain(); saveToFirebase(); });
+          try {
+            const quill = new Quill(editorDiv, { theme: 'snow', placeholder: 'Γράψτε το περιεχόμενο...' });
+            quill.root.innerHTML = cat.content || '';
+            quill.on('text-change', () => { cat.content = quill.root.innerHTML; renderMain(); saveToFirebase(); });
+          } catch(e) { console.error("Quill error", e); editorDiv.innerHTML = '<textarea style="width:100%; background:#0f172a; color:white; border-radius:16px; padding:12px;">' + escapeHtml(cat.content) + '</textarea>'; }
           body.appendChild(txtLabel); body.appendChild(editorDiv);
-          // Subcategories with rich editor
-          const subSec = document.createElement('div'); subSec.style.marginTop='20px'; subSec.style.borderTop='1px solid #334155'; subSec.style.paddingTop='16px'; const subTitle = document.createElement('div'); subTitle.innerHTML='<i class="fas fa-folder-open"></i> Υποκατηγορίες'; subTitle.style.color='#fbbf24'; subTitle.style.marginBottom='12px'; subTitle.style.fontWeight='600'; subSec.appendChild(subTitle); const subList = document.createElement('div');
-          (cat.subcategories || []).forEach((sub, subIdx) => { const subCard = document.createElement('div'); subCard.className = 'subcategory-card-modern'; const subHeader = document.createElement('div'); subHeader.className = 'subcategory-header-modern'; const subTitleInp = document.createElement('input'); subTitleInp.className = 'subcategory-title-modern'; subTitleInp.value = sub.title || ''; subTitleInp.placeholder='Τίτλος'; subTitleInp.addEventListener('input',e=>{sub.title=e.target.value; renderMain(); saveToFirebase();}); const subActions = document.createElement('div'); subActions.style.display='flex'; subActions.style.gap='6px'; if(subIdx>0){ const upSub = document.createElement('button'); upSub.className='icon-btn move'; upSub.innerHTML='<i class="fas fa-arrow-up"></i>'; upSub.addEventListener('click',()=>{ const tmp=cat.subcategories[subIdx]; cat.subcategories[subIdx]=cat.subcategories[subIdx-1]; cat.subcategories[subIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(upSub); } if(subIdx<cat.subcategories.length-1){ const downSub = document.createElement('button'); downSub.className='icon-btn move'; downSub.innerHTML='<i class="fas fa-arrow-down"></i>'; downSub.addEventListener('click',()=>{ const tmp=cat.subcategories[subIdx]; cat.subcategories[subIdx]=cat.subcategories[subIdx+1]; cat.subcategories[subIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(downSub); } const delSub = document.createElement('button'); delSub.className='icon-btn delete'; delSub.innerHTML='<i class="fas fa-trash"></i>'; delSub.addEventListener('click',()=>{ cat.subcategories.splice(subIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(delSub); subHeader.append(subTitleInp, subActions); const subEditorDiv = document.createElement('div'); subEditorDiv.style.backgroundColor = '#0f172a'; subEditorDiv.style.borderRadius = '20px'; const subQuill = new Quill(subEditorDiv, { theme: 'snow', placeholder: 'Περιεχόμενο υποκατηγορίας...' }); subQuill.root.innerHTML = sub.content || ''; subQuill.on('text-change', () => { sub.content = subQuill.root.innerHTML; renderMain(); saveToFirebase(); }); subCard.append(subHeader, subEditorDiv); subList.appendChild(subCard); });
-          subSec.appendChild(subList); const addSubBtn = document.createElement('button'); addSubBtn.className='btn-secondary'; addSubBtn.innerHTML='<i class="fas fa-plus-circle"></i> Προσθήκη υποκατηγορίας'; addSubBtn.addEventListener('click',()=>{ if(!cat.subcategories) cat.subcategories=[]; cat.subcategories.push({id:'sub'+Date.now()+Math.random().toString(36).substring(2,8), title:'Νέα υποκατηγορία', content:''}); renderMain(); saveToFirebase(); renderAdminPanel(); }); subSec.appendChild(addSubBtn); body.appendChild(subSec);
+          // Subcategories
+          const subSec = document.createElement('div'); subSec.style.marginTop='20px'; subSec.style.borderTop='1px solid #334155'; subSec.style.paddingTop='16px';
+          const subTitle = document.createElement('div'); subTitle.innerHTML='<i class="fas fa-folder-open"></i> Υποκατηγορίες'; subTitle.style.color='#fbbf24'; subTitle.style.marginBottom='12px'; subTitle.style.fontWeight='600'; subSec.appendChild(subTitle);
+          const subList = document.createElement('div');
+          (cat.subcategories || []).forEach((sub, subIdx) => {
+            const subCard = document.createElement('div'); subCard.className = 'subcategory-card-modern';
+            const subHeader = document.createElement('div'); subHeader.className = 'subcategory-header-modern';
+            const subTitleInp = document.createElement('input'); subTitleInp.className = 'subcategory-title-modern'; subTitleInp.value = sub.title || ''; subTitleInp.placeholder='Τίτλος'; subTitleInp.addEventListener('input',e=>{sub.title=e.target.value; renderMain(); saveToFirebase();});
+            const subActions = document.createElement('div'); subActions.style.display='flex'; subActions.style.gap='6px';
+            if(subIdx>0){ const upSub = document.createElement('button'); upSub.className='icon-btn move'; upSub.innerHTML='<i class="fas fa-arrow-up"></i>'; upSub.addEventListener('click',()=>{ const tmp=cat.subcategories[subIdx]; cat.subcategories[subIdx]=cat.subcategories[subIdx-1]; cat.subcategories[subIdx-1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(upSub); }
+            if(subIdx<cat.subcategories.length-1){ const downSub = document.createElement('button'); downSub.className='icon-btn move'; downSub.innerHTML='<i class="fas fa-arrow-down"></i>'; downSub.addEventListener('click',()=>{ const tmp=cat.subcategories[subIdx]; cat.subcategories[subIdx]=cat.subcategories[subIdx+1]; cat.subcategories[subIdx+1]=tmp; renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(downSub); }
+            const delSub = document.createElement('button'); delSub.className='icon-btn delete'; delSub.innerHTML='<i class="fas fa-trash"></i>'; delSub.addEventListener('click',()=>{ cat.subcategories.splice(subIdx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); subActions.appendChild(delSub);
+            subHeader.append(subTitleInp, subActions);
+            const subEditorDiv = document.createElement('div'); subEditorDiv.style.backgroundColor = '#0f172a'; subEditorDiv.style.borderRadius = '20px';
+            try {
+              const subQuill = new Quill(subEditorDiv, { theme: 'snow', placeholder: 'Περιεχόμενο υποκατηγορίας...' });
+              subQuill.root.innerHTML = sub.content || '';
+              subQuill.on('text-change', () => { sub.content = subQuill.root.innerHTML; renderMain(); saveToFirebase(); });
+            } catch(e) { subEditorDiv.innerHTML = '<textarea style="width:100%; background:#0f172a; color:white; border-radius:16px; padding:12px;">' + escapeHtml(sub.content) + '</textarea>'; }
+            subCard.append(subHeader, subEditorDiv); subList.appendChild(subCard);
+          });
+          subSec.appendChild(subList);
+          const addSubBtn = document.createElement('button'); addSubBtn.className='btn-secondary'; addSubBtn.innerHTML='<i class="fas fa-plus-circle"></i> Προσθήκη υποκατηγορίας';
+          addSubBtn.addEventListener('click',()=>{ if(!cat.subcategories) cat.subcategories=[]; cat.subcategories.push({id:'sub'+Date.now()+Math.random().toString(36).substring(2,8), title:'Νέα υποκατηγορία', content:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+          subSec.appendChild(addSubBtn);
+          body.appendChild(subSec);
         }
         card.appendChild(body); categoriesContainer.appendChild(card);
       });
-      const addCatBtn = document.createElement('button'); addCatBtn.className='btn-primary'; addCatBtn.innerHTML='<i class="fas fa-plus-circle"></i> Νέα Κατηγορία'; addCatBtn.addEventListener('click',()=>{ const newId='cat'+Date.now()+Math.random().toString(36).substring(2,6); siteContent.categories.push({id:newId, title:'Νέα κατηγορία', type:'text', visibility:'public', content:'Περιεχόμενο...', subcategories:[]}); renderMain(); saveToFirebase(); renderAdminPanel(); });
+
+      const addCatBtn = document.createElement('button'); addCatBtn.className='btn-primary'; addCatBtn.innerHTML='<i class="fas fa-plus-circle"></i> Νέα Κατηγορία';
+      addCatBtn.addEventListener('click',()=>{ const newId='cat'+Date.now()+Math.random().toString(36).substring(2,6); siteContent.categories.push({id:newId, title:'Νέα κατηγορία', type:'text', visibility:'public', content:'Περιεχόμενο...', subcategories:[]}); renderMain(); saveToFirebase(); renderAdminPanel(); });
       catSec.appendChild(categoriesContainer); catSec.appendChild(addCatBtn); adminContent.appendChild(catSec);
-      // Photo management with albums
+
+      // Photo management
       const photoSec = section('Φωτογραφίες & Άλμπουμ', 'fas fa-images');
-      const uploadDiv = document.createElement('div'); uploadDiv.className = 'admin-field-group'; uploadDiv.innerHTML = `<label>URL εικόνας ή ανέβασμα</label><div style="display:flex; gap:8px;"><input type="text" id="photoUrlInput" placeholder="https://..."><button id="uploadPhotoBtn" class="btn-secondary"><i class="fas fa-cloud-upload-alt"></i> Ανέβασμα</button><button id="addPhotoBtnAdmin" class="btn-secondary"><i class="fas fa-plus"></i> Προσθήκη URL</button></div><input type="file" id="photoFileInput" accept="image/*" style="display:none;">`;
+      const uploadDiv = document.createElement('div'); uploadDiv.className = 'admin-field-group';
+      uploadDiv.innerHTML = `<label>URL εικόνας ή ανέβασμα</label><div style="display:flex; gap:8px;"><input type="text" id="photoUrlInput" placeholder="https://..."><button id="uploadPhotoBtn" class="btn-secondary"><i class="fas fa-cloud-upload-alt"></i> Ανέβασμα</button><button id="addPhotoBtnAdmin" class="btn-secondary"><i class="fas fa-plus"></i> Προσθήκη URL</button></div><input type="file" id="photoFileInput" accept="image/*" style="display:none;">`;
       const albumDiv = document.createElement('div'); albumDiv.className = 'admin-field-group'; albumDiv.innerHTML = `<label>Άλμπουμ (προαιρετικό)</label><input type="text" id="photoAlbumInput" placeholder="π.χ. Εκδηλώσεις, Εκπαιδεύσεις">`;
       photoSec.appendChild(uploadDiv); photoSec.appendChild(albumDiv);
       const photoGrid = document.createElement('div'); photoGrid.className = 'photos-grid-modern';
-      const renderPhotos = () => { photoGrid.innerHTML = ''; (siteContent.photos || []).forEach((item, i) => { const url = typeof item === 'string' ? item : item.url; const album = typeof item === 'object' ? item.album : ''; const div = document.createElement('div'); div.className = 'photo-item-modern'; div.innerHTML = `<img src="${escapeHtml(url)}"><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-times"></i></button><div style="font-size:10px; color:#94a3b8;">${escapeHtml(album)}</div>`; photoGrid.appendChild(div); }); };
+      const renderPhotos = () => {
+        photoGrid.innerHTML = '';
+        (siteContent.photos || []).forEach((item, i) => {
+          const url = typeof item === 'string' ? item : item.url;
+          const album = typeof item === 'object' ? item.album : '';
+          const div = document.createElement('div'); div.className = 'photo-item-modern';
+          div.innerHTML = `<img src="${escapeHtml(url)}"><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-times"></i></button><div style="font-size:10px; color:#94a3b8;">${escapeHtml(album)}</div>`;
+          photoGrid.appendChild(div);
+        });
+      };
       renderPhotos();
       photoSec.appendChild(photoGrid);
       adminContent.appendChild(photoSec);
-      // CSV Export buttons
+
+      // CSV Export
       const exportSec = section('Εξαγωγές CSV', 'fas fa-file-csv');
-      const csvDiv = document.createElement('div'); csvDiv.className = 'admin-field-group'; csvDiv.innerHTML = `<button id="exportPersonnelCSV" class="btn-secondary"><i class="fas fa-users"></i> Προσωπικό CSV</button> <button id="exportPenaltiesCSV" class="btn-secondary"><i class="fas fa-gavel"></i> Πειθαρχικά CSV</button> <button id="exportBlacklistCSV" class="btn-secondary"><i class="fas fa-user-slash"></i> Μαύρη Λίστα CSV</button>`;
+      const csvDiv = document.createElement('div'); csvDiv.className = 'admin-field-group';
+      csvDiv.innerHTML = `<button id="exportPersonnelCSV" class="btn-secondary"><i class="fas fa-users"></i> Προσωπικό CSV</button> <button id="exportPenaltiesCSV" class="btn-secondary"><i class="fas fa-gavel"></i> Πειθαρχικά CSV</button> <button id="exportBlacklistCSV" class="btn-secondary"><i class="fas fa-user-slash"></i> Μαύρη Λίστα CSV</button>`;
       exportSec.appendChild(csvDiv); adminContent.appendChild(exportSec);
-      // Backup to Storage
+
+      // Backup
       const backupSec = section('Αντίγραφο Ασφαλείας', 'fas fa-database');
-      const backupBtn = document.createElement('button'); backupBtn.className = 'btn-primary'; backupBtn.innerHTML = '<i class="fas fa-upload"></i> Αποθήκευση Backup στο Storage'; backupBtn.addEventListener('click', async () => { const dataStr = JSON.stringify(siteContent); const blob = new Blob([dataStr], {type: 'application/json'}); const storageRef = ref(storage, `backups/backup_${new Date().toISOString()}.json`); await uploadBytes(storageRef, blob); showToast('Backup αποθηκεύτηκε στο Firebase Storage', 'success'); await logAction('backup_created', 'Δημιουργία backup στο Storage'); }); backupSec.appendChild(backupBtn); adminContent.appendChild(backupSec);
+      const backupBtn = document.createElement('button'); backupBtn.className = 'btn-primary'; backupBtn.innerHTML = '<i class="fas fa-upload"></i> Αποθήκευση Backup στο Storage';
+      backupBtn.addEventListener('click', async () => {
+        const dataStr = JSON.stringify(siteContent); const blob = new Blob([dataStr], {type: 'application/json'});
+        const storageRef = ref(storage, `backups/backup_${new Date().toISOString()}.json`);
+        await uploadBytes(storageRef, blob); showToast('Backup αποθηκεύτηκε στο Firebase Storage', 'success');
+        await logAction('backup_created', 'Δημιουργία backup στο Storage');
+      });
+      backupSec.appendChild(backupBtn); adminContent.appendChild(backupSec);
+
       // Import/Export with code
       const ieSec = section('Ασφαλής Εξαγωγή / Εισαγωγή', 'fas fa-exchange-alt');
       const codeGroup = document.createElement('div'); codeGroup.className = 'admin-field-group';
@@ -1168,22 +1579,36 @@
       const importBtn = document.createElement('button'); importBtn.className = 'btn-secondary'; importBtn.innerHTML = '<i class="fas fa-upload"></i> Εισαγωγή JSON';
       const statusMsg = document.createElement('div'); statusMsg.className = 'import-export-status'; statusMsg.innerHTML = '<i class="fas fa-info-circle"></i> Απαιτείται κωδικός από το έγγραφο settings/importExportCode';
       codeGroup.append(codeLabel, codeInput, exportBtn, importBtn, statusMsg);
-      ieSec.appendChild(codeGroup);
-      adminContent.appendChild(ieSec);
-      // Audit Log (simple view)
+      ieSec.appendChild(codeGroup); adminContent.appendChild(ieSec);
+
+      // Audit Log
       const auditSec = section('Ημερολόγιο Αλλαγών', 'fas fa-history');
       const auditList = document.createElement('div'); auditList.style.maxHeight = '200px'; auditList.style.overflowY = 'auto'; auditList.style.backgroundColor = '#0f172a'; auditList.style.borderRadius = '16px'; auditList.style.padding = '12px';
-      const loadAudit = async () => { const q = query(collection(db, "auditLogs"), orderBy("timestamp", "desc"), limit(20)); const snap = await getDocs(q); auditList.innerHTML = ''; snap.forEach(doc => { const data = doc.data(); const time = data.timestamp?.toDate().toLocaleString() || ''; auditList.innerHTML += `<div style="border-bottom:1px solid #334155; padding:8px;"><strong>${data.user}</strong> - ${data.action}<br><small>${time}</small><div>${data.details || ''}</div></div>`; }); };
+      const loadAudit = async () => {
+        const q = query(collection(db, "auditLogs"), orderBy("timestamp", "desc"), limit(20));
+        const snap = await getDocs(q);
+        auditList.innerHTML = '';
+        snap.forEach(doc => {
+          const data = doc.data(); const time = data.timestamp?.toDate().toLocaleString() || '';
+          auditList.innerHTML += `<div style="border-bottom:1px solid #334155; padding:8px;"><strong>${data.user}</strong> - ${data.action}<br><small>${time}</small><div>${data.details || ''}</div></div>`;
+        });
+      };
       loadAudit(); setInterval(loadAudit, 30000);
       auditSec.appendChild(auditList); adminContent.appendChild(auditSec);
+
       // Footer
       const footSec = section('Υποσέλιδο', 'fas fa-credit-card');
       footSec.appendChild(addField('Αριστερό κείμενο', 'footer.left', siteContent.footer.left));
       footSec.appendChild(addField('Δεξί κείμενο', 'footer.right', siteContent.footer.right));
       adminContent.appendChild(footSec);
-      // Event listeners for photos, CSV, etc.
+
+      // Event listeners for photos and CSV
       setTimeout(() => {
-        const addBtn = document.getElementById('addPhotoBtnAdmin'); const uploadBtn = document.getElementById('uploadPhotoBtn'); const urlInput = document.getElementById('photoUrlInput'); const albumInput = document.getElementById('photoAlbumInput'); const fileInput = document.getElementById('photoFileInput');
+        const addBtn = document.getElementById('addPhotoBtnAdmin');
+        const uploadBtn = document.getElementById('uploadPhotoBtn');
+        const urlInput = document.getElementById('photoUrlInput');
+        const albumInput = document.getElementById('photoAlbumInput');
+        const fileInput = document.getElementById('photoFileInput');
         if(addBtn && urlInput) addBtn.addEventListener('click',()=>{ const url = urlInput.value.trim(); const album = albumInput.value.trim(); if(url){ if(!siteContent.photos) siteContent.photos=[]; siteContent.photos.push({ url, album }); renderMain(); saveToFirebase(); renderAdminPanel(); } });
         if(uploadBtn && fileInput) uploadBtn.addEventListener('click',()=> fileInput.click());
         if(fileInput) fileInput.addEventListener('change', async (e) => { const file = e.target.files[0]; if(file && file.type.startsWith('image/')){ const storageRef = ref(storage, `gallery/${Date.now()}_${file.name}`); const snapshot = await uploadBytes(storageRef, file); const url = await getDownloadURL(snapshot.ref); const album = albumInput.value.trim(); siteContent.photos = siteContent.photos || []; siteContent.photos.push({ url, album }); renderMain(); saveToFirebase(); renderAdminPanel(); } });
@@ -1192,19 +1617,106 @@
         document.getElementById('exportPenaltiesCSV')?.addEventListener('click', () => { let csv = "Όνομα,Πειθαρχικό 1,Πειθαρχικό 2,Πειθαρχικό 3\n"; siteContent.categories.forEach(cat => { if(cat.type === 'penalties') cat.penalties.forEach(p => { csv += `"${p.name || ''}",${p.p1 ? 'X' : ''},${p.p2 ? 'X' : ''},${p.p3 ? 'X' : ''}\n`; }); }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'penalties.csv'; a.click(); URL.revokeObjectURL(a.href); });
         document.getElementById('exportBlacklistCSV')?.addEventListener('click', () => { let csv = "Όνομα,Βαθμός,Ημερομηνία Αποχώρησης,Αιτία\n"; siteContent.categories.forEach(cat => { if(cat.type === 'blacklist') cat.blacklist.forEach(b => { csv += `"${b.name || ''}","${b.rank || ''}","${b.dismissalDate || ''}","${b.reason || ''}"\n`; }); }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'blacklist.csv'; a.click(); URL.revokeObjectURL(a.href); });
       }, 200);
+
       // Export/Import logic
-      exportBtn.addEventListener('click', async () => { const code = codeInput.value; if (!code) { statusMsg.innerHTML = '<i class="fas fa-times-circle"></i> Εισάγετε τον κωδικό ασφαλείας.'; return; } const valid = await verifyImportExportCode(code); if (!valid) { statusMsg.innerHTML = '<i class="fas fa-ban"></i> Μη έγκυρος κωδικός. Η εξαγωγή ακυρώθηκε.'; return; } const dataStr = JSON.stringify(siteContent, null, 2); const blob = new Blob([dataStr], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `police_site_backup_${new Date().toISOString().slice(0,19)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href); statusMsg.innerHTML = '<i class="fas fa-check-circle"></i> Εξαγωγή ολοκληρώθηκε!'; setTimeout(() => { if(statusMsg) statusMsg.innerHTML = '<i class="fas fa-info-circle"></i> Απαιτείται κωδικός από το έγγραφο settings/importExportCode'; }, 3000); await logAction('export_data', 'Εξαγωγή δεδομένων'); });
-      importBtn.addEventListener('click', async () => { const code = codeInput.value; if (!code) { statusMsg.innerHTML = '<i class="fas fa-times-circle"></i> Εισάγετε τον κωδικό ασφαλείας.'; return; } const valid = await verifyImportExportCode(code); if (!valid) { statusMsg.innerHTML = '<i class="fas fa-ban"></i> Μη έγκυρος κωδικός. Η εισαγωγή ακυρώθηκε.'; return; } const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'application/json'; fileInput.onchange = async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const imported = JSON.parse(ev.target.result); if (!imported.categories || !imported.cover) throw new Error('Μη έγκυρη δομή αρχείου'); siteContent = imported; await setDoc(contentDocRef, siteContent); renderMain(); renderAdminPanel(); statusMsg.innerHTML = '<i class="fas fa-check-circle"></i> Εισαγωγή επιτυχής! Η σελίδα ανανεώθηκε.'; setTimeout(() => { if(statusMsg) statusMsg.innerHTML = '<i class="fas fa-info-circle"></i> Απαιτείται κωδικός από το έγγραφο settings/importExportCode'; }, 3000); await logAction('import_data', 'Εισαγωγή δεδομένων'); } catch(err) { statusMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Σφάλμα εισαγωγής: ' + err.message; } }; reader.readAsText(file); }; fileInput.click(); });
+      exportBtn.addEventListener('click', async () => {
+        const code = codeInput.value;
+        if (!code) { statusMsg.innerHTML = '<i class="fas fa-times-circle"></i> Εισάγετε τον κωδικό ασφαλείας.'; return; }
+        const valid = await verifyImportExportCode(code);
+        if (!valid) { statusMsg.innerHTML = '<i class="fas fa-ban"></i> Μη έγκυρος κωδικός. Η εξαγωγή ακυρώθηκε.'; return; }
+        const dataStr = JSON.stringify(siteContent, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `police_site_backup_${new Date().toISOString().slice(0,19)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+        statusMsg.innerHTML = '<i class="fas fa-check-circle"></i> Εξαγωγή ολοκληρώθηκε!';
+        setTimeout(() => { if(statusMsg) statusMsg.innerHTML = '<i class="fas fa-info-circle"></i> Απαιτείται κωδικός από το έγγραφο settings/importExportCode'; }, 3000);
+        await logAction('export_data', 'Εξαγωγή δεδομένων');
+      });
+      importBtn.addEventListener('click', async () => {
+        const code = codeInput.value;
+        if (!code) { statusMsg.innerHTML = '<i class="fas fa-times-circle"></i> Εισάγετε τον κωδικό ασφαλείας.'; return; }
+        const valid = await verifyImportExportCode(code);
+        if (!valid) { statusMsg.innerHTML = '<i class="fas fa-ban"></i> Μη έγκυρος κωδικός. Η εισαγωγή ακυρώθηκε.'; return; }
+        const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'application/json';
+        fileInput.onchange = async (e) => {
+          const file = e.target.files[0]; if(!file) return;
+          const reader = new FileReader();
+          reader.onload = async (ev) => {
+            try {
+              const imported = JSON.parse(ev.target.result);
+              if (!imported.categories || !imported.cover) throw new Error('Μη έγκυρη δομή αρχείου');
+              siteContent = imported;
+              await setDoc(contentDocRef, siteContent);
+              renderMain(); renderAdminPanel();
+              statusMsg.innerHTML = '<i class="fas fa-check-circle"></i> Εισαγωγή επιτυχής! Η σελίδα ανανεώθηκε.';
+              setTimeout(() => { if(statusMsg) statusMsg.innerHTML = '<i class="fas fa-info-circle"></i> Απαιτείται κωδικός από το έγγραφο settings/importExportCode'; }, 3000);
+              await logAction('import_data', 'Εισαγωγή δεδομένων');
+            } catch(err) { statusMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Σφάλμα εισαγωγής: ' + err.message; }
+          };
+          reader.readAsText(file);
+        };
+        fileInput.click();
+      });
     }
 
-    onAuthStateChanged(auth, async (user) => { currentUser = user; if(user){ authStatus.innerHTML = `<i class="fas fa-user-shield"></i> ${user.email}`; loginBtn.style.display = 'none'; logoutBtn.style.display = 'inline-flex'; isAdmin = await checkIfAdmin(user.uid); adminPanel.style.display = isAdmin ? 'flex' : 'none'; if(isAdmin) { renderAdminPanel(); } renderMain(); await logAction('login', 'Σύνδεση διαχειριστή'); } else { authStatus.innerHTML = 'Μη συνδεδεμένος'; loginBtn.style.display = 'inline-flex'; logoutBtn.style.display = 'none'; adminPanel.style.display = 'none'; isAdmin = false; renderMain(); } });
-    loginBtn.addEventListener('click', () => loginModal.classList.add('show')); submitLogin.addEventListener('click', async () => { try { await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value); loginModal.classList.remove('show'); loginError.textContent = ''; } catch(error) { loginError.textContent = 'Λάθος email ή κωδικός'; } }); logoutBtn.addEventListener('click', async () => { await signOut(auth); await logAction('logout', 'Αποσύνδεση'); }); loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('show'); });
+    // Authentication and main flow
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        authStatus.innerHTML = `<i class="fas fa-user-shield"></i> ${user.email}`;
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-flex';
+        isAdmin = await checkIfAdmin(user.uid);
+        adminPanel.style.display = isAdmin ? 'flex' : 'none';
+        // Load content AFTER we know admin status, so render uses correct data
+        await loadContent();
+        if (isAdmin) renderAdminPanel(); // loadContent already calls renderAdminPanel, but call again to be safe
+        await logAction('login', 'Σύνδεση διαχειριστή');
+      } else {
+        authStatus.innerHTML = 'Μη συνδεδεμένος';
+        loginBtn.style.display = 'inline-flex';
+        logoutBtn.style.display = 'none';
+        adminPanel.style.display = 'none';
+        isAdmin = false;
+        await loadContent(); // load content for public view
+      }
+    });
+
+    loginBtn.addEventListener('click', () => loginModal.classList.add('show'));
+    submitLogin.addEventListener('click', async () => {
+      try {
+        await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+        loginModal.classList.remove('show');
+        loginError.textContent = '';
+      } catch(error) {
+        loginError.textContent = 'Λάθος email ή κωδικός';
+      }
+    });
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+      await logAction('logout', 'Αποσύνδεση');
+    });
+    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('show'); });
+
     // Dark mode toggle
-    const darkModeToggle = document.getElementById('darkModeToggle'); darkModeToggle.addEventListener('click', () => { document.body.classList.toggle('dark'); localStorage.setItem('darkMode', document.body.classList.contains('dark')); }); if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    });
+    if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
+
     // Mobile admin panel toggle
-    const adminToggleMobile = document.getElementById('adminToggleMobile'); adminToggleMobile.addEventListener('click', () => { adminPanel.classList.toggle('open'); });
-    loadContent();
-    setTimeout(() => { const loadingScreen = document.getElementById('loading-screen'); if(loadingScreen){ loadingScreen.classList.add('hidden'); setTimeout(() => { loadingScreen.style.display = 'none'; }, 1000); } }, 4000);
+    const adminToggleMobile = document.getElementById('adminToggleMobile');
+    adminToggleMobile.addEventListener('click', () => { adminPanel.classList.toggle('open'); });
+
+    // Initial load will happen inside onAuthStateChanged
+    setTimeout(() => {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => { loadingScreen.style.display = 'none'; }, 1000);
+      }
+    }, 4000);
   </script>
 </body>
 </html>
