@@ -12,9 +12,7 @@
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <style>
-    /* All CSS remains exactly as in the previous version – unchanged for brevity */
-    /* ... (full CSS from previous version) ... */
-    /* I'll include the full CSS from the previous correct version */
+    /* All CSS remains as in previous version – unchanged for brevity */
     #loading-screen {
       position: fixed;
       top: 0;
@@ -807,27 +805,88 @@
     .photos-grid-modern { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
     .photo-item-modern {
       position: relative;
-      width: 90px;
-      height: 90px;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 2px solid #fbbf24;
+      width: 110px;
       background: #1e293b;
+      border-radius: 16px;
+      border: 2px solid #fbbf24;
+      overflow: hidden;
+      padding: 5px;
+      text-align: center;
     }
-    .photo-item-modern img { width: 100%; height: 100%; object-fit: cover; }
-    .delete-photo-modern {
-      position: absolute;
-      top: 4px;
-      right: 4px;
+    .photo-item-modern img { width: 100%; height: 80px; object-fit: cover; border-radius: 12px; }
+    .delete-photo-modern, .edit-photo-modern {
       background: #b91c1c;
       border: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 24px;
+      width: 26px;
+      height: 26px;
+      border-radius: 26px;
       color: white;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin: 2px;
+    }
+    .edit-photo-modern { background: #2c5f8a; }
+    .photo-actions { display: flex; justify-content: center; gap: 6px; margin-top: 5px; }
+    .photo-categories {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      text-align: center;
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 2px 4px;
+      color: #fbbf24;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .category-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 16px;
+    }
+    .category-checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #cbd5e1;
+      font-size: 0.85rem;
       cursor: pointer;
     }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10050;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: #1e293b;
+      border-radius: 32px;
+      padding: 24px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+      border: 1px solid #fbbf24;
+    }
+    .modal-card h3 { color: #fbbf24; margin-bottom: 16px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
     .blacklist-table {
       width: 100%;
       border-collapse: collapse;
@@ -994,6 +1053,18 @@
     </div>
   </div>
 
+  <!-- Modal for editing photo categories -->
+  <div id="editPhotoModal" class="modal">
+    <div class="modal-card">
+      <h3><i class="fas fa-tags"></i> Επεξεργασία κατηγοριών φωτογραφίας</h3>
+      <div id="editPhotoCategoriesContainer" class="category-checkbox-group"></div>
+      <div class="modal-actions">
+        <button id="savePhotoCategoriesBtn" class="btn-primary">Αποθήκευση</button>
+        <button id="cancelEditPhotoBtn" class="btn-secondary">Άκυρο</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1011,6 +1082,7 @@
       cover: { badge: "ΕΛΛΗΝΙΚΗ ΑΣΤΥΝΟΜΙΑ", span: "FIVEM RP", subhead: "ΠΡΩΤΟΚΟΛΛΟ · ΚΑΝΟΝΙΣΜΟΣ · ΔΕΟΝΤΟΛΟΓΙΑ", rank: "ΤΑΞΙΑΡΧΟΣ Δ. ΓΕΩΡΓΑΝΤΖΕΛΗΣ", sticker: "ΕΓΧΕΙΡΙΔΙΟ ΕΛ.ΑΣ.", quote: "Κράτος δικαίου, ασφάλεια, σεβασμός" },
       categories: [ { id: "cat1", title: "ΕΙΣΑΓΩΓΗ", type: "text", visibility: "public", content: "Η Ελληνική Αστυνομία, στο πλαίσιο του δημοκρατικού πολιτεύματος...", subcategories: [] } ],
       photos: [],
+      photoCategories: [],
       footer: { left: "ΕΛ.ΑΣ. FiveM RP – Πρωτόκολλο", right: "Έκδοση 1.0 | Ταξίαρχος Δ. Γεωργαντζέλης" },
       formVisibility: "public",
       announcement: { text: "", active: false }
@@ -1037,6 +1109,11 @@
     const lightboxClose = document.querySelector('.lightbox-close');
     const lightboxPrev = document.querySelector('.lightbox-nav.prev');
     const lightboxNext = document.querySelector('.lightbox-nav.next');
+    const editPhotoModal = document.getElementById('editPhotoModal');
+    const editPhotoCategoriesContainer = document.getElementById('editPhotoCategoriesContainer');
+    const savePhotoCategoriesBtn = document.getElementById('savePhotoCategoriesBtn');
+    const cancelEditPhotoBtn = document.getElementById('cancelEditPhotoBtn');
+    let currentEditingPhotoIndex = null;
 
     // Code modal
     const codeModal = document.getElementById('codeModal');
@@ -1125,7 +1202,14 @@
               subcategories: c.subcategories || [],
               ...c
             })) : defaultContent.categories,
-            photos: Array.isArray(data.photos) ? data.photos : defaultContent.photos,
+            photos: Array.isArray(data.photos) ? data.photos.map(p => {
+              if (typeof p === 'string') return { url: p, categories: [] };
+              if (p && typeof p === 'object') {
+                return { url: p.url, categories: p.categories || [] };
+              }
+              return { url: '', categories: [] };
+            }) : defaultContent.photos,
+            photoCategories: Array.isArray(data.photoCategories) ? data.photoCategories : [],
             footer: { ...defaultContent.footer, ...(data.footer || {}) },
             formVisibility: data.formVisibility || "public",
             announcement: data.announcement || { text: "", active: false }
@@ -1263,7 +1347,7 @@
               cat.blacklist.forEach(b => {
                 blHtml += `<tr><td><strong>${escapeHtml(b.name)}</strong></td><td class="blacklist-rank">${escapeHtml(b.rank)}</td><td>${escapeHtml(b.dismissalDate || '-')}</td><td>${escapeHtml(b.reason || '-')}</td></tr>`;
               });
-              blHtml += '</tbody></table>';
+              blHtml += '</tbody><table>';
               page.innerHTML = `<h2>${escapeHtml(cat.title)}</h2><div class="protocol-card">${blHtml || '<p>Δεν υπάρχουν καταχωρημένοι απολυμένοι.</p>'}</div>`;
             } else {
               if (cat.subcategories && cat.subcategories.length) {
@@ -1299,7 +1383,7 @@
         });
       });
 
-      // Photos page with album tabs
+      // Photos page with predefined categories filter
       tabs.push({
         id: 'page-photos',
         title: 'ΦΩΤΟΓΡΑΦΙΕΣ',
@@ -1307,55 +1391,52 @@
           const page = document.createElement('div');
           page.id = 'page-photos';
           page.className = 'page';
-          // Extract albums
           const photos = siteContent.photos || [];
-          const albums = new Map();
-          albums.set('Όλες', []);
-          photos.forEach(photo => {
-            const albumName = typeof photo === 'object' && photo.album ? photo.album : 'Χωρίς άλμπουμ';
-            if (!albums.has(albumName)) albums.set(albumName, []);
-            albums.get(albumName).push(photo);
+          const categoriesList = siteContent.photoCategories || [];
+          let filterHtml = '<div class="album-tabs">';
+          filterHtml += `<div class="album-tab active" data-category="__ALL__">Όλες οι φωτογραφίες</div>`;
+          categoriesList.forEach(cat => {
+            filterHtml += `<div class="album-tab" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</div>`;
           });
-          let albumTabsHtml = '<div class="album-tabs">';
-          let first = true;
-          for (let [name, _] of albums) {
-            albumTabsHtml += `<div class="album-tab ${first ? 'active' : ''}" data-album="${name}">${escapeHtml(name)}</div>`;
-            first = false;
-          }
-          albumTabsHtml += '</div><div id="photo-gallery-container"></div>';
-          page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${albumTabsHtml}`;
-          function renderGallery(albumName) {
-            const container = page.querySelector('#photo-gallery-container');
+          filterHtml += '</div><div id="photo-gallery-container-multi"></div>';
+          page.innerHTML = `<h2><i class="fas fa-camera-retro"></i> Φωτογραφίες υπηρεσίας</h2>${filterHtml}`;
+          
+          function renderGallery(selectedCategory) {
+            const container = page.querySelector('#photo-gallery-container-multi');
             if (!container) return;
-            let photosToShow = albums.get(albumName) || [];
+            let filteredPhotos = photos;
+            if (selectedCategory !== '__ALL__') {
+              filteredPhotos = photos.filter(photo => photo.categories && photo.categories.includes(selectedCategory));
+            }
             let galleryHtml = '<div style="display:flex; flex-wrap:wrap; gap:25px; margin-top:25px;">';
-            photosToShow.forEach((photo, idx) => {
-              const url = typeof photo === 'string' ? photo : photo.url;
-              galleryHtml += `<img class="photo-gallery-img" data-index="${idx}" data-album="${albumName}" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;">`;
+            filteredPhotos.forEach((photo, idx) => {
+              const url = photo.url;
+              const cats = (photo.categories || []).join(', ');
+              galleryHtml += `<div style="text-align:center;"><img class="photo-gallery-img" data-index="${idx}" data-catfilter="${selectedCategory}" src="${escapeHtml(url)}" style="max-height:160px; max-width:220px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,0.2); border:3px solid white; object-fit:cover;"><div class="photo-categories"><i class="fas fa-tags"></i> ${escapeHtml(cats)}</div></div>`;
             });
             galleryHtml += '</div>';
+            if (filteredPhotos.length === 0) galleryHtml = '<p style="margin-top:20px;">Δεν υπάρχουν φωτογραφίες σε αυτή την κατηγορία.</p>';
             container.innerHTML = galleryHtml;
-            const allUrls = photosToShow.map(p => typeof p === 'string' ? p : p.url);
-            container.querySelectorAll('.photo-gallery-img').forEach(img => {
+            const allUrls = filteredPhotos.map(p => p.url);
+            container.querySelectorAll('.photo-gallery-img').forEach((img, i) => {
               img.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const idx = parseInt(img.dataset.index);
-                showLightbox(allUrls[idx], allUrls, idx);
+                showLightbox(allUrls[i], allUrls, i);
               });
             });
           }
           setTimeout(() => {
             const tabsContainer = page.querySelector('.album-tabs');
-            const albumTabs = tabsContainer.querySelectorAll('.album-tab');
-            albumTabs.forEach(tab => {
+            const filterTabs = tabsContainer.querySelectorAll('.album-tab');
+            filterTabs.forEach(tab => {
               tab.addEventListener('click', () => {
-                albumTabs.forEach(t => t.classList.remove('active'));
+                filterTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                const album = tab.dataset.album;
-                renderGallery(album);
+                const category = tab.dataset.category;
+                renderGallery(category);
               });
             });
-            renderGallery('Όλες');
+            renderGallery('__ALL__');
           }, 0);
           return page;
         }
@@ -1444,7 +1525,7 @@
       toggleDiv.querySelector('input').addEventListener('change', (e) => { siteContent.formVisibility = e.target.checked ? 'admin' : 'public'; renderMain(); saveToFirebase(); });
       formSec.appendChild(toggleDiv); adminContent.appendChild(formSec);
 
-      // Categories
+      // Categories (unchanged for brevity - same as before)
       const catSec = section('Κατηγορίες Περιεχομένου', 'fas fa-layer-group');
       const categoriesContainer = document.createElement('div'); categoriesContainer.className = 'categories-grid';
       const categories = siteContent.categories || [];
@@ -1492,6 +1573,7 @@
         const body = document.createElement('div'); body.className = 'category-body-modern';
 
         if (cat.type === 'personnel') {
+          // personnel rendering (same as before, omitted for brevity but included in final)
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση αστυνομικού..." class="search-input">';
           const officersDiv = document.createElement('div'); officersDiv.className = 'officers-grid-modern';
           const renderOfficers = (filter = '') => {
@@ -1532,6 +1614,7 @@
           addOff.addEventListener('click',()=>{ if(!cat.officers) cat.officers=[]; cat.officers.push({firstName:'', lastName:'', rank:rankOptions[0], discord:'', phone:'', email:'', photoUrl:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(searchDiv, officersDiv, addOff);
         } else if (cat.type === 'penalties') {
+          // penalties unchanged
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση ονόματος..." class="search-input">';
           const penaltiesDiv = document.createElement('div'); penaltiesDiv.className = 'penalties-grid-modern';
           const allNames = getAllPersonnelNames(); const dlId = `names-datalist-${cat.id}`; const datalist = document.createElement('datalist'); datalist.id = dlId; allNames.forEach(n=>{ const opt=document.createElement('option'); opt.value=n.value; opt.textContent=n.display; datalist.appendChild(opt); });
@@ -1568,6 +1651,7 @@
           addPen.addEventListener('click',()=>{ if(!cat.penalties) cat.penalties=[]; cat.penalties.push({name:'',p1:false,p2:false,p3:false}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(searchDiv, penaltiesDiv, addPen);
         } else if (cat.type === 'blacklist') {
+          // blacklist unchanged
           const searchDiv = document.createElement('div'); searchDiv.className = 'search-filter'; searchDiv.innerHTML = '<input type="text" placeholder="Αναζήτηση απολυμένου..." class="search-input">';
           const blDiv = document.createElement('div'); blDiv.className = 'penalties-grid-modern';
           const renderBlacklist = (filter = '') => {
@@ -1599,17 +1683,16 @@
           addBl.addEventListener('click',()=>{ if(!cat.blacklist) cat.blacklist=[]; cat.blacklist.push({name:'', rank:rankOptions[0], dismissalDate:'', reason:''}); renderMain(); saveToFirebase(); renderAdminPanel(); });
           body.append(searchDiv, blDiv, addBl);
         } else {
-          // Text category with rich editor - FIXED: Append first, then create Quill
+          // Text category (unchanged)
           const txtLabel = document.createElement('label'); txtLabel.textContent='Περιεχόμενο (εμπλουτισμένο κείμενο)'; txtLabel.style.color='#cbd5e1'; txtLabel.style.fontSize='0.8rem'; txtLabel.style.display='block'; txtLabel.style.marginBottom='6px';
           const editorDiv = document.createElement('div'); editorDiv.style.backgroundColor = '#0f172a'; editorDiv.style.borderRadius = '20px'; editorDiv.style.marginBottom = '20px';
           body.appendChild(txtLabel); body.appendChild(editorDiv);
-          // Now editorDiv is in the DOM, create Quill
           try {
             const quill = new Quill(editorDiv, { theme: 'snow', placeholder: 'Γράψτε το περιεχόμενο...' });
             quill.root.innerHTML = cat.content || '';
             quill.on('text-change', () => { cat.content = quill.root.innerHTML; renderMain(); saveToFirebase(); });
           } catch(e) { console.error("Quill error", e); editorDiv.innerHTML = '<textarea style="width:100%; background:#0f172a; color:white; border-radius:16px; padding:12px;">' + escapeHtml(cat.content) + '</textarea>'; }
-          // Subcategories
+          // Subcategories (unchanged)
           const subSec = document.createElement('div'); subSec.style.marginTop='20px'; subSec.style.borderTop='1px solid #334155'; subSec.style.paddingTop='16px';
           const subTitle = document.createElement('div'); subTitle.innerHTML='<i class="fas fa-folder-open"></i> Υποκατηγορίες'; subTitle.style.color='#fbbf24'; subTitle.style.marginBottom='12px'; subTitle.style.fontWeight='600'; subSec.appendChild(subTitle);
           const subList = document.createElement('div');
@@ -1632,7 +1715,6 @@
             const subEditorDiv = document.createElement('div'); subEditorDiv.style.backgroundColor = '#0f172a'; subEditorDiv.style.borderRadius = '20px';
             subCard.append(subHeader, subEditorDiv);
             subList.appendChild(subCard);
-            // Append to DOM before creating Quill
             subSec.appendChild(subList);
             try {
               const subQuill = new Quill(subEditorDiv, { theme: 'snow', placeholder: 'Περιεχόμενο υποκατηγορίας...' });
@@ -1653,34 +1735,161 @@
       addCatBtn.addEventListener('click',()=>{ const newId='cat'+Date.now()+Math.random().toString(36).substring(2,6); siteContent.categories.push({id:newId, title:'Νέα κατηγορία', type:'text', visibility:'public', content:'Περιεχόμενο...', subcategories:[]}); renderMain(); saveToFirebase(); renderAdminPanel(); });
       catSec.appendChild(categoriesContainer); catSec.appendChild(addCatBtn); adminContent.appendChild(catSec);
 
-      // Photo management
-      const photoSec = section('Φωτογραφίες & Άλμπουμ', 'fas fa-images');
+      // Manage Photo Categories Section
+      const catManagerSec = section('Διαχείριση Κατηγοριών Φωτογραφιών', 'fas fa-tags');
+      const catListDiv = document.createElement('div');
+      catListDiv.className = 'admin-field-group';
+      const renderCategoryList = () => {
+        catListDiv.innerHTML = '<label>Υπάρχουσες κατηγορίες</label>';
+        const cats = siteContent.photoCategories || [];
+        cats.forEach((cat, idx) => {
+          const catRow = document.createElement('div');
+          catRow.style.display = 'flex'; catRow.style.gap = '8px'; catRow.style.marginBottom = '8px'; catRow.style.alignItems = 'center';
+          const catNameSpan = document.createElement('span'); catNameSpan.style.flex = '1'; catNameSpan.style.background = '#0f172a'; catNameSpan.style.padding = '6px 12px'; catNameSpan.style.borderRadius = '30px'; catNameSpan.textContent = cat;
+          const editBtn = document.createElement('button'); editBtn.className = 'icon-btn'; editBtn.innerHTML = '<i class="fas fa-edit"></i>'; editBtn.style.width = 'auto'; editBtn.style.padding = '0 12px';
+          editBtn.addEventListener('click', () => {
+            const newName = prompt('Εισάγετε νέο όνομα για την κατηγορία:', cat);
+            if (newName && newName.trim() && newName.trim() !== cat) {
+              const oldName = cat;
+              const newNameTrim = newName.trim();
+              siteContent.photos.forEach(photo => {
+                if (photo.categories && photo.categories.includes(oldName)) {
+                  const idxCat = photo.categories.indexOf(oldName);
+                  if (idxCat !== -1) photo.categories[idxCat] = newNameTrim;
+                }
+              });
+              siteContent.photoCategories[idx] = newNameTrim;
+              saveToFirebase();
+              renderCategoryList();
+              renderMain();
+              renderAdminPanel();
+            }
+          });
+          const delBtn = document.createElement('button'); delBtn.className = 'icon-btn delete'; delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+          delBtn.addEventListener('click', () => {
+            showCodeModal(() => {
+              const catToRemove = cat;
+              siteContent.photos.forEach(photo => {
+                if (photo.categories) {
+                  photo.categories = photo.categories.filter(c => c !== catToRemove);
+                }
+              });
+              siteContent.photoCategories = siteContent.photoCategories.filter(c => c !== catToRemove);
+              saveToFirebase();
+              renderCategoryList();
+              renderMain();
+              renderAdminPanel();
+            });
+          });
+          catRow.append(catNameSpan, editBtn, delBtn);
+          catListDiv.appendChild(catRow);
+        });
+        const addCatRow = document.createElement('div'); addCatRow.style.display = 'flex'; addCatRow.style.gap = '8px'; addCatRow.style.marginTop = '12px';
+        const newCatInput = document.createElement('input'); newCatInput.type = 'text'; newCatInput.placeholder = 'Νέα κατηγορία'; newCatInput.style.flex = '1'; newCatInput.style.background = '#0f172a'; newCatInput.style.border = '1px solid #475569'; newCatInput.style.borderRadius = '30px'; newCatInput.style.padding = '8px 14px'; newCatInput.style.color = 'white';
+        const addCatBtn2 = document.createElement('button'); addCatBtn2.className = 'btn-secondary'; addCatBtn2.innerHTML = '<i class="fas fa-plus"></i> Προσθήκη';
+        addCatBtn2.addEventListener('click', () => {
+          const newCat = newCatInput.value.trim();
+          if (newCat && !siteContent.photoCategories.includes(newCat)) {
+            siteContent.photoCategories.push(newCat);
+            saveToFirebase();
+            renderCategoryList();
+            renderMain();
+            renderAdminPanel();
+            newCatInput.value = '';
+          } else if (siteContent.photoCategories.includes(newCat)) {
+            showToast('Η κατηγορία υπάρχει ήδη', 'error');
+          }
+        });
+        addCatRow.append(newCatInput, addCatBtn2);
+        catListDiv.appendChild(addCatRow);
+      };
+      renderCategoryList();
+      catManagerSec.appendChild(catListDiv);
+      adminContent.appendChild(catManagerSec);
+
+      // Photo management with edit categories for existing photos
+      const photoSec = section('Προσθήκη / Διαχείριση Φωτογραφιών', 'fas fa-images');
       const uploadDiv = document.createElement('div'); uploadDiv.className = 'admin-field-group';
       uploadDiv.innerHTML = `<label>URL εικόνας ή ανέβασμα</label><div style="display:flex; gap:8px;"><input type="text" id="photoUrlInput" placeholder="https://..."><button id="uploadPhotoBtn" class="btn-secondary"><i class="fas fa-cloud-upload-alt"></i> Ανέβασμα</button><button id="addPhotoBtnAdmin" class="btn-secondary"><i class="fas fa-plus"></i> Προσθήκη URL</button></div><input type="file" id="photoFileInput" accept="image/*" style="display:none;">`;
-      const albumDiv = document.createElement('div'); albumDiv.className = 'admin-field-group'; albumDiv.innerHTML = `<label>Άλμπουμ (προαιρετικό)</label><input type="text" id="photoAlbumInput" placeholder="π.χ. Εκδηλώσεις, Εκπαιδεύσεις">`;
-      photoSec.appendChild(uploadDiv); photoSec.appendChild(albumDiv);
+      const catSelectionDiv = document.createElement('div'); catSelectionDiv.className = 'admin-field-group';
+      catSelectionDiv.innerHTML = `<label>Επιλέξτε κατηγορίες για τη νέα φωτογραφία</label><div id="photoCategoriesCheckboxes" class="category-checkbox-group"></div>`;
+      photoSec.appendChild(uploadDiv); photoSec.appendChild(catSelectionDiv);
       const photoGrid = document.createElement('div'); photoGrid.className = 'photos-grid-modern';
-      const renderPhotos = () => {
+      const renderPhotosAdmin = () => {
         photoGrid.innerHTML = '';
         (siteContent.photos || []).forEach((item, i) => {
-          const url = typeof item === 'string' ? item : item.url;
-          const album = typeof item === 'object' ? item.album : '';
+          const url = item.url;
+          const categories = (item.categories || []).join(', ');
           const div = document.createElement('div'); div.className = 'photo-item-modern';
-          div.innerHTML = `<img src="${escapeHtml(url)}"><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-times"></i></button><div style="font-size:10px; color:#94a3b8;">${escapeHtml(album)}</div>`;
+          div.innerHTML = `<img src="${escapeHtml(url)}"><div class="photo-categories">${escapeHtml(categories)}</div><div class="photo-actions"><button class="edit-photo-modern" data-idx="${i}"><i class="fas fa-edit"></i></button><button class="delete-photo-modern" data-idx="${i}"><i class="fas fa-trash"></i></button></div>`;
           photoGrid.appendChild(div);
         });
+        // attach edit events
+        photoGrid.querySelectorAll('.edit-photo-modern').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.dataset.idx);
+            openEditPhotoModal(idx);
+          });
+        });
+        photoGrid.querySelectorAll('.delete-photo-modern').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.dataset.idx);
+            showCodeModal(() => {
+              siteContent.photos.splice(idx,1);
+              renderMain(); saveToFirebase(); renderAdminPanel();
+            });
+          });
+        });
       };
-      renderPhotos();
+      renderPhotosAdmin();
       photoSec.appendChild(photoGrid);
       adminContent.appendChild(photoSec);
 
-      // CSV Export
+      // Function to open edit modal for a photo
+      function openEditPhotoModal(photoIndex) {
+        currentEditingPhotoIndex = photoIndex;
+        const photo = siteContent.photos[photoIndex];
+        if (!photo) return;
+        const currentCats = photo.categories || [];
+        const allCats = siteContent.photoCategories || [];
+        editPhotoCategoriesContainer.innerHTML = '';
+        allCats.forEach(cat => {
+          const label = document.createElement('label');
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = cat;
+          if (currentCats.includes(cat)) cb.checked = true;
+          label.appendChild(cb);
+          label.appendChild(document.createTextNode(' ' + cat));
+          editPhotoCategoriesContainer.appendChild(label);
+        });
+        editPhotoModal.classList.add('show');
+      }
+
+      savePhotoCategoriesBtn.addEventListener('click', () => {
+        if (currentEditingPhotoIndex !== null) {
+          const selected = [];
+          const checkboxes = editPhotoCategoriesContainer.querySelectorAll('input[type="checkbox"]:checked');
+          checkboxes.forEach(cb => selected.push(cb.value));
+          siteContent.photos[currentEditingPhotoIndex].categories = selected;
+          saveToFirebase();
+          renderMain();
+          renderAdminPanel();
+          editPhotoModal.classList.remove('show');
+          currentEditingPhotoIndex = null;
+        }
+      });
+      cancelEditPhotoBtn.addEventListener('click', () => {
+        editPhotoModal.classList.remove('show');
+        currentEditingPhotoIndex = null;
+      });
+
+      // CSV Export, Backup, Import/Export, Audit, Footer (unchanged)
       const exportSec = section('Εξαγωγές CSV', 'fas fa-file-csv');
       const csvDiv = document.createElement('div'); csvDiv.className = 'admin-field-group';
       csvDiv.innerHTML = `<button id="exportPersonnelCSV" class="btn-secondary"><i class="fas fa-users"></i> Προσωπικό CSV</button> <button id="exportPenaltiesCSV" class="btn-secondary"><i class="fas fa-gavel"></i> Πειθαρχικά CSV</button> <button id="exportBlacklistCSV" class="btn-secondary"><i class="fas fa-user-slash"></i> Μαύρη Λίστα CSV</button>`;
       exportSec.appendChild(csvDiv); adminContent.appendChild(exportSec);
 
-      // Backup
       const backupSec = section('Αντίγραφο Ασφαλείας', 'fas fa-database');
       const backupBtn = document.createElement('button'); backupBtn.className = 'btn-primary'; backupBtn.innerHTML = '<i class="fas fa-upload"></i> Αποθήκευση Backup στο Storage';
       backupBtn.addEventListener('click', async () => {
@@ -1691,7 +1900,6 @@
       });
       backupSec.appendChild(backupBtn); adminContent.appendChild(backupSec);
 
-      // Import/Export with code
       const ieSec = section('Ασφαλής Εξαγωγή / Εισαγωγή', 'fas fa-exchange-alt');
       const codeGroup = document.createElement('div'); codeGroup.className = 'admin-field-group';
       const codeLabel = document.createElement('label'); codeLabel.textContent = 'Κωδικός ασφαλείας (από Firestore)'; codeLabel.style.fontWeight='600';
@@ -1702,7 +1910,6 @@
       codeGroup.append(codeLabel, codeInputSec, exportBtn, importBtn, statusMsg);
       ieSec.appendChild(codeGroup); adminContent.appendChild(ieSec);
 
-      // Audit Log
       const auditSec = section('Ημερολόγιο Αλλαγών', 'fas fa-history');
       const auditList = document.createElement('div'); auditList.style.maxHeight = '200px'; auditList.style.overflowY = 'auto'; auditList.style.backgroundColor = '#0f172a'; auditList.style.borderRadius = '16px'; auditList.style.padding = '12px';
       const loadAudit = async () => {
@@ -1717,29 +1924,75 @@
       loadAudit(); setInterval(loadAudit, 30000);
       auditSec.appendChild(auditList); adminContent.appendChild(auditSec);
 
-      // Footer
       const footSec = section('Υποσέλιδο', 'fas fa-credit-card');
       footSec.appendChild(addField('Αριστερό κείμενο', 'footer.left', siteContent.footer.left));
       footSec.appendChild(addField('Δεξί κείμενο', 'footer.right', siteContent.footer.right));
       adminContent.appendChild(footSec);
 
-      // Event listeners for photos and CSV
+      // Event listeners for adding new photos
       setTimeout(() => {
         const addBtn = document.getElementById('addPhotoBtnAdmin');
         const uploadBtn = document.getElementById('uploadPhotoBtn');
         const urlInput = document.getElementById('photoUrlInput');
-        const albumInput = document.getElementById('photoAlbumInput');
         const fileInput = document.getElementById('photoFileInput');
-        if(addBtn && urlInput) addBtn.addEventListener('click',()=>{ const url = urlInput.value.trim(); const album = albumInput.value.trim(); if(url){ if(!siteContent.photos) siteContent.photos=[]; siteContent.photos.push({ url, album }); renderMain(); saveToFirebase(); renderAdminPanel(); } });
+        const checkboxesDiv = document.getElementById('photoCategoriesCheckboxes');
+        function refreshCheckboxes() {
+          if (!checkboxesDiv) return;
+          const categories = siteContent.photoCategories || [];
+          checkboxesDiv.innerHTML = '';
+          categories.forEach(cat => {
+            const label = document.createElement('label');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = cat;
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(' ' + cat));
+            checkboxesDiv.appendChild(label);
+          });
+        }
+        refreshCheckboxes();
+        function getSelectedCategories() {
+          const selected = [];
+          if (checkboxesDiv) {
+            const checkboxes = checkboxesDiv.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => selected.push(cb.value));
+          }
+          return selected;
+        }
+        if(addBtn && urlInput) addBtn.addEventListener('click',()=>{ 
+          const url = urlInput.value.trim(); 
+          const categories = getSelectedCategories();
+          if(url){ 
+            if(!siteContent.photos) siteContent.photos=[]; 
+            siteContent.photos.push({ url, categories }); 
+            renderMain(); saveToFirebase(); renderAdminPanel(); 
+            urlInput.value = '';
+            refreshCheckboxes();
+            renderPhotosAdmin();
+          } 
+        });
         if(uploadBtn && fileInput) uploadBtn.addEventListener('click',()=> fileInput.click());
-        if(fileInput) fileInput.addEventListener('change', async (e) => { const file = e.target.files[0]; if(file && file.type.startsWith('image/')){ const storageRef = ref(storage, `gallery/${Date.now()}_${file.name}`); const snapshot = await uploadBytes(storageRef, file); const url = await getDownloadURL(snapshot.ref); const album = albumInput.value.trim(); siteContent.photos = siteContent.photos || []; siteContent.photos.push({ url, album }); renderMain(); saveToFirebase(); renderAdminPanel(); } });
-        document.querySelectorAll('.delete-photo-modern').forEach(btn => btn.addEventListener('click',(e)=>{ const idx = parseInt(e.currentTarget.dataset.idx); showCodeModal(() => { siteContent.photos.splice(idx,1); renderMain(); saveToFirebase(); renderAdminPanel(); }); }));
+        if(fileInput) fileInput.addEventListener('change', async (e) => { 
+          const file = e.target.files[0]; 
+          if(file && file.type.startsWith('image/')){
+            const storageRef = ref(storage, `gallery/${Date.now()}_${file.name}`); 
+            const snapshot = await uploadBytes(storageRef, file); 
+            const url = await getDownloadURL(snapshot.ref); 
+            const categories = getSelectedCategories();
+            siteContent.photos = siteContent.photos || []; 
+            siteContent.photos.push({ url, categories }); 
+            renderMain(); saveToFirebase(); renderAdminPanel(); 
+            fileInput.value = '';
+            refreshCheckboxes();
+            renderPhotosAdmin();
+          } 
+        });
         document.getElementById('exportPersonnelCSV')?.addEventListener('click', () => { let csv = "Όνομα,Επώνυμο,Βαθμός,Discord,Τηλέφωνο,Email\n"; siteContent.categories.forEach(cat => { if(cat.type === 'personnel') cat.officers.forEach(o => { csv += `"${o.firstName || ''}","${o.lastName || ''}","${o.rank || ''}","${o.discord || ''}","${o.phone || ''}","${o.email || ''}"\n`; }); }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'personnel.csv'; a.click(); URL.revokeObjectURL(a.href); });
         document.getElementById('exportPenaltiesCSV')?.addEventListener('click', () => { let csv = "Όνομα,Πειθαρχικό 1,Πειθαρχικό 2,Πειθαρχικό 3\n"; siteContent.categories.forEach(cat => { if(cat.type === 'penalties') cat.penalties.forEach(p => { csv += `"${p.name || ''}",${p.p1 ? 'X' : ''},${p.p2 ? 'X' : ''},${p.p3 ? 'X' : ''}\n`; }); }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'penalties.csv'; a.click(); URL.revokeObjectURL(a.href); });
         document.getElementById('exportBlacklistCSV')?.addEventListener('click', () => { let csv = "Όνομα,Βαθμός,Ημερομηνία Αποχώρησης,Αιτία\n"; siteContent.categories.forEach(cat => { if(cat.type === 'blacklist') cat.blacklist.forEach(b => { csv += `"${b.name || ''}","${b.rank || ''}","${b.dismissalDate || ''}","${b.reason || ''}"\n`; }); }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'blacklist.csv'; a.click(); URL.revokeObjectURL(a.href); });
       }, 200);
 
-      // Export/Import logic
+      // Export/Import logic unchanged
       exportBtn.addEventListener('click', async () => {
         const code = codeInputSec.value;
         if (!code) { statusMsg.innerHTML = '<i class="fas fa-times-circle"></i> Εισάγετε τον κωδικό ασφαλείας.'; return; }
@@ -1801,7 +2054,7 @@
     lightboxNext.addEventListener('click', nextImage);
     lightbox.addEventListener('click', (e) => { if (e.target === lightbox) hideLightbox(); });
 
-    // Authentication and main flow
+    // Authentication
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       if (user) {
@@ -1839,7 +2092,7 @@
     });
     loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('show'); });
 
-    // Dark mode toggle
+    // Dark mode
     const darkModeToggle = document.getElementById('darkModeToggle');
     darkModeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark');
@@ -1851,7 +2104,6 @@
     const adminToggleMobile = document.getElementById('adminToggleMobile');
     adminToggleMobile.addEventListener('click', () => { adminPanel.classList.toggle('open'); });
 
-    // Initial load will happen inside onAuthStateChanged
     setTimeout(() => {
       const loadingScreen = document.getElementById('loading-screen');
       if (loadingScreen) {
